@@ -7,6 +7,9 @@ const router = Router()
 // Generate a personalized sport program
 router.post('/generate', authenticate, controller.generateSportProgram)
 
+// Save a generated sport program
+router.post('/save', authenticate, controller.saveSportProgram)
+
 // Get active sport program
 router.get('/active', authenticate, controller.getActiveSportProgram)
 

@@ -1,15 +1,40 @@
 import pool from '../config/db.js'
+import { openaiGenerateJson } from '../services/openai.service.js'
+
+const SPORT_PROGRAM_SYSTEM = `You are a professional fitness and personal training assistant.
+Your goal is to generate a personalized weekly sport program for the user based on their profile, recent activities, and preferences.
+Return ONLY valid JSON. No markdown.
+
+JSON schema:
+{
+  "program_name": string (e.g., "Endurance Builder Pro"),
+  "target_objective": string (e.g., "Build endurance and lose weight"),
+  "weekly_sessions": number,
+  "session_duration_minutes": number,
+  "exercises": [
+    { "day": string (e.g., "Monday"), "activities": [string, string] }
+  ],
+  "recommendations": [string, string, ...]
+}
+
+Rules:
+- Be realistic and progressive.
+- Provide days where they rest.
+- Provide warmups and cooldowns in the activities list.
+- Do NOT wrap JSON in code blocks (\`\`\`json). Return raw JSON.
+`
 
 export const generateSportProgram = async (req, res) => {
   try {
     const userId = req.user.user_id
+    const { objective, level, sessionsPerWeek } = req.body
 
     // Get user profile and recent activities
     const userQuery = `
       SELECT age, weight_kg, height_cm, bmi FROM users WHERE id = ?
     `
     const [users] = await pool.execute(userQuery, [userId])
-    const user = users[0]
+    const user = users[0] || {}
 
     const activitiesQuery = `
       SELECT activity_type, SUM(duration_minutes) as total_minutes, COUNT(*) as count
@@ -20,20 +45,63 @@ export const generateSportProgram = async (req, res) => {
     `
     const [activities] = await pool.execute(activitiesQuery, [userId])
 
-    // Determine difficulty level based on user activity
-    let difficultyLevel = 'beginner'
-    const totalActivities = activities.reduce((sum, a) => sum + a.count, 0)
+    // Build the prompt
+    let userContext = `User Profile:\n`
+    if (user.age) userContext += `- Age: ${user.age}\n`
+    if (user.weight_kg) userContext += `- Weight: ${user.weight_kg} kg\n`
+    if (user.height_cm) userContext += `- Height: ${user.height_cm} cm\n`
+    if (user.bmi) userContext += `- BMI: ${user.bmi}\n`
 
-    if (totalActivities > 15) {
-      difficultyLevel = 'advanced'
-    } else if (totalActivities > 8) {
-      difficultyLevel = 'intermediate'
+    userContext += `\nRecent physical activities in the last 30 days:\n`
+    if (activities.length > 0) {
+      activities.forEach(a => {
+        userContext += `- ${a.activity_type}: ${a.count} sessions, ${a.total_minutes} total minutes\n`
+      })
+    } else {
+      userContext += `- No recent activities recorded.\n`
     }
 
-    // Generate program based on profile
-    const program = generateProgramContent(user, difficultyLevel, activities)
+    userContext += `\nUser Request:\n`
+    userContext += `- Objective: ${objective || 'General fitness'}\n`
+    userContext += `- Difficulty Level: ${level || 'Beginner'}\n`
+    userContext += `- Desired Sessions Per Week: ${sessionsPerWeek || 3}\n`
+    
+    userContext += `\nGenerate a weekly program that specifically perfectly fits these requirements.`
 
-    // Save program to database
+    console.log('[Generate Program] Calling OpenAI...')
+    const rawProgram = await openaiGenerateJson({
+      systemInstruction: SPORT_PROGRAM_SYSTEM,
+      userPrompt: userContext,
+      maxTokens: 2048,
+    })
+
+    // Return the generated program without saving it.
+    // Frontend will call /save to actually confirm it.
+    const program = {
+      ...rawProgram,
+      difficulty_level: level || 'beginner'
+    }
+
+    console.log('[Generate Program] Success')
+    res.status(200).json({
+      message: 'Sport program generated successfully',
+      program: program,
+    })
+  } catch (err) {
+    console.error('Error generating sport program:', err)
+    res.status(err.status || 500).json({ message: err.message || 'Failed to generate sport program' })
+  }
+}
+
+export const saveSportProgram = async (req, res) => {
+  try {
+    const userId = req.user.user_id
+    const { program } = req.body
+
+    if (!program) {
+      return res.status(400).json({ message: 'Missing program in request body' })
+    }
+
     const insertQuery = `
       INSERT INTO sport_programs (user_id, program_name, difficulty_level, target_objective, weekly_sessions, session_duration_minutes, exercises, recommendations, start_date, is_active)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURDATE(), TRUE)
@@ -41,26 +109,25 @@ export const generateSportProgram = async (req, res) => {
 
     const [result] = await pool.execute(insertQuery, [
       userId,
-      program.name,
-      difficultyLevel,
-      program.objective,
-      program.weeklySessions,
-      program.sessionDuration,
-      JSON.stringify(program.exercises),
-      JSON.stringify(program.recommendations),
+      program.program_name || 'Fitness Program',
+      program.difficulty_level || 'beginner',
+      program.target_objective || '',
+      program.weekly_sessions || 3,
+      program.session_duration_minutes || 45,
+      JSON.stringify(program.exercises || []),
+      JSON.stringify(program.recommendations || []),
     ])
 
     res.status(201).json({
-      message: 'Sport program generated successfully',
+      message: 'Sport program saved successfully',
       program: {
         id: result.insertId,
-        ...program,
-        difficultyLevel,
-      },
+        ...program
+      }
     })
   } catch (err) {
-    console.error('Error generating sport program:', err)
-    res.status(500).json({ message: 'Failed to generate sport program' })
+    console.error('Error saving sport program:', err)
+    res.status(500).json({ message: 'Failed to save sport program' })
   }
 }
 
@@ -136,71 +203,4 @@ export const deactivateSportProgram = async (req, res) => {
     console.error('Error deactivating program:', err)
     res.status(500).json({ message: 'Failed to deactivate program' })
   }
-}
-
-// Helper function to generate program content
-function generateProgramContent(user, difficulty, activities) {
-  const programs = {
-    beginner: {
-      name: 'Fitness Basics - Beginner',
-      objective: 'Build a solid fitness foundation',
-      weeklySessions: 3,
-      sessionDuration: 30,
-      exercises: [
-        { day: 'Monday', activities: ['Warm-up (5min)', 'Walking (20min)', 'Stretching (5min)'] },
-        { day: 'Wednesday', activities: ['Warm-up (5min)', 'Light cardio (20min)', 'Stretching (5min)'] },
-        { day: 'Friday', activities: ['Warm-up (5min)', 'Yoga/Pilates (20min)', 'Stretching (5min)'] },
-      ],
-      recommendations: [
-        'Start with low-intensity exercises',
-        'Focus on consistency rather than intensity',
-        'Increase intensity gradually',
-        'Stay hydrated and take rest days',
-        'Consider working with a trainer',
-      ],
-    },
-    intermediate: {
-      name: 'Fitness Plus - Intermediate',
-      objective: 'Improve endurance and strength',
-      weeklySessions: 4,
-      sessionDuration: 45,
-      exercises: [
-        { day: 'Monday', activities: ['Warm-up (5min)', 'Running (25min)', 'Strength (10min)', 'Cool down (5min)'] },
-        { day: 'Tuesday', activities: ['Yoga/Flexibility (30min)'] },
-        { day: 'Thursday', activities: ['Warm-up (5min)', 'Cycling (25min)', 'Core work (10min)', 'Cool down (5min)'] },
-        { day: 'Saturday', activities: ['Cross-training (45min)', 'Stretching (10min)'] },
-      ],
-      recommendations: [
-        'Mix cardio and strength training',
-        'Build to 150 minutes moderate cardio weekly',
-        'Include 2 days of strength training',
-        'Monitor progress weekly',
-        'Adjust intensity based on performance',
-      ],
-    },
-    advanced: {
-      name: 'Pro Athlete Program - Advanced',
-      objective: 'Maximize performance and endurance',
-      weeklySessions: 6,
-      sessionDuration: 60,
-      exercises: [
-        { day: 'Monday', activities: ['Warm-up (5min)', 'HIIT Training (30min)', 'Strength (20min)', 'Recovery (5min)'] },
-        { day: 'Tuesday', activities: ['Long run (45min)', 'Stretching (15min)'] },
-        { day: 'Wednesday', activities: ['Strength training (45min)', 'Core work (15min)'] },
-        { day: 'Thursday', activities: ['Speed work (30min)', 'Agility drills (20min)', 'Recovery (10min)'] },
-        { day: 'Friday', activities: ['Cross-training (45min)', 'Flexibility (15min)'] },
-        { day: 'Saturday', activities: ['Long training session (60min)'] },
-      ],
-      recommendations: [
-        'Monitor heart rate zones during training',
-        'Plan deload weeks every 4 weeks',
-        'Work on sport-specific skills',
-        'Track performance metrics',
-        'Consider professional coaching',
-        'Prioritize recovery and nutrition',
-      ],
-    },
-  }
-
-  return programs[difficulty] || programs.beginner
 }

@@ -41,13 +41,12 @@ export default function Header() {
         <nav className="wm-nav-center" aria-label="Main navigation">
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/">{t('common.home')}</NavLink>
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/health">{t('common.health')}</NavLink>
-          <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/gym">{t('common.gym')}</NavLink>
+          <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/physical-activity">{t('common.physicalActivity')}</NavLink>
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/events">{t('common.events')}</NavLink>
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/contact">{t('common.contact')}</NavLink>
         </nav>
 
         <div className="wm-auth">
-          <LanguageSelector />
           {me ? (
             <div className="wm-user" ref={menuRef}>
               <button className="wm-user-btn" type="button" onClick={() => setOpen((v) => !v)}>
@@ -87,6 +86,7 @@ export default function Header() {
               <NavLink className="wm-link-btn primary" to="/login">Log in</NavLink>
             </div>
           )}
+          <LanguageSelector />
         </div>
       </div>
     </header>

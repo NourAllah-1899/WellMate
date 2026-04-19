@@ -5,7 +5,7 @@ import Register from './pages/Register.jsx'
 import Login from './pages/Login.jsx'
 import Profile from './pages/Profile.jsx'
 import Health from './pages/Health.jsx'
-import Gym from './pages/Gym.jsx'
+import PhysicalActivity from './pages/PhysicalActivity.jsx'
 import Activity from './pages/Activity.jsx'
 import Events from './pages/Events.jsx'
 import Contact from './pages/Contact.jsx'
@@ -22,7 +22,7 @@ function App() {
       <Route path="/goals" element={<Layout><Goals /></Layout>} />
       <Route path="/meals" element={<Layout><Meals /></Layout>} />
       <Route path="/activity" element={<Layout><Activity /></Layout>} />
-      <Route path="/gym" element={<Layout><Gym /></Layout>} />
+      <Route path="/physical-activity" element={<Layout><PhysicalActivity /></Layout>} />
       <Route path="/events" element={<Layout><Events /></Layout>} />
       <Route path="/contact" element={<Layout><Contact /></Layout>} />
       <Route path="/register" element={<Layout><Register /></Layout>} />

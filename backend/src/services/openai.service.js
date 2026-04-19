@@ -47,7 +47,8 @@ const extractJson = (text) => {
 export const openaiGenerateJson = async ({ 
     systemInstruction, 
     userPrompt,
-    model = process.env.OPENAI_MODEL || 'gpt-4o-mini' 
+    model = process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    maxTokens = 512
 }) => {
     // Check API key before making request
     if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('replace-with-your-real')) {
@@ -78,7 +79,7 @@ export const openaiGenerateJson = async ({
                 },
             ],
             temperature: 0.2,
-            max_tokens: 512,
+            max_tokens: maxTokens,
             response_format: { type: 'json_object' }, // Enforce JSON response
         });
 
