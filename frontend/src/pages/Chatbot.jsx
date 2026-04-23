@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../api/client.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 

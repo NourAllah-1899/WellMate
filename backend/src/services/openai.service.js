@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 
 // Initialize OpenAI client
 let _openai = null;
-const getOpenAIClient = () => {
+export const getOpenAIClient = () => {
     if (_openai) return _openai;
     
     if (!process.env.OPENAI_API_KEY) {
@@ -57,7 +57,7 @@ const extractJson = (text) => {
 export const openaiGenerateJson = async ({ 
     systemInstruction, 
     userPrompt,
-    model = process.env.OPENAI_MODEL || 'google/gemini-2.0-flash-lite-preview-02-05:free',
+    model = process.env.OPENAI_MODEL || 'openai/gpt-oss-20b:free',
     maxTokens = 512
 }) => {
     console.log(`[AI Service] Using model: ${model}`);

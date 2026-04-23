@@ -1,13 +1,8 @@
 import express from 'express';
-import { openaiGenerateJson } from '../services/openai.service.js';
-import OpenAI from 'openai';
+import { openaiGenerateJson, getOpenAIClient } from '../services/openai.service.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
-
-// Helper to get raw text instead of JSON if needed, 
-// but we'll use a modified call to our existing service or the client directly.
-import { getOpenAIClient } from '../services/openai.service.js';
 
 // POST /api/chatbot/message (Protected)
 router.post('/message', authenticate, async (req, res) => {
@@ -17,41 +12,22 @@ router.post('/message', authenticate, async (req, res) => {
     return res.status(400).json({ error: 'Message is required' });
   }
 
-  const systemPrompt = `You are a health assistant integrated into the WellMate application.
-You can respond in English or French depending on the user's language.
+  const systemPrompt = `You are WellMate AI, a friendly but STRICT health assistant.
+You respond in English or French.
 
-You ONLY answer questions about:
-- health (santé)
-- BMI (IMC)
-- calories
-- nutrition (alimentation)
-- physical activity (activité physique)
-- daily habits (habitudes quotidiennes)
-- app usage (utilisation de l'application)
+CRITICAL RULES:
+- ONLY answer questions related to: health, BMI, calories, nutrition, physical activity, daily habits, and WellMate app.
+- If the user asks about ANYTHING else (sports stars like Messi, politics, etc.), you MUST politely refuse and say you only talk about health.
+- NEVER break character.
+- Keep responses EXTREMELY SHORT (max 2-3 sentences).
+- DO NOT provide "Follow-up questions" or "Solutions" or long paragraphs. 
+- Just give the answer directly and stop.
 
-If the question is outside this scope, politely refuse in the same language as the user.
-
-Always respond in the same language as the user's question. If the question is in French, respond in French. If in English, respond in English.`;
+Always match the user's language.`;
 
   try {
-    // Option 1: Using the OpenRouter we just set up (Recommended)
-    const openai = getOpenAIClient();
-    const completion = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'google/gemini-2.0-flash-lite-preview-02-05:free',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: message }
-      ],
-      temperature: 0.7,
-      max_tokens: 500
-    });
-
-    const reply = completion.choices[0]?.message?.content || 'No response from assistant';
-    res.json({ reply });
-
-    /* 
-    // Option 2: Using Ollama (Original request)
-    // Uncomment this and comment the OpenRouter part if you prefer local Ollama
+    // Using Ollama
+    console.log(`[Chatbot] Calling local Ollama with model: phi3:3.8b`);
     const response = await fetch('http://localhost:11434/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -61,12 +37,20 @@ Always respond in the same language as the user's question. If the question is i
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
         ],
-        stream: false
+        stream: false,
+        options: {
+          num_predict: 100, // Strictly limit the length of the response
+          temperature: 0.4, // Make it less creative and more direct
+        }
       })
     });
+
+    if (!response.ok) {
+      throw new Error(`Ollama API error: ${response.status}`);
+    }
+
     const data = await response.json();
-    res.json({ reply: data.message?.content });
-    */
+    res.json({ reply: data.message?.content || 'No response from Ollama' });
 
   } catch (error) {
     console.error('Chatbot error:', error);
