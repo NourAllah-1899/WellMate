@@ -7,6 +7,7 @@
     "activity": "Physical Activity",
     "physicalActivity": "Physical Activity",
     "events": "Events",
+    "chatbot": "Chatbot",
     "contact": "Contact",
     "profile": "My Profile",
     "logout": "Logout",
@@ -141,5 +142,15 @@
     "recentEvents": "Recent Health Events",
     "favoriteMeals": "Favorite Meals (30 days)",
     "personalHealthDashboard": "Your personal health dashboard & insights"
+  },
+  "chatbot": {
+    "title": "WellMate AI Assistant",
+    "subtitle": "Your health companion - Ask in English or French! 💬",
+    "welcome": "Welcome to WellMate Chat!",
+    "description": "I'm here to help with health, BMI, nutrition, physical activity, and daily habits. Ask me in English or French - I'll respond in your language!",
+    "placeholder": "Ask me about health, BMI, nutrition... (en anglais ou français)",
+    "thinking": "Thinking...",
+    "tip": "💡 Try asking: \"What is BMI?\", \"How many calories should I eat?\", \"Best exercises for weight loss\"",
+    "error": "Sorry, I could not process your message. Please try again."
   }
 }

@@ -7,6 +7,7 @@
     "activity": "Activité Physique",
     "physicalActivity": "Activité Physique",
     "events": "Événements",
+    "chatbot": "Chatbot",
     "contact": "Contact",
     "profile": "Mon Profil",
     "logout": "Déconnexion",
@@ -141,5 +142,15 @@
     "recentEvents": "Événements de Santé Récents",
     "favoriteMeals": "Repas Préférés (30 jours)",
     "personalHealthDashboard": "Votre tableau de bord santé personnel et vos statistiques"
+  },
+  "chatbot": {
+    "title": "Assistant IA WellMate",
+    "subtitle": "Votre compagnon santé - Posez vos questions en français ou anglais ! 💬",
+    "welcome": "Bienvenue sur le Chat WellMate !",
+    "description": "Je suis là pour vous aider avec votre santé, l'IMC, la nutrition, l'activité physique et vos habitudes. Posez-moi vos questions, je vous répondrai dans votre langue !",
+    "placeholder": "Posez-moi une question sur la santé, l'IMC... (in English or French)",
+    "thinking": "Réflexion...",
+    "tip": "💡 Essayez : \"C'est quoi l'IMC ?\", \"Combien de calories par jour ?\", \"Meilleurs exercices pour maigrir\"",
+    "error": "Désolé, je n'ai pas pu traiter votre message. Veuillez réessayer."
   }
 }

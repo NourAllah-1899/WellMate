@@ -12,6 +12,7 @@ import mealsRouter from './routes/meals.route.js';
 import activityRouter from './routes/activity.route.js';
 import smokingRouter from './routes/smoking.route.js';
 import programRouter from './routes/program.route.js';
+import chatbotRouter from './routes/chatbot.route.js';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/meals', mealsRouter);
 app.use('/api/activities', activityRouter);
 app.use('/api/smoking', smokingRouter);
 app.use('/api/programs', programRouter);
+app.use('/api/chatbot', chatbotRouter);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((_req, res) => {
