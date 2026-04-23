@@ -18,7 +18,7 @@ export default function Goals() {
 
   const [direction, setDirection] = useState('maintain')
   const [targetWeightKg, setTargetWeightKg] = useState('')
-  const [geminiSummary, setGeminiSummary] = useState('')
+  const [aiSummary, setAiSummary] = useState('')
 
   const fetchActive = async () => {
     const res = await api.get('/api/goals/active')
@@ -56,7 +56,7 @@ export default function Goals() {
 
       if (rec?.direction) setDirection(rec.direction)
       if (rec?.suggestedTargetWeightKg) setTargetWeightKg(String(rec.suggestedTargetWeightKg))
-      if (rec?.explanation) setGeminiSummary(String(rec.explanation))
+      if (rec?.explanation) setAiSummary(String(rec.explanation))
     } catch (err) {
       const msg = err?.response?.data?.message || 'Failed to get recommendation.'
       setApiError(msg)
@@ -72,7 +72,7 @@ export default function Goals() {
       const res = await api.post('/api/goals', {
         direction,
         targetWeightKg: Number(targetWeightKg),
-        geminiSummary,
+        aiSummary,
       })
       setActiveGoal(res?.data?.goal || null)
       navigate('/')
@@ -113,7 +113,7 @@ export default function Goals() {
           <div className="wm-panel">
             <div className="wm-kpi-label">{t('goals.currentGoal')}</div>
             <div className="wm-kpi">{activeGoal.direction} → {activeGoal.target_weight_kg} kg</div>
-            {activeGoal.gemini_summary ? <div className="wm-muted" style={{ marginTop: 10 }}>{activeGoal.gemini_summary}</div> : null}
+            {activeGoal.ai_summary ? <div className="wm-muted" style={{ marginTop: 10 }}>{activeGoal.ai_summary}</div> : null}
           </div>
         ) : (
           <div className="wm-panel">
@@ -166,8 +166,8 @@ export default function Goals() {
               {t('goals.summary')}
               <textarea
                 className="wm-input"
-                value={geminiSummary}
-                onChange={(e) => setGeminiSummary(e.target.value)}
+                value={aiSummary}
+                onChange={(e) => setAiSummary(e.target.value)}
                 rows={3}
                 placeholder=""
               />

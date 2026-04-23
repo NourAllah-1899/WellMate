@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS weight_goals (
     user_id INT NOT NULL,
     direction VARCHAR(20) NOT NULL,
     target_weight_kg DECIMAL(5,2) NOT NULL,
-    gemini_summary TEXT,
+    ai_summary TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,

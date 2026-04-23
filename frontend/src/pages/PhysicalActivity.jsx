@@ -47,12 +47,12 @@ const TODAY = new Date().toISOString().split('T')[0]
 
 function StatCard({ icon, label, value, sub }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-start gap-3 shadow-sm">
+    <div className="wm-card flex items-start gap-4">
       <div className="text-2xl leading-none mt-0.5">{icon}</div>
       <div>
-        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-0.5">{label}</div>
-        <div className="text-2xl font-black text-slate-900 leading-none">{value}</div>
-        {sub && <div className="text-xs text-slate-400 mt-1">{sub}</div>}
+        <div className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: 'var(--text-secondary)' }}>{label}</div>
+        <div className="text-2xl font-black leading-none" style={{ color: 'var(--text-primary)' }}>{value}</div>
+        {sub && <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{sub}</div>}
       </div>
     </div>
   )
@@ -63,21 +63,21 @@ function ActivityCard({ activity, onDelete, onEdit }) {
   const intensityClass = INTENSITY_COLORS[activity.intensity] || 'bg-slate-50 text-slate-700 border-slate-200'
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-start justify-between gap-4">
+    <div className="wm-panel flex items-start justify-between gap-4">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-1">
-          <span className="font-bold text-slate-900 capitalize">{label}</span>
+          <span className="font-bold capitalize" style={{ color: 'var(--text-heading)' }}>{label}</span>
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${intensityClass}`}>
             {INTENSITY_LABELS[activity.intensity] || activity.intensity}
           </span>
         </div>
-        <div className="text-sm text-slate-500">
+        <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
           {activity.duration_minutes} min
           {activity.calories_burned ? ` · ${activity.calories_burned} kcal` : ''}
           {activity.activity_date ? ` · ${activity.activity_date}` : ''}
         </div>
         {activity.description && (
-          <div className="text-sm text-slate-600 mt-1 italic">{activity.description}</div>
+          <div className="text-sm mt-1 italic" style={{ color: 'var(--text-muted)' }}>{activity.description}</div>
         )}
       </div>
       <div className="flex gap-2 shrink-0">
@@ -114,22 +114,22 @@ function EmptyState({ icon, title, desc }) {
 
 function DayCard({ day, activities }) {
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-      <div className="bg-indigo-600 px-4 py-2">
+    <div className="wm-panel overflow-hidden p-0" style={{ padding: 0 }}>
+      <div style={{ backgroundColor: 'var(--brand-primary)' }} className="px-4 py-2">
         <span className="text-sm font-black text-white tracking-wide">{day}</span>
       </div>
       <div className="p-4">
         {activities && activities.length > 0 ? (
           <ul className="space-y-1.5">
             {activities.map((act, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                <span className="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+              <li key={i} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <span className="mt-1 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: 'var(--brand-action)' }} />
                 {act}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-slate-400 italic">Repos</p>
+          <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>Repos</p>
         )}
       </div>
     </div>
@@ -306,8 +306,8 @@ export default function PhysicalActivity() {
 
         {/* ── Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-black text-slate-900">Activité physique</h1>
-          <p className="text-slate-500 mt-1 text-sm">
+          <h1 className="text-2xl font-black" style={{ color: 'var(--text-heading)' }}>Activité physique</h1>
+          <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
             Suivez vos séances et générez un programme sportif personnalisé.
           </p>
         </div>
@@ -367,8 +367,8 @@ export default function PhysicalActivity() {
             </div>
 
             {/* Add / Edit form */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-base font-black text-slate-800 mb-4">
+            <div className="wm-card">
+              <h2 className="text-base font-black mb-4">
                 {editingId ? '✏️ Modifier l\'activité' : '➕ Enregistrer une activité'}
               </h2>
 
@@ -456,8 +456,8 @@ export default function PhysicalActivity() {
             </div>
 
             {/* History */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-base font-black text-slate-800 mb-4">
+            <div className="wm-card">
+              <h2 className="text-base font-black mb-4">
                 📅 Activités d'aujourd'hui
               </h2>
 
@@ -500,9 +500,9 @@ export default function PhysicalActivity() {
             )}
 
             {/* Preferences form */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <h2 className="text-base font-black text-slate-800 mb-1">⚙️ Vos préférences</h2>
-              <p className="text-sm text-slate-400 mb-4">
+            <div className="wm-card">
+              <h2 className="text-base font-black mb-1">⚙️ Vos préférences</h2>
+              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                 Configurez vos objectifs pour générer un programme adapté.
               </p>
 
@@ -559,14 +559,14 @@ export default function PhysicalActivity() {
 
             {/* Generated program */}
             {progLoading && !sportProgram && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center">
+              <div className="wm-card text-center">
                 <div className="text-3xl mb-2">⏳</div>
-                <p className="text-slate-500 text-sm">Génération du programme en cours…</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Génération du programme en cours…</p>
               </div>
             )}
 
             {!progLoading && !sportProgram && !progError && (
-              <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <div className="wm-card">
                 <EmptyState
                   icon="📋"
                   title="Aucun programme généré"
@@ -578,11 +578,11 @@ export default function PhysicalActivity() {
             {sportProgram && (
               <div className="space-y-5">
                 {/* Program header */}
-                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div className="wm-card">
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
-                      <h2 className="text-lg font-black text-slate-900">{sportProgram.program_name}</h2>
-                      <p className="text-sm text-slate-500 mt-0.5">{sportProgram.target_objective}</p>
+                      <h2 className="text-lg font-black">{sportProgram.program_name}</h2>
+                      <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>{sportProgram.target_objective}</p>
                     </div>
                     {sportProgram.difficulty_level && (
                       <span className="text-xs font-black px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 shrink-0">
@@ -629,8 +629,8 @@ export default function PhysicalActivity() {
 
                 {/* Weekly schedule day cards */}
                 {Array.isArray(sportProgram.exercises) && sportProgram.exercises.length > 0 && (
-                  <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h2 className="text-base font-black text-slate-800 mb-4">📆 Planning hebdomadaire</h2>
+                  <div className="wm-card">
+                    <h2 className="text-base font-black mb-4">📆 Planning hebdomadaire</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {sportProgram.exercises.map((ex, idx) => (
                         <DayCard key={idx} day={ex.day} activities={ex.activities} />
@@ -641,11 +641,11 @@ export default function PhysicalActivity() {
 
                 {/* Recommendations */}
                 {Array.isArray(sportProgram.recommendations) && sportProgram.recommendations.length > 0 && (
-                  <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h2 className="text-base font-black text-slate-800 mb-3">💡 Recommandations</h2>
+                  <div className="wm-card">
+                    <h2 className="text-base font-black mb-3">💡 Recommandations</h2>
                     <ul className="space-y-2">
                       {sportProgram.recommendations.map((rec, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-slate-600">
+                        <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                           <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
                           {rec}
                         </li>

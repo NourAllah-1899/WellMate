@@ -4,13 +4,46 @@
 
 @layer base {
   :root {
+    --bg-main: #F8FAFC;
+    --bg-secondary: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --text-primary: #0B1020;
+    --text-heading: #1E2433;
+    --text-secondary: #6B7280;
+    --text-muted: #94A3B8;
+    --brand-primary: #7C3AED;
+    --brand-action: #2D7FF9;
+    --brand-hover: #00D4E0;
+    --brand-highlight: #FF5BAE;
+    --border-main: #E5E7EB;
+    --border-input: #CBD5E1;
     --bg-gradient: radial-gradient(1200px 600px at 20% 0%, #e0f2fe 0%, transparent 55%),
-      radial-gradient(1200px 600px at 80% 0%, #ede9fe 0%, transparent 55%),
-      #f8fafc;
+      radial-gradient(1200px 600px at 80% 0%, #ede9fe 0%, transparent 55%), var(--bg-main);
+  }
+
+  body.dark {
+    --bg-main: #0B1020;
+    --bg-secondary: #111827;
+    --bg-card: #1E2433;
+    --text-primary: #FFFFFF;
+    --text-heading: #FFFFFF;
+    --text-secondary: #E5E7EB;
+    --text-muted: #94A3B8;
+    --border-main: #2A3348;
+    --border-input: #334155;
+    --bg-gradient: radial-gradient(800px 500px at 20% -10%, #1a233b 0%, transparent 70%),
+      radial-gradient(800px 500px at 80% -10%, #20163b 0%, transparent 70%), var(--bg-main);
   }
   
   body {
-    @apply m-0 min-h-screen text-slate-900 bg-[image:var(--bg-gradient)] font-sans antialiased p-4 md:p-8;
+    @apply m-0 min-h-screen font-sans antialiased p-4 md:p-8 transition-colors duration-300;
+    background-image: var(--bg-gradient);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--text-heading);
   }
 
   h1 {
@@ -29,7 +62,9 @@
   }
 
   .wm-card {
-    @apply bg-white/90 border border-slate-900/10 shadow-[0_20px_40px_rgba(15,23,42,0.08)] rounded-2xl p-5 backdrop-blur-md;
+    @apply rounded-2xl p-5 shadow-[0_20px_40px_rgba(15,23,42,0.08)] backdrop-blur-md transition-colors duration-300;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-main);
   }
 
   .wm-header {
@@ -37,7 +72,8 @@
   }
 
   .wm-subtitle {
-    @apply mt-1.5 text-slate-700/80;
+    @apply mt-1.5;
+    color: var(--text-secondary);
   }
 
   .wm-nav {
@@ -45,7 +81,10 @@
   }
 
   .wm-pill {
-    @apply inline-flex items-center gap-2 px-3 py-2 rounded-full bg-indigo-600/10 border border-indigo-600/20 text-indigo-700 font-medium;
+    @apply inline-flex items-center gap-2 px-3 py-2 rounded-full font-medium;
+    background-color: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--brand-primary) 20%, transparent);
+    color: var(--brand-primary);
   }
 
   /* Form */
@@ -54,27 +93,38 @@
   }
 
   .wm-field {
-    @apply block mt-3.5 text-slate-900/90 font-semibold text-[0.95rem];
+    @apply block mt-3.5 font-semibold text-[0.95rem];
+    color: var(--text-heading);
   }
 
   .wm-input {
-    @apply w-full mt-2 px-3 py-3 rounded-xl border border-slate-900/15 bg-white outline-none transition-all duration-200 focus:border-indigo-600/60 focus:ring-4 focus:ring-indigo-600/15;
+    @apply w-full mt-2 px-3 py-3 rounded-xl outline-none transition-all duration-200;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-input);
+    color: var(--text-primary);
+  }
+  .wm-input:focus {
+    border-color: var(--brand-hover);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-hover) 15%, transparent);
   }
 
   .wm-btn {
-    @apply w-full mt-4 px-3.5 py-3 rounded-xl border border-indigo-600/30 bg-gradient-to-br from-indigo-600 to-purple-600 text-white font-bold cursor-pointer transition-transform duration-75 hover:brightness-110 active:translate-y-px disabled:grayscale disabled:opacity-70 disabled:cursor-not-allowed;
+    @apply w-full mt-4 px-3.5 py-3 rounded-xl font-bold cursor-pointer transition-transform duration-75 hover:brightness-110 active:translate-y-px disabled:grayscale disabled:opacity-70 disabled:cursor-not-allowed text-white border-0;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-action));
   }
 
   .wm-btn.secondary {
-    @apply bg-none bg-slate-200 border-slate-300 text-slate-800;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
   }
 
   .wm-btn.success {
-    @apply bg-none bg-gradient-to-br from-emerald-500 to-teal-600 border-emerald-600/30 text-white;
+    @apply bg-gradient-to-br from-emerald-500 to-teal-600 text-white;
   }
 
   .wm-btn.error {
-    @apply bg-none bg-gradient-to-br from-red-500 to-rose-600 border-red-600/30 text-white;
+    @apply bg-gradient-to-br from-red-500 to-rose-600 text-white;
   }
 
   .wm-btn.small {
@@ -83,40 +133,47 @@
 
   /* Alerts */
   .wm-error {
-    @apply mt-2 text-red-700;
+    @apply mt-2 text-red-500;
   }
 
   .wm-success {
-    @apply mt-2 text-green-700;
+    @apply mt-2 text-emerald-500;
   }
 
   .wm-panel {
-    @apply mt-3.5 p-3 rounded-xl border border-slate-900/10 bg-white/75;
+    @apply mt-3.5 p-3 rounded-xl;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-main);
   }
 
   .wm-muted {
-    @apply text-slate-700/80;
+    color: var(--text-muted);
   }
 
   .wm-badge {
-    @apply inline-flex items-center px-2.5 py-1.5 rounded-full font-black text-sm border border-slate-900/10 bg-white/70 text-slate-800/90;
+    @apply inline-flex items-center px-2.5 py-1.5 rounded-full font-black text-sm;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
   }
 
   .wm-badge.success {
-    @apply border-emerald-500/30 bg-emerald-500/10 text-emerald-800;
+    @apply border-emerald-500/30 bg-emerald-500/10 text-emerald-600;
   }
 
   .wm-badge.warn {
-    @apply border-amber-500/30 bg-amber-500/10 text-amber-800;
+    @apply border-amber-500/30 bg-amber-500/10 text-amber-600;
   }
 
   .wm-badge.danger {
-    @apply border-red-500/30 bg-red-500/10 text-red-900;
+    @apply border-red-500/30 bg-red-500/10 text-red-500;
   }
 
   /* Topbar */
   .wm-topbar {
-    @apply relative z-50 bg-slate-50/75 backdrop-blur-md border-b border-slate-900/10;
+    @apply relative z-50 backdrop-blur-md transition-colors duration-300;
+    background-color: color-mix(in srgb, var(--bg-main) 75%, transparent);
+    border-bottom: 1px solid var(--border-main);
   }
 
   .wm-topbar-inner {
@@ -129,16 +186,21 @@
   }
 
   .wm-brand {
-    @apply inline-flex items-center gap-2.5 text-indigo-600 font-medium hover:text-indigo-800;
+    @apply inline-flex items-center gap-2.5 font-medium;
+    color: var(--brand-primary);
+  }
+  .wm-brand:hover {
+    color: var(--brand-hover);
   }
 
   .wm-logo {
-    @apply w-14 h-14 object-contain;
+    @apply h-12 w-auto object-contain;
     image-rendering: -webkit-optimize-contrast;
   }
 
   .wm-brand-text {
-    @apply font-black tracking-tight text-slate-900;
+    @apply font-black tracking-tight;
+    color: var(--text-heading);
   }
 
   .wm-nav-center {
@@ -146,11 +208,18 @@
   }
 
   .wm-nav-link {
-    @apply px-2.5 py-2 rounded-lg text-slate-700/80 font-bold hover:bg-indigo-600/10 hover:text-slate-900/90;
+    @apply px-2.5 py-2 rounded-lg font-bold transition-colors duration-200;
+    color: var(--text-secondary);
+  }
+  
+  .wm-nav-link:hover {
+    background-color: color-mix(in srgb, var(--brand-action) 10%, transparent);
+    color: var(--text-primary);
   }
 
   .wm-nav-link.is-active {
-    @apply bg-indigo-600/10 text-indigo-900;
+    background-color: color-mix(in srgb, var(--brand-primary) 15%, transparent);
+    color: var(--brand-primary);
   }
 
   .wm-auth {
@@ -162,11 +231,19 @@
   }
 
   .wm-link-btn {
-    @apply inline-flex items-center justify-center px-3 py-2 rounded-xl border border-slate-900/10 bg-white/70 text-slate-800/90 font-extrabold hover:bg-white/95;
+    @apply inline-flex items-center justify-center px-3 py-2 rounded-xl font-extrabold transition-colors duration-200;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
+  }
+  .wm-link-btn:hover {
+    brightness: 110%;
   }
 
   .wm-link-btn.primary {
-    @apply border-indigo-600/25 bg-indigo-600/10 text-indigo-900;
+    background-color: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+    border-color: color-mix(in srgb, var(--brand-primary) 25%, transparent);
+    color: var(--brand-primary);
   }
 
   .wm-user {
@@ -174,27 +251,37 @@
   }
 
   .wm-user-btn {
-    @apply inline-flex items-center gap-2.5 px-2.5 py-2 rounded-full border border-slate-900/10 bg-white/75 cursor-pointer font-sans;
+    @apply inline-flex items-center gap-2.5 px-2.5 py-2 rounded-full cursor-pointer font-sans transition-colors duration-200;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
   }
 
   .wm-avatar {
-    @apply w-8 h-8 rounded-full inline-flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-600 text-white font-black text-sm;
+    @apply w-8 h-8 rounded-full inline-flex items-center justify-center text-white font-black text-sm;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-action));
   }
 
   .wm-user-name {
-    @apply font-black text-slate-900/90 max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap;
+    @apply font-black max-w-[160px] overflow-hidden text-ellipsis whitespace-nowrap;
   }
 
   .wm-menu {
-    @apply absolute right-0 top-[calc(100%+10px)] min-w-[180px] bg-white/95 border border-slate-900/10 shadow-[0_20px_40px_rgba(15,23,42,0.12)] rounded-xl p-2 z-[1000];
+    @apply absolute right-0 top-[calc(100%+10px)] min-w-[180px] shadow-[0_20px_40px_rgba(15,23,42,0.12)] rounded-xl p-2 z-[1000];
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-main);
   }
 
   .wm-menu-item {
-    @apply w-full text-left border-0 bg-transparent px-2.5 py-2.5 rounded-lg cursor-pointer font-extrabold text-slate-900/90 hover:bg-slate-900/5 font-sans;
+    @apply w-full text-left border-0 bg-transparent px-2.5 py-2.5 rounded-lg cursor-pointer font-extrabold font-sans;
+    color: var(--text-primary);
+  }
+  .wm-menu-item:hover {
+    background-color: var(--bg-secondary);
   }
 
   .wm-menu-item.danger {
-    @apply text-red-700;
+    @apply text-red-500;
   }
 
   /* Globe Language Selector */
@@ -203,7 +290,15 @@
   }
 
   .wm-lang-btn {
-    @apply inline-flex items-center gap-1.5 px-2.5 py-2 rounded-xl border border-slate-900/10 bg-white/70 text-slate-700 font-bold cursor-pointer transition-all duration-150 hover:bg-white/95 hover:text-indigo-700 hover:border-indigo-400/30 hover:shadow-sm font-sans;
+    @apply inline-flex items-center gap-1.5 px-2.5 py-2 rounded-xl cursor-pointer font-bold transition-all duration-150 font-sans;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-main);
+    color: var(--text-secondary);
+  }
+  .wm-lang-btn:hover {
+    background-color: var(--bg-secondary);
+    color: var(--brand-primary);
+    border-color: color-mix(in srgb, var(--brand-primary) 30%, transparent);
   }
 
   .wm-lang-code {
@@ -213,21 +308,28 @@
   .wm-lang-chevron {
     @apply transition-transform duration-200;
   }
-
   .wm-lang-chevron.rotated {
     @apply rotate-180;
   }
 
   .wm-lang-menu {
-    @apply absolute right-0 top-[calc(100%+8px)] min-w-[160px] bg-white/95 backdrop-blur-md border border-slate-900/10 shadow-[0_20px_40px_rgba(15,23,42,0.12)] rounded-xl p-1.5 z-[1000];
+    @apply absolute right-0 top-[calc(100%+8px)] min-w-[160px] backdrop-blur-md border shadow-[0_20px_40px_rgba(15,23,42,0.12)] rounded-xl p-1.5 z-[1000];
+    background-color: var(--bg-card);
+    border-color: var(--border-main);
   }
 
   .wm-lang-option {
-    @apply w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border-0 bg-transparent cursor-pointer text-slate-700 font-semibold text-sm transition-colors duration-100 hover:bg-indigo-50 hover:text-indigo-800 font-sans;
+    @apply w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border-0 bg-transparent cursor-pointer font-semibold text-sm font-sans transition-colors duration-100;
+    color: var(--text-secondary);
+  }
+  .wm-lang-option:hover {
+    background-color: var(--bg-secondary);
+    color: var(--brand-primary);
   }
 
   .wm-lang-option.active {
-    @apply bg-indigo-600/10 text-indigo-900;
+    background-color: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+    color: var(--brand-primary);
   }
 
   .wm-lang-flag {
@@ -235,9 +337,10 @@
   }
 
   .wm-lang-check {
-    @apply ml-auto text-indigo-600;
+    color: var(--brand-action);
   }
 }
+
 
 @media (max-width: 900px) {
   .wm-topbar-inner {

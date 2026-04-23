@@ -1,14 +1,24 @@
 import OpenAI from 'openai';
 
 // Initialize OpenAI client
-let openai = null;
-try {
-    openai = new OpenAI({
+let _openai = null;
+const getOpenAIClient = () => {
+    if (_openai) return _openai;
+    
+    if (!process.env.OPENAI_API_KEY) {
+        throw new Error('OPENAI_API_KEY is missing in .env');
+    }
+
+    _openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
+        baseURL: process.env.OPENAI_BASE_URL || 'https://openrouter.ai/api/v1',
+        defaultHeaders: {
+            "HTTP-Referer": "http://localhost:3000",
+            "X-Title": "WellMate",
+        }
     });
-} catch (err) {
-    console.error('OpenAI client initialization error:', err.message);
-}
+    return _openai;
+};
 
 const extractJson = (text) => {
     if (!text) return null;
@@ -47,9 +57,10 @@ const extractJson = (text) => {
 export const openaiGenerateJson = async ({ 
     systemInstruction, 
     userPrompt,
-    model = process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    model = process.env.OPENAI_MODEL || 'google/gemini-2.0-flash-lite-preview-02-05:free',
     maxTokens = 512
 }) => {
+    console.log(`[AI Service] Using model: ${model}`);
     // Check API key before making request
     if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY.includes('replace-with-your-real')) {
         const err = new Error('OPENAI_API_KEY is not configured. Please set a valid API key in your .env file.');
@@ -57,11 +68,7 @@ export const openaiGenerateJson = async ({
         throw err;
     }
 
-    if (!openai) {
-        const err = new Error('OpenAI client not initialized. Check your API key.');
-        err.status = 500;
-        throw err;
-    }
+    const openai = getOpenAIClient();
 
     try {
         console.log(`[OpenAI] Calling model: ${model}`);
@@ -80,7 +87,7 @@ export const openaiGenerateJson = async ({
             ],
             temperature: 0.2,
             max_tokens: maxTokens,
-            response_format: { type: 'json_object' }, // Enforce JSON response
+            // response_format: { type: 'json_object' }, // Disabled for OpenRouter compatibility with free models
         });
 
         const text = response.choices[0]?.message?.content;

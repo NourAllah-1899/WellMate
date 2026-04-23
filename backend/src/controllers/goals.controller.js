@@ -59,7 +59,7 @@ export const getActiveGoal = async (req, res) => {
     try {
         const userId = req.user.user_id;
         const [rows] = await pool.query(
-            'SELECT id, direction, target_weight_kg, gemini_summary, created_at, updated_at FROM weight_goals WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+            'SELECT id, direction, target_weight_kg, ai_summary, created_at, updated_at FROM weight_goals WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
             [userId]
         );
         res.json({ success: true, goal: rows[0] || null });
@@ -138,7 +138,7 @@ Return JSON only following the schema.`;
 
 // POST /api/goals (protected)
 export const createGoal = async (req, res) => {
-    const { direction, targetWeightKg, geminiSummary } = req.body;
+    const { direction, targetWeightKg, aiSummary } = req.body;
 
     if (!direction || !['lose', 'gain', 'maintain'].includes(direction)) {
         return res.status(400).json({ success: false, message: 'direction must be lose, gain, or maintain.' });
@@ -152,12 +152,12 @@ export const createGoal = async (req, res) => {
     try {
         const userId = req.user.user_id;
         const [result] = await pool.query(
-            'INSERT INTO weight_goals (user_id, direction, target_weight_kg, gemini_summary) VALUES (?, ?, ?, ?)',
-            [userId, direction, target, geminiSummary || null]
+            'INSERT INTO weight_goals (user_id, direction, target_weight_kg, ai_summary) VALUES (?, ?, ?, ?)',
+            [userId, direction, target, aiSummary || null]
         );
 
         const [rows] = await pool.query(
-            'SELECT id, direction, target_weight_kg, gemini_summary, created_at, updated_at FROM weight_goals WHERE id = ?',
+            'SELECT id, direction, target_weight_kg, ai_summary, created_at, updated_at FROM weight_goals WHERE id = ?',
             [result.insertId]
         );
 

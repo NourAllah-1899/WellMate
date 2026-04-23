@@ -31,21 +31,21 @@
 .stat-card {
   padding: 24px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background-color: #fff;
+  border: 1px solid var(--border-main);
+  background-color: var(--bg-card);
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  border-color: #667eea;
+  border-color: var(--brand-action);
 }
 
 .stat-card h3 {
   margin: 0 0 16px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-heading);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -67,7 +67,7 @@
 .stat-label {
   font-size: 12px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -75,13 +75,13 @@
 .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: #667eea;
+  color: var(--brand-action);
   line-height: 1;
 }
 
 .stat-sublabel {
   font-size: 11px;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
@@ -98,21 +98,21 @@
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background-color: #f9fafb;
+  background-color: var(--bg-secondary);
   border-radius: 8px;
-  border-left: 3px solid #667eea;
+  border-left: 3px solid var(--brand-primary);
 }
 
 .weight-date {
   font-size: 12px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .weight-val {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .change-indicator {
@@ -127,12 +127,12 @@
 }
 
 .change-indicator.gain {
-  background-color: #fee2e2;
+  background-color: color-mix(in srgb, #dc2626 15%, transparent);
   color: #dc2626;
 }
 
 .change-indicator.loss {
-  background-color: #dcfce7;
+  background-color: color-mix(in srgb, #16a34a 15%, transparent);
   color: #16a34a;
 }
 
@@ -145,14 +145,14 @@
 .calorie-value {
   font-size: 36px;
   font-weight: 700;
-  color: #667eea;
+  color: var(--brand-action);
   display: block;
   line-height: 1;
 }
 
 .calorie-label {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-secondary);
   margin-top: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -169,13 +169,13 @@
 .goal-direction {
   font-size: 24px;
   font-weight: 700;
-  color: #764ba2;
+  color: var(--brand-primary);
 }
 
 .goal-target {
   font-size: 28px;
   font-weight: 700;
-  color: #667eea;
+  color: var(--brand-action);
 }
 
 /* Action Grid */
@@ -189,8 +189,8 @@
 .section-card {
   padding: 24px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background-color: #fff;
+  border: 1px solid var(--border-main);
+  background-color: var(--bg-card);
   margin-bottom: 20px;
 }
 
@@ -198,7 +198,7 @@
   margin: 0 0 16px 0;
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-heading);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -213,16 +213,16 @@
 
 .event-item {
   padding: 12px;
-  background-color: #f9fafb;
+  background-color: var(--bg-secondary);
   border-radius: 8px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--brand-primary);
 }
 
 .event-type {
   display: inline-block;
   padding: 4px 8px;
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+  color: var(--brand-primary);
   border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
@@ -233,14 +233,14 @@
 
 .event-desc {
   font-size: 14px;
-  color: #1f2937;
+  color: var(--text-primary);
   font-weight: 500;
   margin-bottom: 6px;
 }
 
 .event-date {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 /* Meals List */
@@ -255,15 +255,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background-color: #f9fafb;
+  background-color: var(--bg-secondary);
   border-radius: 8px;
-  border-left: 3px solid #f59e0b;
+  border-left: 3px solid var(--brand-highlight);
 }
 
 .meal-name {
   font-size: 14px;
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .meal-count {
@@ -272,8 +272,8 @@
   justify-content: center;
   min-width: 32px;
   height: 32px;
-  background-color: #fef3c7;
-  color: #d97706;
+  background-color: color-mix(in srgb, var(--brand-highlight) 15%, transparent);
+  color: var(--brand-highlight);
   border-radius: 50%;
   font-size: 12px;
   font-weight: 600;

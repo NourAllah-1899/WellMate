@@ -2,8 +2,10 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
 import LanguageSelector from './LanguageSelector.jsx'
-import logo from '../assets/wellmate-logo.png'
+import logoLight from '../assets/WellMate_light.png'
+import logoDark from '../assets/WellMate_dark.png'
 
 const initials = (name) => {
   const s = String(name || '').trim()
@@ -16,6 +18,7 @@ export default function Header() {
   const navigate = useNavigate()
   const { me, logout } = useAuth()
   const { t } = useLanguage()
+  const { isDarkMode, toggleTheme } = useTheme()
   const [open, setOpen] = useState(false)
   const menuRef = useRef(null)
 
@@ -34,8 +37,7 @@ export default function Header() {
     <header className="wm-topbar">
       <div className="wm-topbar-inner">
         <NavLink to="/" className="wm-brand" aria-label="WellMate Home">
-          <img className="wm-logo" src={logo} alt="WellMate" />
-          <span className="wm-brand-text">WellMate</span>
+          <img key={isDarkMode ? 'dark' : 'light'} className="wm-logo" src={isDarkMode ? logoDark : logoLight} alt="WellMate" />
         </NavLink>
 
         <nav className="wm-nav-center" aria-label="Main navigation">
@@ -86,7 +88,17 @@ export default function Header() {
               <NavLink className="wm-link-btn primary" to="/login">Log in</NavLink>
             </div>
           )}
-          <LanguageSelector />
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <button 
+              type="button" 
+              className="wm-lang-btn" 
+              onClick={toggleTheme} 
+              aria-label="Toggle theme"
+            >
+              {isDarkMode ? '🌙' : '☀️'}
+            </button>
+            <LanguageSelector />
+          </div>
         </div>
       </div>
     </header>

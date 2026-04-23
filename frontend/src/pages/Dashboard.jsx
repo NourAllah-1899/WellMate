@@ -192,7 +192,7 @@ export default function Dashboard() {
                     <div className="goal-direction">{goal.direction}</div>
                     <div className="goal-target">{goal.target_weight_kg} kg</div>
                   </div>
-                  <p className="wm-muted">{goal.gemini_summary || t('dashboard.workingTowards')}</p>
+                  <p className="wm-muted">{goal.ai_summary || t('dashboard.workingTowards')}</p>
                 </>
               ) : (
                 <>

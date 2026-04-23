@@ -24,7 +24,7 @@ export const getDashboard = async (req, res) => {
         let goal = null;
         try {
             const [gRows] = await pool.query(
-                'SELECT id, direction, target_weight_kg, gemini_summary, created_at, updated_at FROM weight_goals WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
+                'SELECT id, direction, target_weight_kg, ai_summary, created_at, updated_at FROM weight_goals WHERE user_id = ? ORDER BY created_at DESC LIMIT 1',
                 [userId]
             );
             goal = gRows[0] || null;
