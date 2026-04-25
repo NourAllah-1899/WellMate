@@ -31,7 +31,7 @@ const extractJson = (text) => {
         .replace(/```$/i, '')
         .trim();
 
-    // Try direct parse
+// Try direct parse
     try {
         return JSON.parse(noFences);
     } catch {
@@ -39,10 +39,17 @@ const extractJson = (text) => {
         const start = noFences.indexOf('{');
         const end = noFences.lastIndexOf('}');
         if (start >= 0 && end > start) {
-            const candidate = noFences.slice(start, end + 1);
-            return JSON.parse(candidate);
+            try {
+                const candidate = noFences.slice(start, end + 1);
+                return JSON.parse(candidate);
+            } catch (e) {
+                // Ignore and fall back to raw text
+            }
         }
-        throw new Error('OpenAI response was not valid JSON.');
+        
+        // If all JSON parsing fails, return the raw text gracefully
+        console.warn('[OpenAI Service] Failed to parse JSON, returning raw text.');
+        return { report: noFences, text: noFences, raw: noFences };
     }
 };
 

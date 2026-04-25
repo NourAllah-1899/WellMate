@@ -13,6 +13,7 @@ JSON schema:
   "direction": "lose|gain|maintain",
   "suggestedTargetWeightKg": number,
   "suggestedTimeframeWeeks": number,
+  "suggestedCalories": number,
   "notes": string
 }
 
@@ -20,6 +21,7 @@ Rules:
 - Keep explanation short (1-3 sentences).
 - suggestedTargetWeightKg must be realistic for a human adult.
 - suggestedTimeframeWeeks should be between 4 and 52.
+- suggestedCalories should be a calculated daily calorie goal (e.g. 1500 to 3500) based on age, weight, height, BMI, and direction.
 `;
 
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
@@ -49,6 +51,9 @@ const validateRecommendation = (rec, fallback) => {
 
     const weeks = Number(rec.suggestedTimeframeWeeks);
     if (Number.isFinite(weeks)) out.suggestedTimeframeWeeks = Math.round(clamp(weeks, 4, 52));
+
+    const cals = Number(rec.suggestedCalories);
+    if (Number.isFinite(cals)) out.suggestedCalories = Math.round(clamp(cals, 1200, 5000));
 
     if (typeof rec.notes === 'string') out.notes = rec.notes.trim();
     return out;
@@ -138,7 +143,7 @@ Return JSON only following the schema.`;
 
 // POST /api/goals (protected)
 export const createGoal = async (req, res) => {
-    const { direction, targetWeightKg, aiSummary } = req.body;
+    const { direction, targetWeightKg, aiSummary, suggestedCalories } = req.body;
 
     if (!direction || !['lose', 'gain', 'maintain'].includes(direction)) {
         return res.status(400).json({ success: false, message: 'direction must be lose, gain, or maintain.' });
@@ -151,17 +156,52 @@ export const createGoal = async (req, res) => {
 
     try {
         const userId = req.user.user_id;
+        
+        // 1. Insert Weight Goal
         const [result] = await pool.query(
             'INSERT INTO weight_goals (user_id, direction, target_weight_kg, ai_summary) VALUES (?, ?, ?, ?)',
             [userId, direction, target, aiSummary || null]
         );
 
+        // 2. Automatically Update User's Calorie Goal & Type
+        // If AI provided suggestedCalories, use it, otherwise calculate a basic TDEE
+        let finalCalories = Number(suggestedCalories);
+        
+        if (!finalCalories || finalCalories < 1000) {
+            const [[u]] = await pool.query('SELECT weight_kg, height_cm, age FROM users WHERE id = ?', [userId]);
+            if (u && u.weight_kg && u.height_cm && u.age) {
+                // Mifflin-St Jeor (Gender Neutral Average)
+                const bmr = (10 * u.weight_kg) + (6.25 * u.height_cm) - (5 * u.age);
+                const tdee = bmr * 1.55; // Moderate activity
+                
+                if (direction === 'lose') finalCalories = tdee - 500;
+                else if (direction === 'gain') finalCalories = tdee + 500;
+                else finalCalories = tdee;
+            } else {
+                // Fallback
+                finalCalories = direction === 'lose' ? 1800 : (direction === 'gain' ? 2800 : 2200);
+            }
+        }
+        
+        finalCalories = Math.max(1200, Math.round(finalCalories));
+
+        await pool.query(
+            'UPDATE users SET calorie_goal = ?, goal_type = ? WHERE id = ?',
+            [finalCalories, direction, userId]
+        );
+
+        // 3. Return saved goal
         const [rows] = await pool.query(
             'SELECT id, direction, target_weight_kg, ai_summary, created_at, updated_at FROM weight_goals WHERE id = ?',
             [result.insertId]
         );
 
-        res.status(201).json({ success: true, message: 'Goal saved.', goal: rows[0] });
+        res.status(201).json({ 
+            success: true, 
+            message: 'Goal saved and nutrition profile updated.', 
+            goal: rows[0],
+            newCalorieGoal: finalCalories
+        });
     } catch (err) {
         console.error('CreateGoal error:', err);
         res.status(500).json({ success: false, message: 'Failed to save goal.' });

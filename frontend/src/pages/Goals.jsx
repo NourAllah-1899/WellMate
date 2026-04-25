@@ -73,6 +73,7 @@ export default function Goals() {
         direction,
         targetWeightKg: Number(targetWeightKg),
         aiSummary,
+        suggestedCalories: recommendation?.suggestedCalories
       })
       setActiveGoal(res?.data?.goal || null)
       navigate('/')
