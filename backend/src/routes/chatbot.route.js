@@ -27,7 +27,9 @@ Always match the user's language.`;
 
   try {
     // Using Ollama
+    console.log(`[Chatbot] Message from user: "${message}"`);
     console.log(`[Chatbot] Calling local Ollama with model: phi3:3.8b`);
+    
     const response = await fetch('http://localhost:11434/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -39,21 +41,31 @@ Always match the user's language.`;
         ],
         stream: false,
         options: {
-          num_predict: 100, // Strictly limit the length of the response
-          temperature: 0.4, // Make it less creative and more direct
+          num_predict: 150, 
+          temperature: 0.5,
         }
       })
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[Chatbot] Ollama error response: ${errorText}`);
       throw new Error(`Ollama API error: ${response.status}`);
     }
 
     const data = await response.json();
-    res.json({ reply: data.message?.content || 'No response from Ollama' });
+    const reply = data.message?.content?.trim();
+    
+    console.log(`[Chatbot] Ollama reply: "${reply}"`);
+
+    if (!reply) {
+      return res.json({ reply: "Je n'ai pas pu générer de réponse. Pouvez-vous reformuler ?" });
+    }
+
+    res.json({ reply });
 
   } catch (error) {
-    console.error('Chatbot error:', error);
+    console.error('[Chatbot] Catch error:', error);
     res.status(500).json({ error: 'Failed to get response from chatbot' });
   }
 });

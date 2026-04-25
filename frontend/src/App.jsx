@@ -13,7 +13,6 @@ import Dashboard from './pages/Dashboard.jsx'
 import Goals from './pages/Goals.jsx'
 import Meals from './pages/Meals.jsx'
 import Layout from './components/Layout.jsx'
-import Chatbot from './pages/Chatbot.jsx'
 
 function App() {
   return (
@@ -29,7 +28,6 @@ function App() {
       <Route path="/register" element={<Layout><Register /></Layout>} />
       <Route path="/login" element={<Layout><Login /></Layout>} />
       <Route path="/profile" element={<Layout><Profile /></Layout>} />
-      <Route path="/chatbot" element={<Layout><Chatbot /></Layout>} />
     </Routes>
   )
 }

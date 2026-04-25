@@ -231,7 +231,7 @@
   }
 
   .wm-link-btn {
-    @apply inline-flex items-center justify-center px-3 py-2 rounded-xl font-extrabold transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-3 py-2 rounded-xl font-extrabold whitespace-nowrap transition-colors duration-200;
     background-color: var(--bg-card);
     border: 1px solid var(--border-main);
     color: var(--text-primary);
@@ -339,8 +339,143 @@
   .wm-lang-check {
     color: var(--brand-action);
   }
-}
+  /* Chat Popup */
+  .wm-chat-popup-container {
+    @apply fixed bottom-6 right-6 z-[2000] flex flex-col items-end;
+  }
 
+  .wm-chat-toggle {
+    @apply w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl transition-all duration-300 hover:scale-110 active:scale-95;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-action));
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .wm-chat-window {
+    @apply mb-4 w-[350px] h-[500px] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-main);
+    animation: wm-popup-fade-in 0.3s ease-out;
+  }
+
+  @keyframes wm-popup-fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .wm-chat-header {
+    @apply p-4 border-b flex items-center justify-between;
+    border-color: var(--border-main);
+    background: linear-gradient(135deg, color-mix(in srgb, var(--brand-primary) 5%, transparent), color-mix(in srgb, var(--brand-action) 5%, transparent));
+  }
+
+  .wm-chat-close {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center text-sm transition-all duration-200 opacity-40 hover:opacity-100 hover:bg-slate-200 dark:hover:bg-slate-700;
+    color: var(--text-primary);
+    border: none;
+    cursor: pointer;
+  }
+
+  .wm-chat-header-info {
+    @apply flex items-center gap-3;
+  }
+
+  .wm-chat-bot-icon {
+    @apply w-10 h-10 rounded-full flex items-center justify-center text-xl shadow-sm;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-action));
+    color: white;
+  }
+
+  .wm-chat-header h3 {
+    @apply text-sm font-bold m-0 leading-tight;
+  }
+
+  .wm-chat-header p {
+    @apply text-[10px] m-0 opacity-70;
+  }
+
+  .wm-chat-messages {
+    @apply flex-1 overflow-y-auto p-4 flex flex-col gap-3;
+    background-color: color-mix(in srgb, var(--bg-main) 30%, transparent);
+  }
+
+  .wm-chat-empty {
+    @apply flex flex-col items-center justify-center h-full text-center p-6 opacity-60;
+  }
+
+  .wm-chat-empty-icon {
+    @apply text-4xl mb-2;
+  }
+
+  .wm-chat-empty p {
+    @apply text-xs leading-relaxed;
+  }
+
+  .wm-chat-msg {
+    @apply flex;
+  }
+
+  .wm-chat-msg.user {
+    @apply justify-end;
+  }
+
+  .wm-chat-msg-bubble {
+    @apply max-w-[80%] p-3 rounded-2xl text-sm leading-relaxed;
+  }
+
+  .wm-chat-msg.user .wm-chat-msg-bubble {
+    @apply bg-blue-600 text-white rounded-br-sm shadow-md;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-action));
+  }
+
+  .wm-chat-msg.bot .wm-chat-msg-bubble {
+    @apply rounded-bl-sm shadow-sm;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-main);
+    color: var(--text-primary);
+  }
+
+  body.dark .wm-chat-msg.bot .wm-chat-msg-bubble {
+    color: white;
+    background-color: var(--bg-card);
+  }
+
+  .wm-chat-input-area {
+    @apply p-3 border-t;
+    border-color: var(--border-main);
+    background-color: var(--bg-card);
+  }
+
+  .wm-chat-input-wrapper {
+    @apply flex items-center gap-2 p-1 rounded-full border;
+    border-color: var(--border-input);
+    background-color: var(--bg-secondary);
+  }
+
+  .wm-chat-input-wrapper input {
+    @apply flex-1 bg-transparent border-none outline-none px-3 py-2 text-sm;
+    color: var(--text-primary);
+  }
+
+  .wm-chat-send-btn {
+    @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 disabled:opacity-30;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-action));
+    color: white;
+    border: none;
+  }
+
+  .wm-typing-dots {
+    @apply flex gap-1 items-center justify-center py-1;
+  }
+
+  .wm-typing-dots span {
+    @apply w-1.5 h-1.5 bg-current rounded-full opacity-40 animate-bounce;
+  }
+
+  .wm-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .wm-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+}
 
 @media (max-width: 900px) {
   .wm-topbar-inner {

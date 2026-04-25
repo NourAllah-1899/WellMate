@@ -67,7 +67,12 @@
     "duration": "Duration",
     "schedule": "Weekly Schedule",
     "recommendations": "Recommendations",
-    "generating": "Generating..."
+    "generating": "Generating...",
+    "objective": "Main objective",
+    "level": "Level",
+    "sessionsPerWeek": "Sessions per week",
+    "preview": "Previewed Plan !",
+    "tips": "Tips & Recommendations"
   },
   "auth": {
     "email": "Email",
@@ -106,7 +111,8 @@
     "breakdown": "Breakdown",
     "today": "Today",
     "working": "Working…",
-    "noMeals": "No meals recorded yet."
+    "noMeals": "No meals recorded yet.",
+    "history": "History (30 days)"
   },
   "dashboard": {
     "welcome": "Welcome back",

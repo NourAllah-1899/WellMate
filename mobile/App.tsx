@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { LanguageProvider } from './src/context/LanguageContext';
 
 function AppRoot() {
   const { isDarkMode } = useTheme();
@@ -17,7 +18,9 @@ function AppRoot() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AppRoot />
+      <LanguageProvider>
+        <AppRoot />
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

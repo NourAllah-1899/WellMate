@@ -7,12 +7,14 @@ import HealthScreen from '../screens/HealthScreen';
 import EventsScreen from '../screens/EventsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Colors } from '../constants/Colors';
 
 const Tab = createBottomTabNavigator();
 
 export default function MainTabNavigator() {
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const theme = isDarkMode ? Colors.dark : Colors.light;
 
   return (
@@ -34,6 +36,7 @@ export default function MainTabNavigator() {
         name="Dashboard" 
         component={HomeScreen} 
         options={{
+          tabBarLabel: t('common.home'),
           tabBarIcon: ({ color, size }) => <Feather name="home" color={color} size={size} />,
         }}
       />
@@ -41,6 +44,7 @@ export default function MainTabNavigator() {
         name="Santé" 
         component={HealthScreen} 
         options={{
+          tabBarLabel: t('common.health'),
           tabBarIcon: ({ color, size }) => <Feather name="heart" color={color} size={size} />,
         }}
       />
@@ -48,13 +52,15 @@ export default function MainTabNavigator() {
         name="Sports" 
         component={PhysicalActivityScreen} 
         options={{
+          tabBarLabel: 'Sports',
           tabBarIcon: ({ color, size }) => <Feather name="activity" color={color} size={size} />,
         }}
       />
       <Tab.Screen 
-        name="Événements" 
+        name="Events" 
         component={EventsScreen} 
         options={{
+          tabBarLabel: 'Events',
           tabBarIcon: ({ color, size }) => <Feather name="calendar" color={color} size={size} />,
         }}
       />
@@ -62,6 +68,7 @@ export default function MainTabNavigator() {
         name="Profil" 
         component={ProfileScreen} 
         options={{
+          tabBarLabel: t('common.profile'),
           tabBarIcon: ({ color, size }) => <Feather name="user" color={color} size={size} />,
         }}
       />

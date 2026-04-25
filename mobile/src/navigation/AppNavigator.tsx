@@ -5,14 +5,17 @@ import RegisterScreen from '../screens/Register';
 import MainTabNavigator from './MainTabNavigator';
 import MealsScreen from '../screens/MealsScreen';
 import GoalsScreen from '../screens/GoalsScreen';
+import ChatbotScreen from '../screens/ChatbotScreen';
 
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Colors } from '../constants/Colors';
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   const { isDarkMode } = useTheme();
+  const { t } = useLanguage();
   const theme = isDarkMode ? Colors.dark : Colors.light;
 
   return (
@@ -33,7 +36,7 @@ export default function AppNavigator() {
       <Stack.Screen 
         name="Register" 
         component={RegisterScreen} 
-        options={{ title: 'Create Account' }} 
+        options={{ title: t('common.register') }} 
       />
       <Stack.Screen 
         name="Home" 
@@ -41,14 +44,19 @@ export default function AppNavigator() {
         options={{ headerShown: false }} 
       />
       <Stack.Screen 
-         name="Meals" 
-         component={MealsScreen} 
-         options={{ title: 'Suivi Repas', headerBackTitle: 'Retour' }} 
+        name="Meals" 
+        component={MealsScreen} 
+        options={{ title: t('common.meals'), headerBackTitle: t('common.cancel') }} 
       />
       <Stack.Screen 
-         name="Goals" 
-         component={GoalsScreen} 
-         options={{ title: 'Mes Objectifs', headerBackTitle: 'Retour' }} 
+        name="Goals" 
+        component={GoalsScreen} 
+        options={{ title: t('common.goals'), headerBackTitle: t('common.cancel') }} 
+      />
+      <Stack.Screen 
+        name="Chatbot" 
+        component={ChatbotScreen} 
+        options={{ title: t('common.chatbot'), headerBackTitle: t('common.cancel') }} 
       />
     </Stack.Navigator>
   );

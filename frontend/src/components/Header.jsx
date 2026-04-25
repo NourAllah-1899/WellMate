@@ -45,7 +45,6 @@ export default function Header() {
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/health">{t('common.health')}</NavLink>
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/physical-activity">{t('common.physicalActivity')}</NavLink>
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/events">{t('common.events')}</NavLink>
-          <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/chatbot">{t('common.chatbot')}</NavLink>
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/contact">{t('common.contact')}</NavLink>
         </nav>
 
@@ -85,8 +84,8 @@ export default function Header() {
             </div>
           ) : (
             <div className="wm-auth-links">
-              <NavLink className="wm-link-btn" to="/register">Sign in</NavLink>
-              <NavLink className="wm-link-btn primary" to="/login">Log in</NavLink>
+              <NavLink className="wm-link-btn" to="/register">{t('common.register')}</NavLink>
+              <NavLink className="wm-link-btn primary" to="/login">{t('common.login')}</NavLink>
             </div>
           )}
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>

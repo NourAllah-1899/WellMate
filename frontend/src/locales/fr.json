@@ -67,7 +67,12 @@
     "duration": "Durée",
     "schedule": "Horaire Hebdomadaire",
     "recommendations": "Recommandations",
-    "generating": "Génération..."
+    "generating": "Génération...",
+    "objective": "Objectif principal",
+    "level": "Niveau",
+    "sessionsPerWeek": "Séances par semaine",
+    "preview": "Plan Prévisualisé !",
+    "tips": "Conseils & Recommandations"
   },
   "auth": {
     "email": "Email",
@@ -106,7 +111,8 @@
     "breakdown": "Détail",
     "today": "Aujourd'hui",
     "working": "En cours…",
-    "noMeals": "Aucun repas enregistré."
+    "noMeals": "Aucun repas enregistré.",
+    "history": "Historique (30 jours)"
   },
   "dashboard": {
     "welcome": "Bienvenue!",

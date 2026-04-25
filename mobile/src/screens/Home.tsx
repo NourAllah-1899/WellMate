@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView, ScrollView, ActivityIndicator, Image } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import apiClient from '../api/apiClient';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Colors } from '../constants/Colors';
 import { Feather } from '@expo/vector-icons';
 
@@ -14,21 +16,25 @@ export default function HomeScreen({ navigation }: Props) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { isDarkMode, toggleTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const theme = isDarkMode ? Colors.dark : Colors.light;
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const response = await apiClient.get('/dashboard');
-        setData(response.data.dashboard);
-      } catch (error) {
-        console.log('Error fetching dashboard:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDashboard();
-  }, []);
+  const fetchDashboard = async () => {
+    try {
+      const response = await apiClient.get('/dashboard');
+      setData(response.data.dashboard);
+    } catch (error) {
+      console.log('Error fetching dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchDashboard();
+    }, [])
+  );
 
   if (loading) {
     return (
@@ -46,7 +52,7 @@ export default function HomeScreen({ navigation }: Props) {
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
 
-        {/* Updated Header with Logo Image & Toggle */}
+        {/* Updated Header with Logo Image, Theme & Language Toggles */}
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <View style={styles.logoContainer}>
@@ -56,32 +62,40 @@ export default function HomeScreen({ navigation }: Props) {
                 resizeMode="contain"
               />
             </View>
-            <TouchableOpacity onPress={toggleTheme} style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0' }]}>
-              <Feather name={isDarkMode ? 'moon' : 'sun'} size={20} color={isDarkMode ? '#fbbf24' : '#f59e0b'} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity 
+                onPress={() => setLanguage(language === 'fr' ? 'en' : 'fr')} 
+                style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0', width: 'auto', paddingHorizontal: 10 }]}
+              >
+                <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 12 }}>{language === 'fr' ? 'EN' : 'FR'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toggleTheme} style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0' }]}>
+                <Feather name={isDarkMode ? 'moon' : 'sun'} size={20} color={isDarkMode ? '#fbbf24' : '#f59e0b'} />
+              </TouchableOpacity>
+            </View>
           </View>
-          <Text style={[styles.title, { color: theme.heading }]}>Welcome, {user?.full_name || user?.username || 'User'}! 👋</Text>
-          <Text style={[styles.subtitle, { color: theme.secondaryText }]}>Your personal health dashboard</Text>
+          <Text style={[styles.title, { color: theme.heading }]}>{t('dashboard.welcome', { name: user?.full_name || user?.username || 'User' })}</Text>
+          <Text style={[styles.subtitle, { color: theme.secondaryText }]}>{t('dashboard.subtitle')}</Text>
         </View>
 
         {/* Profile Card */}
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <Text style={[styles.cardTitle, { color: Colors.brand.primary }]}>💪 Profile Santé</Text>
+          <Text style={[styles.cardTitle, { color: Colors.brand.primary }]}>💪 {t('dashboard.healthProfile')}</Text>
           <View style={styles.grid}>
             <View style={styles.gridItem}>
-              <Text style={[styles.gridLabel, { color: theme.muted }]}>Âge</Text>
+              <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.age')}</Text>
               <Text style={[styles.gridValue, { color: theme.text }]}>{user?.age || '—'}</Text>
             </View>
             <View style={styles.gridItem}>
-              <Text style={[styles.gridLabel, { color: theme.muted }]}>Taille</Text>
+              <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.height')}</Text>
               <Text style={[styles.gridValue, { color: theme.text }]}>{user?.height_cm ? `${user.height_cm} cm` : '—'}</Text>
             </View>
             <View style={styles.gridItem}>
-              <Text style={[styles.gridLabel, { color: theme.muted }]}>Poids</Text>
+              <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.weight')}</Text>
               <Text style={[styles.gridValue, { color: theme.text }]}>{user?.weight_kg ? `${user.weight_kg} kg` : '—'}</Text>
             </View>
             <View style={styles.gridItem}>
-              <Text style={[styles.gridLabel, { color: theme.muted }]}>IMC</Text>
+              <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.bmi')}</Text>
               <Text style={[styles.gridValue, { color: theme.text }]}>{user?.bmi || '—'}</Text>
             </View>
           </View>
@@ -89,7 +103,7 @@ export default function HomeScreen({ navigation }: Props) {
 
         {/* Goal Card */}
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <Text style={[styles.cardTitle, { color: Colors.brand.action }]}>🎯 Objectif Poids</Text>
+          <Text style={[styles.cardTitle, { color: Colors.brand.action }]}>🎯 {t('dashboard.weightGoal')}</Text>
           {goal ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
               <View style={{ backgroundColor: Colors.brand.primary, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, marginRight: 12 }}>
@@ -98,47 +112,59 @@ export default function HomeScreen({ navigation }: Props) {
               <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 24 }}>{goal.target_weight_kg} kg</Text>
             </View>
           ) : (
-            <Text style={{ color: theme.muted, marginBottom: 15 }}>Aucun objectif défini.</Text>
+            <Text style={{ color: theme.muted, marginBottom: 15 }}>{t('dashboard.noGoal')}</Text>
           )}
           <TouchableOpacity
             style={[styles.inlineButton, { backgroundColor: isDarkMode ? '#2d3748' : '#edf2f7' }]}
             onPress={() => navigation.navigate('Goals')}
           >
-            <Text style={[styles.inlineButtonText, { color: theme.text }]}>{goal ? 'Modifier l\'objectif' : 'Définir un objectif'}</Text>
+            <Text style={[styles.inlineButtonText, { color: theme.text }]}>{goal ? t('dashboard.editGoal') : t('dashboard.setGoal')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Calories Card */}
         <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <Text style={[styles.cardTitle, { color: Colors.brand.accent }]}>🍽️ Calories Aujourd'hui</Text>
+          <Text style={[styles.cardTitle, { color: Colors.brand.accent }]}>🍽️ {t('dashboard.todaysCalories')}</Text>
           <View style={{ alignItems: 'center', marginVertical: 10 }}>
             <Text style={[styles.bigValue, { color: theme.text }]}>{today?.total_calories || 0}</Text>
-            <Text style={[styles.gridLabel, { color: theme.muted }]}>kcal consommées</Text>
+            <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.kcalConsumed')}</Text>
           </View>
           <TouchableOpacity
             style={[styles.inlineButton, { backgroundColor: isDarkMode ? '#2d3748' : '#edf2f7' }]}
             onPress={() => navigation.navigate('Meals')}
           >
-            <Text style={[styles.inlineButtonText, { color: theme.text }]}>Gestion des Repas</Text>
+            <Text style={[styles.inlineButtonText, { color: theme.text }]}>{t('dashboard.manageMeals')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Quick Actions */}
         <View style={[styles.card, { backgroundColor: 'transparent', borderColor: 'transparent', paddingHorizontal: 0 }]}>
-          <Text style={[styles.cardTitle, { color: Colors.brand.highlight }]}>⚡ Actions Rapides</Text>
-          <View style={{ flexDirection: 'row', gap: 12 }}>
-            <TouchableOpacity style={[styles.quickButton, { backgroundColor: Colors.brand.primary }]} onPress={() => navigation.navigate('Meals')}>
+          <Text style={[styles.cardTitle, { color: Colors.brand.highlight }]}>⚡ {t('dashboard.quickActions')}</Text>
+          <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+            <TouchableOpacity style={[styles.quickButton, { backgroundColor: Colors.brand.primary, flex: 1, minWidth: '30%' }]} onPress={() => navigation.navigate('Meals')}>
               <Feather name="plus" size={18} color="#fff" />
-              <Text style={styles.quickText}>Repas</Text>
+              <Text style={styles.quickText}>{t('dashboard.meals')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.quickButton, { backgroundColor: Colors.brand.action }]} onPress={() => navigation.navigate('Health', { screen: 'Health' })}>
+            <TouchableOpacity style={[styles.quickButton, { backgroundColor: Colors.brand.action, flex: 1, minWidth: '30%' }]} onPress={() => navigation.navigate('Health', { screen: 'Health' })}>
               <Feather name="heart" size={18} color="#fff" />
-              <Text style={styles.quickText}>Santé</Text>
+              <Text style={styles.quickText}>{t('dashboard.health')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.quickButton, { backgroundColor: '#8b5cf6', flex: 1, minWidth: '30%' }]} onPress={() => navigation.navigate('Chatbot')}>
+              <Feather name="message-square" size={18} color="#fff" />
+              <Text style={styles.quickText}>IA</Text>
             </TouchableOpacity>
           </View>
         </View>
 
       </ScrollView>
+
+      {/* Floating Chatbot Button */}
+      <TouchableOpacity 
+        style={styles.fab} 
+        onPress={() => navigation.navigate('Chatbot')}
+      >
+        <Text style={{ fontSize: 24 }}>🤖</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -173,5 +199,21 @@ const styles = StyleSheet.create({
   inlineButton: { marginTop: 10, padding: 14, borderRadius: 12, alignItems: 'center' },
   inlineButtonText: { fontWeight: 'bold', fontSize: 14 },
   quickButton: { flex: 1, padding: 15, borderRadius: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  quickText: { color: '#fff', fontWeight: 'bold', fontSize: 14 }
+  quickText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
+  fab: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: Colors.brand.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
 });

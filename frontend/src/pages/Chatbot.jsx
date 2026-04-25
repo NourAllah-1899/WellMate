@@ -27,14 +27,15 @@ function Chatbot() {
     setLoading(true);
 
     try {
-      // Changed from axios.post('http://localhost:5000/api/chatbot/message') 
-      // to api.post('/api/chatbot/message') to use the project's API client
+      console.log('Sending message to chatbot:', messageToSend);
       const response = await api.post('/api/chatbot/message', {
         message: messageToSend
       });
-      const botMessage = { role: 'bot', content: response.data.reply };
+      console.log('Chatbot response:', response.data);
+      const botMessage = { role: 'bot', content: response.data.reply || String(response.data) };
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
+      console.error('Chatbot error:', error);
       const errorMessage = {
         role: 'bot',
         content: t('chatbot.error')
