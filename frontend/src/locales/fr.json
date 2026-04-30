@@ -105,6 +105,7 @@
     "title": "Repas",
     "subtitle": "Écrivez ce que vous avez mangé. Enregistrez-le pour suivre votre journée.",
     "description": "Description du Repas",
+    "calories": "Calories",
     "estimate": "Estimer les Calories",
     "saveMeal": "Enregistrer le Repas",
     "estimatedCalories": "Calories Estimées",
@@ -158,5 +159,73 @@
     "thinking": "Réflexion...",
     "tip": "💡 Essayez : \"C'est quoi l'IMC ?\", \"Combien de calories par jour ?\", \"Meilleurs exercices pour maigrir\"",
     "error": "Désolé, je n'ai pas pu traiter votre message. Veuillez réessayer."
+  },
+  "health": {
+    "title": "Santé",
+    "ai": "AI",
+    "cockpitSubtitle": "Votre cockpit de santé intelligent supervisé par WellMate.",
+    "vitals": {
+      "weight": "Poids",
+      "height": "Taille",
+      "bmi": "IMC",
+      "age": "Âge",
+      "years": "ans"
+    },
+    "hydration": {
+      "title": "Hydratation",
+      "reset": "Réinitialiser",
+      "goal": "Objectif 2.0L",
+      "liter": "L"
+    },
+    "tips": {
+      "title": "Conseil du jour",
+      "waterFact": "L'eau est le seul carburant dont votre cerveau a réellement besoin pour rester concentré.",
+      "cognitiveBoost": "Boost cognitif"
+    },
+    "reports": {
+      "title": "Bilans Intelligents",
+      "analyzeDay": "Analyse Jour",
+      "week": "Semaine",
+      "firstReportTitle": "Votre premier bilan",
+      "firstReportDesc": "L'IA WellMate est prête à analyser vos données (repas, sport, tabac) pour vous fournir des conseils personnalisés.",
+      "generateDaily": "Générer mon bilan du jour",
+      "analyzing": "Analyse en cours",
+      "consultingData": "L'IA consulte vos données de santé...",
+      "dailyAnalysis": "Analyse Quotidienne",
+      "weeklyAnalysis": "Analyse Hebdomadaire"
+    },
+    "nutrition": {
+      "title": "Bilan Nutritionnel",
+      "sur": "sur",
+      "remaining": "Restant",
+      "goal": "Objectif"
+    },
+    "settings": {
+      "title": "Paramètres Santé",
+      "calorieGoal": "Objectif Calories",
+      "goalType": "Type d'Objectif",
+      "update": "Mettre à jour",
+      "maintain": "Maintenir le poids",
+      "lose": "Perdre du poids",
+      "gain": "Prendre du poids"
+    }
+  },
+  "smokingTracker": {
+    "title": "Suivi Tabagisme",
+    "placeholder": "Cigarettes aujourd'hui",
+    "validate": "Valider",
+    "today": "Aujourd'hui",
+    "week": "Semaine",
+    "month": "Mois",
+    "messages": {
+      "noSmoking": "Incroyable ! Une journée sans tabac. Continuez comme ça ! 🎉",
+      "noSmokingFact": "Après 24h sans fumer, le risque de crise cardiaque commence déjà à diminuer.",
+      "increase": "Attention, vous fumez plus qu'hier. Votre santé est en jeu ! ⚠️",
+      "increaseFact": "Le tabac est responsable de 90% des cancers du poumon.",
+      "decrease": "Bien joué ! Vous avez réduit votre consommation. Un pas vers la liberté ! 📈",
+      "decreaseFact": "Moins fumer réduit immédiatement la pression artérielle.",
+      "victory": "Chaque cigarette évitée est une victoire pour vos poumons.",
+      "victoryFact": "Le tabac contient plus de 7000 substances chimiques, dont 70 sont cancérigènes."
+    }
   }
 }

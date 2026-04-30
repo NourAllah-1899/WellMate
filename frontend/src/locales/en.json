@@ -105,6 +105,7 @@
     "title": "Meals",
     "subtitle": "Write what you ate. Save it to track your day.",
     "description": "Meal description",
+    "calories": "Calories",
     "estimate": "Estimate calories",
     "saveMeal": "Save meal",
     "estimatedCalories": "Estimated calories",
@@ -158,5 +159,73 @@
     "thinking": "Thinking...",
     "tip": "💡 Try asking: \"What is BMI?\", \"How many calories should I eat?\", \"Best exercises for weight loss\"",
     "error": "Sorry, I could not process your message. Please try again."
+  },
+  "health": {
+    "title": "Health",
+    "ai": "AI",
+    "cockpitSubtitle": "Your intelligent health cockpit supervised by WellMate.",
+    "vitals": {
+      "weight": "Weight",
+      "height": "Height",
+      "bmi": "BMI",
+      "age": "Age",
+      "years": "years"
+    },
+    "hydration": {
+      "title": "Hydration",
+      "reset": "Reset",
+      "goal": "Goal 2.0L",
+      "liter": "L"
+    },
+    "tips": {
+      "title": "Tip of the Day",
+      "waterFact": "Water is the only fuel your brain really needs to stay focused.",
+      "cognitiveBoost": "Cognitive boost"
+    },
+    "reports": {
+      "title": "Smart Reports",
+      "analyzeDay": "Analyze Day",
+      "week": "Week",
+      "firstReportTitle": "Your First Report",
+      "firstReportDesc": "WellMate AI is ready to analyze your data (meals, sport, smoking) to provide personalized advice.",
+      "generateDaily": "Generate my daily report",
+      "analyzing": "Analyzing...",
+      "consultingData": "AI is consulting your health data...",
+      "dailyAnalysis": "Daily Analysis",
+      "weeklyAnalysis": "Weekly Analysis"
+    },
+    "nutrition": {
+      "title": "Nutrition Summary",
+      "sur": "of",
+      "remaining": "Remaining",
+      "goal": "Goal"
+    },
+    "settings": {
+      "title": "Health Settings",
+      "calorieGoal": "Calorie Goal",
+      "goalType": "Goal Type",
+      "update": "Update",
+      "maintain": "Maintain weight",
+      "lose": "Lose weight",
+      "gain": "Gain weight"
+    }
+  },
+  "smokingTracker": {
+    "title": "Smoking Tracker",
+    "placeholder": "Cigarettes today",
+    "validate": "Validate",
+    "today": "Today",
+    "week": "Week",
+    "month": "Month",
+    "messages": {
+      "noSmoking": "Incredible! A smoke-free day. Keep it up! 🎉",
+      "noSmokingFact": "After 24 hours without smoking, the risk of heart attack already begins to decrease.",
+      "increase": "Careful, you're smoking more than yesterday. Your health is at stake! ⚠️",
+      "increaseFact": "Tobacco is responsible for 90% of lung cancers.",
+      "decrease": "Well done! You've reduced your consumption. A step towards freedom! 📈",
+      "decreaseFact": "Smoking less immediately reduces blood pressure.",
+      "victory": "Every cigarette avoided is a victory for your lungs.",
+      "victoryFact": "Tobacco contains more than 7000 chemical substances, 70 of which are carcinogenic."
+    }
   }
 }

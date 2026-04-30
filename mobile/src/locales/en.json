@@ -127,5 +127,48 @@
     "thinking": "Thinking...",
     "tip": "💡 TRY: \"What is BMI?\", \"How many calories in a pizza?\"",
     "error": "Sorry, I could not process your message."
+  },
+  "health": {
+    "title": "Health",
+    "ai": "AI",
+    "cockpitSubtitle": "Your intelligent health cockpit supervised by WellMate.",
+    "vitals": {
+      "weight": "Weight",
+      "height": "Height",
+      "bmi": "BMI",
+      "age": "Age",
+      "years": "yrs"
+    },
+    "nutrition": {
+      "title": "Nutrition",
+      "sur": "of",
+      "remaining": "Remaining",
+      "goal": "Goal",
+      "noGoal": "No goal"
+    },
+    "smoking": {
+      "title": "Smoking",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "Week"
+    },
+    "hydration": {
+      "title": "Hydration",
+      "reset": "Reset",
+      "goal": "Goal 2.0L",
+      "liter": "L"
+    },
+    "reports": {
+      "title": "Smart Reports",
+      "daily": "Daily",
+      "weekly": "Weekly"
+    },
+    "settings": {
+      "lose": "Weight Loss",
+      "gain": "Muscle Gain",
+      "maintain": "Maintenance",
+      "notSet": "Not set"
+    },
+    "reportGenerated": "Report generated successfully"
   }
 }

@@ -67,17 +67,15 @@ export default function MealsScreen() {
       Alert.alert(t('common.error'), t('meals.placeholder'));
       return;
     }
+    
     setLoading(true);
     try {
       const payload: any = {
         description: description,
+        estimatedCalories: estimate ? estimate.totalCalories : null,
         eatenAt: new Date().toISOString()
       };
       
-      if (estimate) {
-        payload.estimatedCalories = estimate.totalCalories;
-      }
-
       await apiClient.post('/meals', payload);
 
       setDescription('');

@@ -36,6 +36,13 @@ export const generateSportProgram = async (req, res) => {
     const [users] = await pool.execute(userQuery, [userId])
     const user = users[0] || {}
 
+    if (!user.age || !user.weight_kg || !user.height_cm) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Veuillez compléter vos informations de profil (âge, poids, taille) dans votre profil avant de générer un programme personnalisé.' 
+      });
+    }
+
     const activitiesQuery = `
       SELECT activity_type, SUM(duration_minutes) as total_minutes, COUNT(*) as count
       FROM physical_activities

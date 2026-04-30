@@ -51,7 +51,7 @@ export const getActivitiesToday = async (req, res) => {
     const today = new Date().toISOString().split('T')[0]
 
     const query = `
-      SELECT id, activity_type, description, duration_minutes, intensity, calories_burned, activity_date
+      SELECT id, activity_type, description, duration_minutes, intensity, calories_burned, DATE_FORMAT(activity_date, '%Y-%m-%d') as activity_date
       FROM physical_activities
       WHERE user_id = ? AND activity_date = ?
       ORDER BY created_at DESC
@@ -113,6 +113,50 @@ export const deleteActivity = async (req, res) => {
   } catch (err) {
     console.error('Error deleting activity:', err)
     res.status(500).json({ message: 'Failed to delete activity' })
+  }
+}
+
+export const updateActivity = async (req, res) => {
+  try {
+    const userId = req.user.user_id
+    const { activityId } = req.params
+    const { activityType, description, durationMinutes, intensity, activityDate } = req.body
+
+    if (!activityType || !durationMinutes || !intensity || !activityDate) {
+      return res.status(400).json({
+        message: 'Missing required fields: activityType, durationMinutes, intensity, activityDate',
+      })
+    }
+
+    const caloriesBurned = calculateCalories(activityType, durationMinutes, intensity)
+
+    const query = `
+      UPDATE physical_activities 
+      SET activity_type = ?, description = ?, duration_minutes = ?, intensity = ?, calories_burned = ?, activity_date = ?
+      WHERE id = ? AND user_id = ?
+    `
+
+    const [result] = await pool.execute(query, [
+      activityType,
+      description || null,
+      durationMinutes,
+      intensity,
+      caloriesBurned,
+      activityDate,
+      activityId,
+      userId,
+    ])
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Activity not found' })
+    }
+
+    res.json({
+      message: 'Activity updated successfully',
+    })
+  } catch (err) {
+    console.error('Error updating activity:', err)
+    res.status(500).json({ message: 'Failed to update activity' })
   }
 }
 

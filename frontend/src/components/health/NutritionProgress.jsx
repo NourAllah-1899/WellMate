@@ -1,6 +1,8 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 
 const NutritionProgress = ({ summary }) => {
+  const { t, language } = useLanguage();
   if (!summary) return null;
 
   const { calorieGoal, caloriesConsumedToday, caloriesRemaining, progressPercentage, goalType } = summary;
@@ -12,10 +14,10 @@ const NutritionProgress = ({ summary }) => {
 
   const getGoalLabel = (type) => {
     switch (type) {
-      case 'lose': return 'Perte de poids';
-      case 'gain': return 'Prise de masse';
-      case 'maintain': return 'Maintien';
-      default: return 'Maintien';
+      case 'lose': return t('health.settings.lose');
+      case 'gain': return t('health.settings.gain');
+      case 'maintain': return t('health.settings.maintain');
+      default: return t('health.settings.notSet') || (language === 'fr' ? 'Non défini' : 'Not set');
     }
   };
 
@@ -29,7 +31,7 @@ const NutritionProgress = ({ summary }) => {
     <div className="wm-card overflow-hidden">
       <div className="flex flex-col items-center">
         <h2 className="text-xl font-bold mb-4 flex items-center gap-2" style={{ color: 'var(--text-heading)' }}>
-          <span>🥗</span> Bilan Nutritionnel
+          <span>🥗</span> {t('health.nutrition.title')}
         </h2>
         
         {/* Circular Progress */}
@@ -66,7 +68,7 @@ const NutritionProgress = ({ summary }) => {
               {caloriesConsumedToday}
             </span>
             <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>
-              sur {calorieGoal}
+              {calorieGoal > 0 ? `${t('health.nutrition.sur')} ${calorieGoal}` : (t('health.nutrition.noGoal') || (language === 'fr' ? 'Pas d\'objectif' : 'No Goal'))}
             </span>
           </div>
         </div>
@@ -74,13 +76,13 @@ const NutritionProgress = ({ summary }) => {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-4 w-full">
           <div className="p-3 rounded-2xl border" style={{ backgroundColor: 'var(--bg-main)', borderColor: 'var(--border-main)' }}>
-            <p className="text-[10px] font-black uppercase mb-1" style={{ color: 'var(--text-secondary)' }}>Restant</p>
+            <p className="text-[10px] font-black uppercase mb-1" style={{ color: 'var(--text-secondary)' }}>{t('health.nutrition.remaining')}</p>
             <p className="text-lg font-bold" style={{ color: caloriesRemaining === 0 ? '#f43f5e' : 'var(--text-primary)' }}>
               {caloriesRemaining} <span className="text-xs font-normal opacity-70">kcal</span>
             </p>
           </div>
           <div className="p-3 rounded-2xl border" style={{ backgroundColor: 'var(--bg-main)', borderColor: 'var(--border-main)' }}>
-            <p className="text-[10px] font-black uppercase mb-1" style={{ color: 'var(--text-secondary)' }}>Objectif</p>
+            <p className="text-[10px] font-black uppercase mb-1" style={{ color: 'var(--text-secondary)' }}>{t('health.nutrition.goal')}</p>
             <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
               {getGoalLabel(goalType)}
             </p>

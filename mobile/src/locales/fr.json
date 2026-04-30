@@ -127,5 +127,48 @@
     "thinking": "Réflexion...",
     "tip": "💡 ESSAYEZ : \"C'est quoi l'IMC ?\", \"Calories dans une pizza ?\"",
     "error": "Désolé, je n'ai pas pu traiter votre message."
+  },
+  "health": {
+    "title": "Santé",
+    "ai": "IA",
+    "cockpitSubtitle": "Votre cockpit de santé intelligent supervisé par WellMate.",
+    "vitals": {
+      "weight": "Poids",
+      "height": "Taille",
+      "bmi": "IMC",
+      "age": "Âge",
+      "years": "ans"
+    },
+    "nutrition": {
+      "title": "Nutrition",
+      "sur": "sur",
+      "remaining": "Restant",
+      "goal": "Objectif",
+      "noGoal": "Pas d'objectif"
+    },
+    "smoking": {
+      "title": "Tabagisme",
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "week": "Semaine"
+    },
+    "hydration": {
+      "title": "Hydratation",
+      "reset": "Réinitialiser",
+      "goal": "Objectif 2.0L",
+      "liter": "L"
+    },
+    "reports": {
+      "title": "Bilans Intelligents",
+      "daily": "Quotidien",
+      "weekly": "Hebdomadaire"
+    },
+    "settings": {
+      "lose": "Perte de poids",
+      "gain": "Prise de masse",
+      "maintain": "Maintien",
+      "notSet": "Non défini"
+    },
+    "reportGenerated": "Bilan généré avec succès"
   }
 }

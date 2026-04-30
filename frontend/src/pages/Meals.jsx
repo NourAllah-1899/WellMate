@@ -89,7 +89,10 @@ export default function Meals() {
           estimatedCalories: estimate?.totalCalories 
         })
       } else {
-        await api.post('/api/meals', { description })
+        await api.post('/api/meals', { 
+          description,
+          estimatedCalories: estimate?.totalCalories
+        })
       }
       setDescription('')
       setEstimate(null)
@@ -165,8 +168,7 @@ export default function Meals() {
             placeholder='e.g. "2 eggs, bread, and a glass of milk"'
           />
         </label>
-
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 14 }}>
           <button className="wm-btn secondary" type="button" onClick={onEstimate} disabled={!canEstimate}>
             {actionLoading ? t('meals.working') : t('meals.estimate')}
           </button>

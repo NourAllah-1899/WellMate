@@ -65,6 +65,7 @@ export default function PhysicalActivityScreen() {
   const [duration, setDuration] = useState('');
   const [intensity, setIntensity] = useState('medium');
   const [activityDate, setActivityDate] = useState(TODAY);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [loadingActivity, setLoadingActivity] = useState(false);
   const [activities, setActivities] = useState<any[]>([]);
   const [totalCalories, setTotalCalories] = useState(0);
@@ -121,25 +122,49 @@ export default function PhysicalActivityScreen() {
     }
     setLoadingActivity(true);
     try {
-      await apiClient.post('/activities', {
-        activityType,
-        description,
-        durationMinutes: parseInt(duration),
-        intensity,
-        activityDate
-      });
+      if (editingId) {
+        await apiClient.put(`/activities/${editingId}`, {
+          activityType,
+          description,
+          durationMinutes: parseInt(duration),
+          intensity,
+          activityDate
+        });
+      } else {
+        await apiClient.post('/activities', {
+          activityType,
+          description,
+          durationMinutes: parseInt(duration),
+          intensity,
+          activityDate
+        });
+      }
       Alert.alert(t('common.success'), t('common.success'));
-      setActivityType('');
-      setDescription('');
-      setDuration('');
-      setIntensity('medium');
-      setActivityDate(TODAY);
+      resetActivityForm();
       fetchTodayActivities();
     } catch (error: any) {
       Alert.alert(t('common.error'), 'Impossible d\'enregistrer l\'activité.');
     } finally {
       setLoadingActivity(false);
     }
+  };
+
+  const resetActivityForm = () => {
+    setActivityType('');
+    setDescription('');
+    setDuration('');
+    setIntensity('medium');
+    setActivityDate(TODAY);
+    setEditingId(null);
+  };
+
+  const handleEditActivity = (act: any) => {
+    setEditingId(act.id);
+    setActivityType(act.activity_type);
+    setDescription(act.description || '');
+    setDuration(act.duration_minutes.toString());
+    setIntensity(act.intensity || 'medium');
+    setActivityDate(act.activity_date ? act.activity_date.split('T')[0] : TODAY);
   };
 
   const handleGenerateProgram = async () => {
@@ -152,7 +177,7 @@ export default function PhysicalActivityScreen() {
       });
       setGeneratedProgram(response.data.program);
     } catch (error: any) {
-      Alert.alert(t('common.error'), 'Impossible de générer le programme.');
+      Alert.alert(t('common.error'), error.response?.data?.message || 'Impossible de générer le programme.');
     } finally {
       setLoadingProgram(false);
     }
@@ -258,7 +283,7 @@ export default function PhysicalActivityScreen() {
               {renderStatCard('🔥', 'Calories', `${totalCalories} kcal`, 'estimation')}
             </View>
             <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-              <Text style={[styles.cardTitle, { color: theme.text }]}>➕ {t('activities.addActivity')}</Text>
+              <Text style={[styles.cardTitle, { color: theme.text }]}>{editingId ? '✏️ Modifier l\'activité' : `➕ ${t('activities.addActivity')}`}</Text>
               <Text style={[styles.fieldLabel, { color: theme.text }]}>{t('activities.activityType')}</Text>
               <TouchableOpacity style={[styles.input, { backgroundColor: theme.background, borderColor: theme.border, justifyContent: 'center' }]} onPress={() => setShowTypeSelect(!showTypeSelect)}>
                 <Text style={{ color: activityType ? theme.text : theme.muted }}>{ACTIVITY_TYPES.find(t => t.value === activityType)?.label || '— Choisir —'}</Text>
@@ -289,14 +314,34 @@ export default function PhysicalActivityScreen() {
               )}
               <Text style={[styles.fieldLabel, { color: theme.text, marginTop: 10 }]}>{t('activities.date')}</Text>
               <TextInput style={[styles.input, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]} placeholder="YYYY-MM-DD" placeholderTextColor={theme.muted} value={activityDate} onChangeText={setActivityDate} />
-              <TouchableOpacity style={[styles.button, { backgroundColor: Colors.brand.primary, marginTop: 10 }]} onPress={handleLogActivity} disabled={loadingActivity}>{loadingActivity ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{t('activities.save')}</Text>}</TouchableOpacity>
+              {editingId ? (
+                <View style={{flexDirection: 'row', gap: 10, marginTop: 10}}>
+                  <TouchableOpacity style={[styles.button, { backgroundColor: Colors.brand.primary, flex: 1 }]} onPress={handleLogActivity} disabled={loadingActivity}>
+                    {loadingActivity ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{t('common.save') || 'Mettre à jour'}</Text>}
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.button, { backgroundColor: theme.card, borderColor: theme.border, borderWidth: 1, flex: 1 }]} onPress={resetActivityForm} disabled={loadingActivity}>
+                    <Text style={[styles.buttonText, {color: theme.text}]}>{t('common.cancel') || 'Annuler'}</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity style={[styles.button, { backgroundColor: Colors.brand.primary, marginTop: 10 }]} onPress={handleLogActivity} disabled={loadingActivity}>
+                  {loadingActivity ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>{t('activities.save')}</Text>}
+                </TouchableOpacity>
+              )}
             </View>
             <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
               <Text style={[styles.cardTitle, { color: theme.text }]}>📅 {t('activities.todayActivities')}</Text>
               {activities.length === 0 ? (<Text style={{ color: theme.muted, textAlign: 'center', marginVertical: 20 }}>{t('activities.noActivities')}</Text>) : (
                 <View style={{ gap: 12 }}>{activities.map((act) => (
                     <View key={act.id} style={[styles.activityItem, { backgroundColor: theme.background, borderColor: theme.border }]}><View style={{ flex: 1 }}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}><Text style={[styles.activityType, { color: theme.text }]}>{ACTIVITY_TYPES.find(t => t.value === act.activity_type)?.label || act.activity_type}</Text><View style={[styles.intensityBadge, { backgroundColor: act.intensity === 'high' ? Colors.error + '20' : act.intensity === 'medium' ? Colors.brand.primary + '20' : Colors.success + '20' }]}><Text style={{ fontSize: 10, fontWeight: 'bold', color: act.intensity === 'high' ? Colors.error : act.intensity === 'medium' ? Colors.brand.primary : Colors.success }}>{act.intensity === 'high' ? 'Élevée' : act.intensity === 'medium' ? 'Modérée' : 'Faible'}</Text></View></View><Text style={{ color: theme.secondaryText, fontSize: 13 }}>{act.duration_minutes} min • {act.calories_burned} kcal</Text></View>
-                      <TouchableOpacity onPress={async () => { Alert.alert('Supprimer', '...', [{ text: 'Annuler', style: 'cancel' }, { text: 'Supprimer', style: 'destructive', onPress: async () => { try { await apiClient.delete(`/activities/${act.id}`); fetchTodayActivities(); } catch (e) {} }}]); }}><Feather name="trash-2" size={18} color={Colors.error} /></TouchableOpacity>
+                      <View style={{ flexDirection: 'row', gap: 15, alignItems: 'center' }}>
+                        <TouchableOpacity onPress={() => handleEditActivity(act)}>
+                          <Feather name="edit-2" size={18} color={Colors.brand.primary} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={async () => { Alert.alert('Supprimer', 'Voulez-vous vraiment supprimer cette activité ?', [{ text: 'Annuler', style: 'cancel' }, { text: 'Supprimer', style: 'destructive', onPress: async () => { try { await apiClient.delete(`/activities/${act.id}`); fetchTodayActivities(); } catch (e) {} }}]); }}>
+                          <Feather name="trash-2" size={18} color={Colors.error} />
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   ))}</View>
               )}

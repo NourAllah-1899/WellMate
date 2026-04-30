@@ -16,4 +16,7 @@ router.get('/stats', authenticate, controller.getActivitiesRange)
 // Delete an activity
 router.delete('/:activityId', authenticate, controller.deleteActivity)
 
+// Update an activity
+router.put('/:activityId', authenticate, controller.updateActivity)
+
 export default router
