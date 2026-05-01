@@ -1,27 +1,31 @@
 import { Router } from 'express';
-import { getEvents, postEvent, joinEvent } from '../controllers/events.controller.js';
+import { getEvents, postEvent, joinEvent, leaveEvent, getEventDetails, getMyEvents } from '../controllers/events.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
+import jwt from 'jsonwebtoken';
 
 const router = Router();
 
-// Public — but optionally enriched with hasJoined if authenticated
-router.get('/', (req, res, next) => {
-    // Try to decode token if present, but don't block if missing
+// Middleware to optionally attach user for public routes
+const optionalAuth = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (authHeader?.startsWith('Bearer ')) {
-        import('jsonwebtoken').then(({ default: jwt }) => {
-            try {
-                req.user = jwt.verify(authHeader.split(' ')[1], process.env.JWT_SECRET);
-            } catch { /* ignore */ }
-            next();
-        });
-    } else {
-        next();
+        try {
+            const token = authHeader.split(' ')[1];
+            req.user = jwt.verify(token, process.env.JWT_SECRET);
+        } catch { /* ignore */ }
     }
-}, getEvents);
+    next();
+};
+
+// Public/Optional routes
+router.get('/', optionalAuth, getEvents);
+router.get('/my-events', authenticate, getMyEvents); // Changed from me/all to my-events for simplicity or as requested
+router.get('/:id', optionalAuth, getEventDetails);
 
 // Protected
 router.post('/', authenticate, postEvent);
 router.post('/:id/join', authenticate, joinEvent);
+router.delete('/:id/join', authenticate, leaveEvent);
 
 export default router;
+
