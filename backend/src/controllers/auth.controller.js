@@ -105,8 +105,8 @@ export const getMe = async (req, res) => {
         }
         res.json({ success: true, user: rows[0] });
     } catch (err) {
-        console.error('GetMe error:', err);
-        res.status(500).json({ success: false, message: 'Server error.' });
+        console.error('GetMe error:', err.message, err.code);
+        res.status(500).json({ success: false, message: 'Server error.', error: err.message });
     }
 };
 

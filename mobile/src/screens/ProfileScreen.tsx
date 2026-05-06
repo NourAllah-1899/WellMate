@@ -20,8 +20,9 @@ export default function ProfileScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', fetchProfile);
+    return unsubscribe;
+  }, [navigation]);
 
   const fetchProfile = async () => {
     try {
@@ -92,8 +93,13 @@ export default function ProfileScreen({ navigation }: Props) {
                 </View>
             </View>
 
-            <TouchableOpacity style={[styles.editButton, { backgroundColor: isDarkMode ? '#2d3748' : '#edf2f7' }]}>
-                <Text style={[styles.editButtonText, { color: theme.text }]}>{t('profile.editWeb')}</Text>
+            <TouchableOpacity
+                style={[styles.editButton, { backgroundColor: Colors.brand.primary }]}
+                onPress={() => navigation.navigate('EditProfile')}
+                activeOpacity={0.85}
+            >
+                <Feather name="edit-2" size={15} color="#fff" style={{ marginRight: 8 }} />
+                <Text style={[styles.editButtonText, { color: '#fff' }]}>{t('profile.edit')}</Text>
             </TouchableOpacity>
         </View>
 
@@ -126,7 +132,7 @@ const styles = StyleSheet.create({
   value: { fontSize: 15, fontWeight: '700' },
   langBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: Colors.brand.primary },
   langBtnText: { fontWeight: 'bold', fontSize: 12 },
-  editButton: { marginTop: 25, padding: 14, borderRadius: 12, alignItems: 'center' },
+  editButton: { marginTop: 25, padding: 14, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
   editButtonText: { fontSize: 13, fontWeight: '600' },
   logoutButton: {
     backgroundColor: 'transparent',

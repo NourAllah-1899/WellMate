@@ -43,6 +43,104 @@
     "medium": "Medium",
     "high": "High"
   },
+  "physicalActivity": {
+    "title": "Physical Activity",
+    "subtitle": "Track your sessions and generate a personalized sports program.",
+    "tabSuivi": "🏃 Activity Tracking",
+    "tabProgram": "📋 Sport Program",
+    "summary": {
+      "sessions": "Sessions today",
+      "duration": "Total Duration",
+      "calories": "Calories Burned",
+      "recorded": "activities recorded",
+      "sessionDay": "today's session",
+      "estimation": "today's estimate"
+    },
+    "form": {
+      "addTitle": "➕ Record an activity",
+      "editTitle": "✏️ Edit activity",
+      "type": "Activity type *",
+      "choose": "— Choose —",
+      "duration": "Duration (minutes) *",
+      "intensity": "Intensity",
+      "date": "Date",
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "Ex. 5 km in the forest, difficult session...",
+      "save": "Record",
+      "update": "Update",
+      "cancel": "Cancel",
+      "errorFill": "Please fill in activity type and duration.",
+      "errorSave": "Error during recording.",
+      "errorDelete": "Error during deletion.",
+      "confirmDelete": "Delete this activity?"
+    },
+    "history": {
+      "title": "📅 Today's activities",
+      "emptyTitle": "No activities recorded",
+      "emptyDesc": "Start by adding your first session of the day above."
+    },
+    "types": {
+      "running": "Running",
+      "walking": "Walking",
+      "cycling": "Cycling",
+      "swimming": "Swimming",
+      "gym": "Gym / Weightlifting",
+      "yoga": "Yoga",
+      "football": "Football",
+      "basketball": "Basketball",
+      "tennis": "Tennis",
+      "boxing": "Boxing",
+      "hiit": "HIIT",
+      "pilates": "Pilates",
+      "other": "Other"
+    },
+    "intensities": {
+      "low": "Low",
+      "medium": "Moderate",
+      "high": "High"
+    }
+  },
+  "programs": {
+    "title": "Sport Program",
+    "preferences": "⚙️ Your preferences",
+    "prefDesc": "Configure your goals to generate an adapted program.",
+    "objective": "Objective",
+    "level": "Level",
+    "sessionsPerWeek": "Sessions / week",
+    "generate": "✨ Generate my program",
+    "generating": "⏳ Generation in progress...",
+    "emptyTitle": "No program generated",
+    "emptyDesc": "Configure your preferences above and click \"Generate my program\".",
+    "header": {
+      "sessions": "Sessions / week",
+      "duration": "Duration / session",
+      "trainingDays": "training days",
+      "perTraining": "per training"
+    },
+    "actions": {
+      "save": "💾 Save",
+      "saved": "✓ Saved",
+      "regenerate": "🔄 Regenerate",
+      "successSave": "✅ Program saved successfully.",
+      "errorSave": "Error during saving.",
+      "errorGenerate": "Error during generation."
+    },
+    "schedule": "📆 Weekly planning",
+    "rest": "Rest",
+    "recommendations": "💡 Recommendations",
+    "objectives": {
+      "weight_loss": "Weight loss",
+      "muscle_gain": "Muscle gain",
+      "endurance": "Improve endurance",
+      "flexibility": "Flexibility & mobility",
+      "maintenance": "Form maintenance"
+    },
+    "levels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    }
+  },
   "smoking": {
     "title": "Smoking Tracker",
     "logToday": "Log Today's Cigarettes",
@@ -57,22 +155,6 @@
     "weekly": "Weekly",
     "monthly": "Monthly",
     "noStats": "No statistics available yet."
-  },
-  "programs": {
-    "title": "Sport Programs",
-    "generateBtn": "Generate Program",
-    "activeProgram": "Active Program",
-    "noProgram": "No active program. Generate one based on your profile and activities.",
-    "sessions": "Sessions/Week",
-    "duration": "Duration",
-    "schedule": "Weekly Schedule",
-    "recommendations": "Recommendations",
-    "generating": "Generating...",
-    "objective": "Main objective",
-    "level": "Level",
-    "sessionsPerWeek": "Sessions per week",
-    "preview": "Previewed Plan !",
-    "tips": "Tips & Recommendations"
   },
   "auth": {
     "email": "Email",
@@ -227,5 +309,58 @@
       "victory": "Every cigarette avoided is a victory for your lungs.",
       "victoryFact": "Tobacco contains more than 7000 chemical substances, 70 of which are carcinogenic."
     }
+  },
+  "events": {
+    "title": "Move Together, Stay Healthy.",
+    "subtitle": "Discover local activities, join passionate groups, and make fitness a social experience.",
+    "activeEvents": "Active Events",
+    "participants": "Participants",
+    "feed": "📰 Feed",
+    "mapView": "📍 Map View",
+    "createEvent": "✨ Create Event",
+    "myEvents": "👤 My Events",
+    "searchPlaceholder": "Search events...",
+    "allActivities": "All Activities",
+    "host": "Host",
+    "joining": "joining",
+    "joinActivity": "Join Activity",
+    "alreadyJoined": "Already Joined ✓",
+    "eventEnded": "Event Ended",
+    "noActivities": "No activities found",
+    "noActivitiesSubtitle": "It's a bit quiet here. Be the pioneer and start a new community event today!",
+    "launchFirst": "🚀 Launch First Event",
+    "tapToJoin": "Tap to Join",
+    "newActivity": "New Activity",
+    "cancel": "Cancel",
+    "eventTitle": "Event Title",
+    "activityType": "Activity Type",
+    "date": "Date (YYYY-MM-DD)",
+    "time": "Time (HH:MM)",
+    "description": "Description",
+    "selectLocation": "📍 Select Location (Tap on Map)",
+    "publishEvent": "Publish Event",
+    "creating": "Creating...",
+    "organizedByMe": "Organized by Me",
+    "joinedByMe": "Joined by Me",
+    "noCreated": "You haven't created any events yet.",
+    "noJoined": "You haven't joined any events yet.",
+    "confirmDelete": "Are you sure you want to delete this event? This action cannot be undone.",
+    "capacityReached": "Capacity Reached",
+    "full": "Full",
+    "status": {
+      "upcoming": "Upcoming",
+      "ongoing": "Ongoing",
+      "finished": "Finished"
+    }
+  },
+  "footer": {
+    "about": "About WellMate",
+    "aboutDesc": "WellMate is your AI-powered personal health companion, helping you track nutrition, activity, and habits for a better life.",
+    "quickLinks": "Quick Links",
+    "contactUs": "Contact Us",
+    "address": "123 Health St, Wellness City",
+    "phone": "+1 (555) 000-1111",
+    "email": "support@wellmate.com",
+    "rights": "All rights reserved."
   }
 }

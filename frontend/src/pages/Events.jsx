@@ -4,8 +4,10 @@ import EventsFeed from './events/EventsFeed';
 import EventsMap from './events/EventsMap';
 import CreateEvent from './events/CreateEvent';
 import MyEvents from './events/MyEvents';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Events() {
+    const { t } = useLanguage();
     const [view, setView] = useState('feed'); // 'feed', 'map', 'create', 'my'
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -40,17 +42,15 @@ export default function Events() {
                 const res = await api.delete(`/api/events/${eventId}/join`);
                 if (res.data.success) {
                     fetchEvents();
-                    alert('Successfully left the event.');
                 }
             } else {
                 const res = await api.post(`/api/events/${eventId}/join`, {});
                 if (res.data.success) {
                     fetchEvents();
-                    alert('Successfully joined the event!');
                 }
             }
         } catch (err) {
-            alert(err.response?.data?.message || 'Action failed.');
+            console.error('Join/Leave error:', err);
         }
     };
 
@@ -85,18 +85,18 @@ export default function Events() {
                          color: 'white'
                      }}>
                     <div className="relative z-10 max-w-2xl">
-                        <h1 className="text-white text-4xl md:text-5xl mb-4 leading-tight">Move Together, <br/>Stay Healthy.</h1>
+                        <h1 className="text-white text-4xl md:text-5xl mb-4 leading-tight" dangerouslySetInnerHTML={{ __html: t('events.title').replace(', ', ', <br/>') }}></h1>
                         <p className="text-white/80 text-lg mb-8 max-w-md">
-                            Discover local activities, join passionate groups, and make fitness a social experience.
+                            {t('events.subtitle')}
                         </p>
                         <div className="flex flex-wrap gap-4">
                             <div className="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/20">
                                 <span className="block text-2xl font-black">{events.length}</span>
-                                <span className="text-xs uppercase tracking-wider opacity-70">Active Events</span>
+                                <span className="text-xs uppercase tracking-wider opacity-70">{t('events.activeEvents')}</span>
                             </div>
                             <div className="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/20">
                                 <span className="block text-2xl font-black">{events.reduce((acc, e) => acc + e.participant_count, 0)}</span>
-                                <span className="text-xs uppercase tracking-wider opacity-70">Participants</span>
+                                <span className="text-xs uppercase tracking-wider opacity-70">{t('events.participants')}</span>
                             </div>
                         </div>
                     </div>
@@ -112,25 +112,25 @@ export default function Events() {
                         className={`wm-btn small ${view === 'feed' ? '' : 'secondary'}`}
                         onClick={() => setView('feed')}
                     >
-                        📰 Feed
+                        {t('events.feed')}
                     </button>
                     <button 
                         className={`wm-btn small ${view === 'map' ? '' : 'secondary'}`}
                         onClick={() => setView('map')}
                     >
-                        📍 Map View
+                        {t('events.mapView')}
                     </button>
                     <button 
                         className={`wm-btn small success`}
                         onClick={() => setView('create')}
                     >
-                        ✨ Create Event
+                        {t('events.createEvent')}
                     </button>
                     <button 
                         className={`wm-btn small secondary`}
                         onClick={() => setView('my')}
                     >
-                        👤 My Events
+                        {t('events.myEvents')}
                     </button>
                 </div>
 
@@ -139,7 +139,7 @@ export default function Events() {
                         <input 
                             type="text" 
                             className="wm-input !mt-0 !py-2 text-sm max-w-[200px]" 
-                            placeholder="Search events..."
+                            placeholder={t('events.searchPlaceholder')}
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
                         />
@@ -148,7 +148,7 @@ export default function Events() {
                             value={filterActivity}
                             onChange={e => setFilterActivity(e.target.value)}
                         >
-                            <option value="All">All Activities</option>
+                            <option value="All">{t('events.allActivities')}</option>
                             <option value="Running">Running</option>
                             <option value="Walking">Walking</option>
                             <option value="Cycling">Cycling</option>

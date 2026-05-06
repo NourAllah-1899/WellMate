@@ -1,47 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import api from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
-
-// ─── Constants ─────────────────────────────────────────────────────────────────
-const ACTIVITY_TYPES = [
-  { value: 'running',    label: 'Course à pied' },
-  { value: 'walking',    label: 'Marche' },
-  { value: 'cycling',    label: 'Vélo' },
-  { value: 'swimming',   label: 'Natation' },
-  { value: 'gym',        label: 'Musculation' },
-  { value: 'yoga',       label: 'Yoga' },
-  { value: 'football',   label: 'Football' },
-  { value: 'basketball', label: 'Basketball' },
-  { value: 'tennis',     label: 'Tennis' },
-  { value: 'boxing',     label: 'Boxe' },
-  { value: 'hiit',       label: 'HIIT' },
-  { value: 'pilates',    label: 'Pilates' },
-  { value: 'other',      label: 'Autre' },
-]
-
-const INTENSITY_LABELS = { low: 'Faible', medium: 'Modérée', high: 'Élevée' }
-
-const INTENSITY_COLORS = {
-  low:    'bg-emerald-50 text-emerald-700 border-emerald-200',
-  medium: 'bg-amber-50 text-amber-700 border-amber-200',
-  high:   'bg-red-50 text-red-700 border-red-200',
-}
-
-const OBJECTIVES = [
-  { value: 'perte_de_poids',      label: 'Perte de poids' },
-  { value: 'prise_de_masse',      label: 'Prise de masse musculaire' },
-  { value: 'endurance',           label: 'Améliorer l\'endurance' },
-  { value: 'flexibilite',         label: 'Flexibilité & mobilité' },
-  { value: 'maintien',            label: 'Maintien de la forme' },
-]
-
-const LEVELS = [
-  { value: 'debutant',     label: 'Débutant' },
-  { value: 'intermediaire', label: 'Intermédiaire' },
-  { value: 'avance',       label: 'Avancé' },
-]
-
-const TODAY = new Date().toISOString().split('T')[0]
+import { useLanguage } from '../context/LanguageContext.jsx'
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
@@ -58,17 +18,22 @@ function StatCard({ icon, label, value, sub }) {
   )
 }
 
-function ActivityCard({ activity, onDelete, onEdit }) {
-  const label = ACTIVITY_TYPES.find(t => t.value === activity.activity_type)?.label || activity.activity_type
-  const intensityClass = INTENSITY_COLORS[activity.intensity] || 'bg-slate-50 text-slate-700 border-slate-200'
+function ActivityCard({ activity, onDelete, onEdit, t }) {
+  const intensityClass = {
+    low:    'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
+    medium: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
+    high:   'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800',
+  }[activity.intensity] || 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
 
   return (
     <div className="wm-panel flex items-start justify-between gap-4">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-1">
-          <span className="font-bold capitalize" style={{ color: 'var(--text-heading)' }}>{label}</span>
+          <span className="font-bold capitalize" style={{ color: 'var(--text-heading)' }}>
+            {t(`physicalActivity.types.${activity.activity_type}`) || activity.activity_type}
+          </span>
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${intensityClass}`}>
-            {INTENSITY_LABELS[activity.intensity] || activity.intensity}
+            {t(`physicalActivity.intensities.${activity.intensity}`) || activity.intensity}
           </span>
         </div>
         <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -85,17 +50,17 @@ function ActivityCard({ activity, onDelete, onEdit }) {
           <button
             type="button"
             onClick={() => onEdit(activity)}
-            className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-50 transition-colors"
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 text-indigo-700 hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-900/30 transition-colors"
           >
-            Modifier
+            {t('common.edit')}
           </button>
         )}
         <button
           type="button"
           onClick={() => onDelete(activity.id)}
-          className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-900/30 transition-colors"
         >
-          Supprimer
+          {t('common.delete')}
         </button>
       </div>
     </div>
@@ -106,13 +71,13 @@ function EmptyState({ icon, title, desc }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <div className="text-4xl mb-3">{icon}</div>
-      <div className="font-bold text-slate-700 mb-1">{title}</div>
-      <div className="text-sm text-slate-400 max-w-xs">{desc}</div>
+      <div className="font-bold mb-1" style={{ color: 'var(--text-heading)' }}>{title}</div>
+      <div className="text-sm max-w-xs" style={{ color: 'var(--text-muted)' }}>{desc}</div>
     </div>
   )
 }
 
-function DayCard({ day, activities }) {
+function DayCard({ day, activities, t }) {
   return (
     <div className="wm-panel overflow-hidden p-0" style={{ padding: 0 }}>
       <div style={{ backgroundColor: 'var(--brand-primary)' }} className="px-4 py-2">
@@ -129,7 +94,7 @@ function DayCard({ day, activities }) {
             ))}
           </ul>
         ) : (
-          <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>Repos</p>
+          <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>{t('programs.rest')}</p>
         )}
       </div>
     </div>
@@ -138,9 +103,43 @@ function DayCard({ day, activities }) {
 
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
+const TODAY = new Date().toISOString().split('T')[0]
+
 export default function PhysicalActivity() {
   const { me } = useAuth()
+  const { t } = useLanguage()
   const [activeTab, setActiveTab] = useState('suivi')
+
+  // ── Memos for translated options
+  const ACTIVITY_TYPES = useMemo(() => [
+    { value: 'running',    label: t('physicalActivity.types.running') },
+    { value: 'walking',    label: t('physicalActivity.types.walking') },
+    { value: 'cycling',    label: t('physicalActivity.types.cycling') },
+    { value: 'swimming',   label: t('physicalActivity.types.swimming') },
+    { value: 'gym',        label: t('physicalActivity.types.gym') },
+    { value: 'yoga',       label: t('physicalActivity.types.yoga') },
+    { value: 'football',   label: t('physicalActivity.types.football') },
+    { value: 'basketball', label: t('physicalActivity.types.basketball') },
+    { value: 'tennis',     label: t('physicalActivity.types.tennis') },
+    { value: 'boxing',     label: t('physicalActivity.types.boxing') },
+    { value: 'hiit',       label: t('physicalActivity.types.hiit') },
+    { value: 'pilates',    label: t('physicalActivity.types.pilates') },
+    { value: 'other',      label: t('physicalActivity.types.other') },
+  ], [t])
+
+  const OBJECTIVES = useMemo(() => [
+    { value: 'perte_de_poids',      label: t('programs.objectives.weight_loss') },
+    { value: 'prise_de_masse',      label: t('programs.objectives.muscle_gain') },
+    { value: 'endurance',           label: t('programs.objectives.endurance') },
+    { value: 'flexibilite',         label: t('programs.objectives.flexibility') },
+    { value: 'maintien',            label: t('programs.objectives.maintenance') },
+  ], [t])
+
+  const LEVELS = useMemo(() => [
+    { value: 'debutant',     label: t('programs.levels.beginner') },
+    { value: 'intermediaire', label: t('programs.levels.intermediate') },
+    { value: 'avance',       label: t('programs.levels.advanced') },
+  ], [t])
 
   // ── Activity state
   const [activityType, setActivityType]       = useState('')
@@ -197,7 +196,7 @@ export default function PhysicalActivity() {
   const onSaveActivity = async () => {
     setActError('')
     if (!activityType || !durationMinutes) {
-      setActError('Veuillez remplir le type d\'activité et la durée.')
+      setActError(t('physicalActivity.form.errorFill'))
       return
     }
     setActLoading(true)
@@ -219,7 +218,7 @@ export default function PhysicalActivity() {
       resetActivityForm()
       await fetchActivities()
     } catch (err) {
-      setActError(err?.response?.data?.message || 'Erreur lors de l\'enregistrement.')
+      setActError(err?.response?.data?.message || t('physicalActivity.form.errorSave'))
     } finally {
       setActLoading(false)
     }
@@ -245,12 +244,12 @@ export default function PhysicalActivity() {
   }
 
   const onDeleteActivity = async (id) => {
-    if (!window.confirm('Supprimer cette activité ?')) return
+    if (!window.confirm(t('physicalActivity.form.confirmDelete'))) return
     try {
       await api.delete(`/api/activities/${id}`)
       await fetchActivities()
     } catch {
-      setActError('Erreur lors de la suppression.')
+      setActError(t('physicalActivity.form.errorDelete'))
     }
   }
 
@@ -266,7 +265,7 @@ export default function PhysicalActivity() {
       })
       setSportProgram(res?.data?.program || null)
     } catch (err) {
-      setProgError(err?.response?.data?.message || 'Erreur lors de la génération.')
+      setProgError(err?.response?.data?.message || t('programs.actions.errorGenerate'))
     } finally {
       setProgLoading(false)
     }
@@ -279,7 +278,7 @@ export default function PhysicalActivity() {
       await api.post('/api/programs/save', { program: sportProgram })
       setProgSaved(true)
     } catch {
-      setProgError('Erreur lors de la sauvegarde.')
+      setProgError(t('programs.actions.errorSave'))
     } finally {
       setProgLoading(false)
     }
@@ -290,8 +289,8 @@ export default function PhysicalActivity() {
     return (
       <div className="wm-container">
         <div className="wm-card" style={{ maxWidth: 600, margin: '0 auto' }}>
-          <h1>Activité physique</h1>
-          <p className="wm-muted mt-2">Veuillez vous connecter pour accéder à cette section.</p>
+          <h1>{t('physicalActivity.title')}</h1>
+          <p className="wm-muted mt-2">{t('dashboard.notLoggedIn').replace('{logIn}', t('dashboard.logIn'))}</p>
         </div>
       </div>
     )
@@ -306,17 +305,17 @@ export default function PhysicalActivity() {
 
         {/* ── Page Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-black" style={{ color: 'var(--text-heading)' }}>Activité physique</h1>
+          <h1 className="text-2xl font-black" style={{ color: 'var(--text-heading)' }}>{t('physicalActivity.title')}</h1>
           <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
-            Suivez vos séances et générez un programme sportif personnalisé.
+            {t('physicalActivity.subtitle')}
           </p>
         </div>
 
         {/* ── Tabs */}
-        <div className="flex gap-1 mb-6 bg-slate-100 rounded-xl p-1 w-fit">
+        <div className="flex gap-1 mb-6 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 w-fit">
           {[
-            { key: 'suivi',     label: '🏃 Suivi d\'activité' },
-            { key: 'programme', label: '📋 Programme sportif' },
+            { key: 'suivi',     label: t('physicalActivity.tabSuivi') },
+            { key: 'programme', label: t('physicalActivity.tabProgram') },
           ].map(tab => (
             <button
               key={tab.key}
@@ -324,8 +323,8 @@ export default function PhysicalActivity() {
               onClick={() => setActiveTab(tab.key)}
               className={`px-5 py-2 rounded-lg text-sm font-bold transition-all duration-150 ${
                 activeTab === tab.key
-                  ? 'bg-white text-indigo-700 shadow-sm border border-slate-200'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-white dark:bg-slate-700 text-indigo-700 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-600'
+                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               {tab.label}
@@ -339,48 +338,48 @@ export default function PhysicalActivity() {
 
             {/* Error */}
             {actError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-medium rounded-xl px-4 py-3">
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-medium rounded-xl px-4 py-3 dark:bg-red-900/20 dark:border-red-900 dark:text-red-400">
                 {actError}
               </div>
             )}
 
             {/* Summary cards */}
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <StatCard
                 icon="🏅"
-                label="Séances aujourd'hui"
+                label={t('physicalActivity.summary.sessions')}
                 value={activities.length}
-                sub="activités enregistrées"
+                sub={t('physicalActivity.summary.recorded')}
               />
               <StatCard
                 icon="⏱️"
-                label="Durée totale"
+                label={t('physicalActivity.summary.duration')}
                 value={`${totalDuration} min`}
-                sub="session du jour"
+                sub={t('physicalActivity.summary.sessionDay')}
               />
               <StatCard
                 icon="🔥"
-                label="Calories brûlées"
+                label={t('physicalActivity.summary.calories')}
                 value={`${totalCalories} kcal`}
-                sub="estimation du jour"
+                sub={t('physicalActivity.summary.estimation')}
               />
             </div>
 
             {/* Add / Edit form */}
             <div className="wm-card">
               <h2 className="text-base font-black mb-4">
-                {editingId ? '✏️ Modifier l\'activité' : '➕ Enregistrer une activité'}
+                {editingId ? t('physicalActivity.form.editTitle') : t('physicalActivity.form.addTitle')}
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="wm-field">Type d'activité *</label>
+                  <label className="wm-field">{t('physicalActivity.form.type')}</label>
                   <select
                     className="wm-input"
                     value={activityType}
                     onChange={e => setActivityType(e.target.value)}
                   >
-                    <option value="">— Choisir —</option>
+                    <option value="">{t('physicalActivity.form.choose')}</option>
                     {ACTIVITY_TYPES.map(t => (
                       <option key={t.value} value={t.value}>{t.label}</option>
                     ))}
@@ -388,7 +387,7 @@ export default function PhysicalActivity() {
                 </div>
 
                 <div>
-                  <label className="wm-field">Durée (minutes) *</label>
+                  <label className="wm-field">{t('physicalActivity.form.duration')}</label>
                   <input
                     className="wm-input"
                     type="number"
@@ -400,20 +399,20 @@ export default function PhysicalActivity() {
                 </div>
 
                 <div>
-                  <label className="wm-field">Intensité</label>
+                  <label className="wm-field">{t('physicalActivity.form.intensity')}</label>
                   <select
                     className="wm-input"
                     value={intensity}
                     onChange={e => setIntensity(e.target.value)}
                   >
-                    <option value="low">Faible</option>
-                    <option value="medium">Modérée</option>
-                    <option value="high">Élevée</option>
+                    <option value="low">{t('physicalActivity.intensities.low')}</option>
+                    <option value="medium">{t('physicalActivity.intensities.medium')}</option>
+                    <option value="high">{t('physicalActivity.intensities.high')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="wm-field">Date</label>
+                  <label className="wm-field">{t('physicalActivity.form.date')}</label>
                   <input
                     className="wm-input"
                     type="date"
@@ -424,13 +423,13 @@ export default function PhysicalActivity() {
               </div>
 
               <div className="mb-4">
-                <label className="wm-field">Notes (optionnel)</label>
+                <label className="wm-field">{t('physicalActivity.form.notes')}</label>
                 <textarea
                   className="wm-input"
                   rows={2}
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  placeholder="Ex. 5 km en forêt, séance difficile…"
+                  placeholder={t('physicalActivity.form.notesPlaceholder')}
                 />
               </div>
 
@@ -441,7 +440,7 @@ export default function PhysicalActivity() {
                   onClick={onSaveActivity}
                   disabled={actLoading}
                 >
-                  {actLoading ? 'Enregistrement…' : editingId ? 'Mettre à jour' : 'Enregistrer'}
+                  {actLoading ? t('common.loading') : editingId ? t('physicalActivity.form.update') : t('physicalActivity.form.save')}
                 </button>
                 {editingId && (
                   <button
@@ -449,7 +448,7 @@ export default function PhysicalActivity() {
                     className="wm-btn small secondary"
                     onClick={resetActivityForm}
                   >
-                    Annuler
+                    {t('physicalActivity.form.cancel')}
                   </button>
                 )}
               </div>
@@ -458,14 +457,14 @@ export default function PhysicalActivity() {
             {/* History */}
             <div className="wm-card">
               <h2 className="text-base font-black mb-4">
-                📅 Activités d'aujourd'hui
+                {t('physicalActivity.history.title')}
               </h2>
 
               {activities.length === 0 ? (
                 <EmptyState
                   icon="🏋️"
-                  title="Aucune activité enregistrée"
-                  desc="Commencez par ajouter votre première séance du jour ci-dessus."
+                  title={t('physicalActivity.history.emptyTitle')}
+                  desc={t('physicalActivity.history.emptyDesc')}
                 />
               ) : (
                 <div className="space-y-3">
@@ -475,6 +474,7 @@ export default function PhysicalActivity() {
                       activity={activity}
                       onDelete={onDeleteActivity}
                       onEdit={onEditActivity}
+                      t={t}
                     />
                   ))}
                 </div>
@@ -489,26 +489,26 @@ export default function PhysicalActivity() {
 
             {/* Error */}
             {progError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-medium rounded-xl px-4 py-3">
+              <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-medium rounded-xl px-4 py-3 dark:bg-red-900/20 dark:border-red-900 dark:text-red-400">
                 {progError}
               </div>
             )}
             {progSaved && (
-              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-medium rounded-xl px-4 py-3">
-                ✅ Programme sauvegardé avec succès.
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm font-medium rounded-xl px-4 py-3 dark:bg-emerald-900/20 dark:border-emerald-900 dark:text-emerald-400">
+                {t('programs.actions.successSave')}
               </div>
             )}
 
             {/* Preferences form */}
             <div className="wm-card">
-              <h2 className="text-base font-black mb-1">⚙️ Vos préférences</h2>
+              <h2 className="text-base font-black mb-1">{t('programs.preferences')}</h2>
               <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                Configurez vos objectifs pour générer un programme adapté.
+                {t('programs.prefDesc')}
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
                 <div>
-                  <label className="wm-field">Objectif</label>
+                  <label className="wm-field">{t('programs.objective')}</label>
                   <select
                     className="wm-input"
                     value={objective}
@@ -521,7 +521,7 @@ export default function PhysicalActivity() {
                 </div>
 
                 <div>
-                  <label className="wm-field">Niveau</label>
+                  <label className="wm-field">{t('programs.level')}</label>
                   <select
                     className="wm-input"
                     value={level}
@@ -534,14 +534,14 @@ export default function PhysicalActivity() {
                 </div>
 
                 <div>
-                  <label className="wm-field">Séances / semaine</label>
+                  <label className="wm-field">{t('programs.sessionsPerWeek')}</label>
                   <select
                     className="wm-input"
                     value={sessionsPerWeek}
                     onChange={e => setSessionsPerWeek(e.target.value)}
                   >
                     {[2, 3, 4, 5, 6].map(n => (
-                      <option key={n} value={n}>{n} jours</option>
+                      <option key={n} value={n}>{n} {t('programs.header.trainingDays')}</option>
                     ))}
                   </select>
                 </div>
@@ -553,7 +553,7 @@ export default function PhysicalActivity() {
                 onClick={onGenerateProgram}
                 disabled={progLoading}
               >
-                {progLoading ? '⏳ Génération en cours…' : '✨ Générer mon programme'}
+                {progLoading ? t('programs.generating') : t('programs.generate')}
               </button>
             </div>
 
@@ -561,7 +561,7 @@ export default function PhysicalActivity() {
             {progLoading && !sportProgram && (
               <div className="wm-card text-center">
                 <div className="text-3xl mb-2">⏳</div>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Génération du programme en cours…</p>
+                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('programs.generating')}</p>
               </div>
             )}
 
@@ -569,8 +569,8 @@ export default function PhysicalActivity() {
               <div className="wm-card">
                 <EmptyState
                   icon="📋"
-                  title="Aucun programme généré"
-                  desc={'Configurez vos préférences ci-dessus et cliquez sur \u00ab\u00a0Générer mon programme\u00a0\u00bb.'}
+                  title={t('programs.emptyTitle')}
+                  desc={t('programs.emptyDesc')}
                 />
               </div>
             )}
@@ -585,7 +585,7 @@ export default function PhysicalActivity() {
                       <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>{sportProgram.target_objective}</p>
                     </div>
                     {sportProgram.difficulty_level && (
-                      <span className="text-xs font-black px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 shrink-0">
+                      <span className="text-xs font-black px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800 shrink-0">
                         {sportProgram.difficulty_level.toUpperCase()}
                       </span>
                     )}
@@ -594,15 +594,15 @@ export default function PhysicalActivity() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
                     <StatCard
                       icon="📅"
-                      label="Séances / semaine"
+                      label={t('programs.header.sessions')}
                       value={sportProgram.weekly_sessions}
-                      sub="jours d'entraînement"
+                      sub={t('programs.header.trainingDays')}
                     />
                     <StatCard
                       icon="⏱️"
-                      label="Durée / séance"
+                      label={t('programs.header.duration')}
                       value={`${sportProgram.session_duration_minutes} min`}
-                      sub="par entraînement"
+                      sub={t('programs.header.perTraining')}
                     />
                   </div>
 
@@ -614,7 +614,7 @@ export default function PhysicalActivity() {
                       onClick={onSaveProgram}
                       disabled={progLoading || progSaved}
                     >
-                      {progSaved ? '✓ Sauvegardé' : '💾 Sauvegarder'}
+                      {progSaved ? t('programs.actions.saved') : t('programs.actions.save')}
                     </button>
                     <button
                       type="button"
@@ -622,7 +622,7 @@ export default function PhysicalActivity() {
                       onClick={onGenerateProgram}
                       disabled={progLoading}
                     >
-                      🔄 Régénérer
+                      {t('programs.actions.regenerate')}
                     </button>
                   </div>
                 </div>
@@ -630,10 +630,10 @@ export default function PhysicalActivity() {
                 {/* Weekly schedule day cards */}
                 {Array.isArray(sportProgram.exercises) && sportProgram.exercises.length > 0 && (
                   <div className="wm-card">
-                    <h2 className="text-base font-black mb-4">📆 Planning hebdomadaire</h2>
+                    <h2 className="text-base font-black mb-4">{t('programs.schedule')}</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {sportProgram.exercises.map((ex, idx) => (
-                        <DayCard key={idx} day={ex.day} activities={ex.activities} />
+                        <DayCard key={idx} day={ex.day} activities={ex.activities} t={t} />
                       ))}
                     </div>
                   </div>
@@ -642,7 +642,7 @@ export default function PhysicalActivity() {
                 {/* Recommendations */}
                 {Array.isArray(sportProgram.recommendations) && sportProgram.recommendations.length > 0 && (
                   <div className="wm-card">
-                    <h2 className="text-base font-black mb-3">💡 Recommandations</h2>
+                    <h2 className="text-base font-black mb-3">{t('programs.recommendations')}</h2>
                     <ul className="space-y-2">
                       {sportProgram.recommendations.map((rec, idx) => (
                         <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>

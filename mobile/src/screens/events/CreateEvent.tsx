@@ -10,15 +10,18 @@ interface CreateEventProps {
     onCancel: () => void;
 }
 
+import { useTheme } from '../../context/ThemeContext';
+
 export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
-    const systemColorScheme = useColorScheme();
-    const isLight = (systemColorScheme || Appearance.getColorScheme()) === 'light';
+    const { isDarkMode } = useTheme();
+    const isLight = !isDarkMode;
     const [formData, setFormData] = useState({
         title: '',
         activity_type: 'Running',
         date: '',
         time: '',
         description: '',
+        max_participants: null,
     });
     const [position, setPosition] = useState<{ latitude: number; longitude: number } | null>(null);
     const [loading, setLoading] = useState(false);
@@ -40,6 +43,7 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
         try {
             await apiClient.post('/events', {
                 ...formData,
+                max_participants: formData.max_participants ? parseInt(formData.max_participants as any) : null,
                 latitude: position.latitude,
                 longitude: position.longitude
             });
@@ -130,6 +134,16 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
                         numberOfLines={3}
                         value={formData.description}
                         onChangeText={text => setFormData({...formData, description: text})}
+                    />
+
+                    <Text style={[styles.label, isLight && styles.labelLight]}>Maximum Participants (Optional)</Text>
+                    <TextInput 
+                        style={[styles.input, isLight && styles.inputLight]}
+                        placeholder="e.g., 11 for 11v11 football"
+                        placeholderTextColor={isLight ? "#94a3b8" : "#64748b"}
+                        keyboardType="number-pad"
+                        value={formData.max_participants ? String(formData.max_participants) : ''}
+                        onChangeText={text => setFormData({...formData, max_participants: text ? parseInt(text) : null})}
                     />
 
                     <Text style={[styles.label, isLight && styles.labelLight]}>📍 Select Location (Tap on Map)</Text>

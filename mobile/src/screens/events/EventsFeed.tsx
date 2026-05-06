@@ -10,9 +10,11 @@ interface EventsFeedProps {
     setView: (view: string) => void;
 }
 
+import { useTheme } from '../../context/ThemeContext';
+
 export default function EventsFeed({ events, loading, onJoin, onRefresh, setView }: EventsFeedProps) {
-    const colorScheme = useColorScheme();
-    const isLight = colorScheme === 'light';
+    const { isDarkMode } = useTheme();
+    const isLight = !isDarkMode;
 
     if (loading && events.length === 0) {
         return (

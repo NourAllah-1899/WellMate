@@ -6,6 +6,7 @@ import MainTabNavigator from './MainTabNavigator';
 import MealsScreen from '../screens/MealsScreen';
 import GoalsScreen from '../screens/GoalsScreen';
 import ChatbotScreen from '../screens/ChatbotScreen';
+import EditProfileScreen from '../screens/EditProfileScreen';
 
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -57,6 +58,11 @@ export default function AppNavigator() {
         name="Chatbot" 
         component={ChatbotScreen} 
         options={{ title: t('common.chatbot'), headerBackTitle: t('common.cancel') }} 
+      />
+      <Stack.Screen 
+        name="EditProfile" 
+        component={EditProfileScreen} 
+        options={{ title: t('editProfile.title'), headerBackTitle: t('common.cancel') }} 
       />
     </Stack.Navigator>
   );

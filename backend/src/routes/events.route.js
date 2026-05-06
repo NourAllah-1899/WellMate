@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getEvents, postEvent, joinEvent, leaveEvent, getEventDetails, getMyEvents } from '../controllers/events.controller.js';
+import { getEvents, postEvent, joinEvent, leaveEvent, getEventDetails, getMyEvents, deleteEvent, updateEvent } from '../controllers/events.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import jwt from 'jsonwebtoken';
 
@@ -26,6 +26,8 @@ router.get('/:id', optionalAuth, getEventDetails);
 router.post('/', authenticate, postEvent);
 router.post('/:id/join', authenticate, joinEvent);
 router.delete('/:id/join', authenticate, leaveEvent);
+router.put('/:id', authenticate, updateEvent);
+router.delete('/:id', authenticate, deleteEvent);
 
 export default router;
 

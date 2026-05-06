@@ -23,6 +23,7 @@ const CreateEvent = ({ onCreated, onCancel }) => {
         date: '',
         time: '',
         description: '',
+        max_participants: null,
     });
     const [position, setPosition] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -128,6 +129,19 @@ const CreateEvent = ({ onCreated, onCancel }) => {
                         value={formData.description}
                         onChange={e => setFormData({...formData, description: e.target.value})}
                     ></textarea>
+                </div>
+
+                <div>
+                    <label className="wm-field">Maximum Participants (Optional)</label>
+                    <input 
+                        type="number" 
+                        className="wm-input" 
+                        placeholder="e.g., 11 for 11v11 football, or leave empty for unlimited"
+                        min="1"
+                        value={formData.max_participants || ''}
+                        onChange={e => setFormData({...formData, max_participants: e.target.value ? parseInt(e.target.value) : null})}
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty if there's no limit to how many people can join</p>
                 </div>
 
                 <div className="space-y-3">

@@ -43,6 +43,104 @@
     "medium": "Moyen",
     "high": "Élevé"
   },
+  "physicalActivity": {
+    "title": "Activité Physique",
+    "subtitle": "Suivez vos séances et générez un programme sportif personnalisé.",
+    "tabSuivi": "🏃 Suivi d'activité",
+    "tabProgram": "📋 Programme sportif",
+    "summary": {
+      "sessions": "Séances aujourd'hui",
+      "duration": "Durée totale",
+      "calories": "Calories brûlées",
+      "recorded": "activités enregistrées",
+      "sessionDay": "session du jour",
+      "estimation": "estimation du jour"
+    },
+    "form": {
+      "addTitle": "➕ Enregistrer une activité",
+      "editTitle": "✏️ Modifier l'activité",
+      "type": "Type d'activité *",
+      "choose": "— Choisir —",
+      "duration": "Durée (minutes) *",
+      "intensity": "Intensité",
+      "date": "Date",
+      "notes": "Notes (optionnel)",
+      "notesPlaceholder": "Ex. 5 km en forêt, séance difficile...",
+      "save": "Enregistrer",
+      "update": "Mettre à jour",
+      "cancel": "Annuler",
+      "errorFill": "Veuillez remplir le type d'activité et la durée.",
+      "errorSave": "Erreur lors de l'enregistrement.",
+      "errorDelete": "Erreur lors de la suppression.",
+      "confirmDelete": "Supprimer cette activité ?"
+    },
+    "history": {
+      "title": "📅 Activités d'aujourd'hui",
+      "emptyTitle": "Aucune activité enregistrée",
+      "emptyDesc": "Commencez par ajouter votre première séance du jour ci-dessus."
+    },
+    "types": {
+      "running": "Course à pied",
+      "walking": "Marche",
+      "cycling": "Vélo",
+      "swimming": "Natation",
+      "gym": "Musculation",
+      "yoga": "Yoga",
+      "football": "Football",
+      "basketball": "Basketball",
+      "tennis": "Tennis",
+      "boxing": "Boxe",
+      "hiit": "HIIT",
+      "pilates": "Pilates",
+      "other": "Autre"
+    },
+    "intensities": {
+      "low": "Faible",
+      "medium": "Modérée",
+      "high": "Élevée"
+    }
+  },
+  "programs": {
+    "title": "Programme Sportif",
+    "preferences": "⚙️ Vos préférences",
+    "prefDesc": "Configurez vos objectifs pour générer un programme adapté.",
+    "objective": "Objectif",
+    "level": "Niveau",
+    "sessionsPerWeek": "Séances / semaine",
+    "generate": "✨ Générer mon programme",
+    "generating": "⏳ Génération en cours...",
+    "emptyTitle": "Aucun programme généré",
+    "emptyDesc": "Configurez vos préférences ci-dessus et cliquez sur \"Générer mon programme\".",
+    "header": {
+      "sessions": "Séances / semaine",
+      "duration": "Durée / séance",
+      "trainingDays": "jours d'entraînement",
+      "perTraining": "par entraînement"
+    },
+    "actions": {
+      "save": "💾 Sauvegarder",
+      "saved": "✓ Sauvegardé",
+      "regenerate": "🔄 Régénérer",
+      "successSave": "✅ Programme sauvegardé avec succès.",
+      "errorSave": "Erreur lors de la sauvegarde.",
+      "errorGenerate": "Erreur lors de la génération."
+    },
+    "schedule": "📆 Planning hebdomadaire",
+    "rest": "Repos",
+    "recommendations": "💡 Recommandations",
+    "objectives": {
+      "weight_loss": "Perte de poids",
+      "muscle_gain": "Prise de masse musculaire",
+      "endurance": "Améliorer l'endurance",
+      "flexibility": "Flexibilité & mobilité",
+      "maintenance": "Maintien de la forme"
+    },
+    "levels": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé"
+    }
+  },
   "smoking": {
     "title": "Suivi du Tabagisme",
     "logToday": "Enregistrer les Cigarettes d'Aujourd'hui",
@@ -57,22 +155,6 @@
     "weekly": "Hebdomadaire",
     "monthly": "Mensuel",
     "noStats": "Aucune statistique disponible."
-  },
-  "programs": {
-    "title": "Programmes Sportifs",
-    "generateBtn": "Générer un Programme",
-    "activeProgram": "Programme Actif",
-    "noProgram": "Aucun programme actif. Générez-en un selon votre profil et vos activités.",
-    "sessions": "Séances/Semaine",
-    "duration": "Durée",
-    "schedule": "Horaire Hebdomadaire",
-    "recommendations": "Recommandations",
-    "generating": "Génération...",
-    "objective": "Objectif principal",
-    "level": "Niveau",
-    "sessionsPerWeek": "Séances par semaine",
-    "preview": "Plan Prévisualisé !",
-    "tips": "Conseils & Recommandations"
   },
   "auth": {
     "email": "Email",
@@ -223,9 +305,62 @@
       "increase": "Attention, vous fumez plus qu'hier. Votre santé est en jeu ! ⚠️",
       "increaseFact": "Le tabac est responsable de 90% des cancers du poumon.",
       "decrease": "Bien joué ! Vous avez réduit votre consommation. Un pas vers la liberté ! 📈",
-      "decreaseFact": "Moins fumer réduit immédiatement la pression artérielle.",
+      "decreaseFact": "Fumer moins réduit immédiatement la pression artérielle.",
       "victory": "Chaque cigarette évitée est une victoire pour vos poumons.",
       "victoryFact": "Le tabac contient plus de 7000 substances chimiques, dont 70 sont cancérigènes."
     }
+  },
+  "events": {
+    "title": "Bougez Ensemble, Restez en Forme.",
+    "subtitle": "Découvrez des activités locales, rejoignez des groupes passionnés et faites du fitness une expérience sociale.",
+    "activeEvents": "Événements Actifs",
+    "participants": "Participants",
+    "feed": "📰 Flux",
+    "mapView": "📍 Vue Carte",
+    "createEvent": "✨ Créer un Événement",
+    "myEvents": "👤 Mes Événements",
+    "searchPlaceholder": "Rechercher des événements...",
+    "allActivities": "Toutes les Activités",
+    "host": "Hôte",
+    "joining": "participants",
+    "joinActivity": "Rejoindre",
+    "alreadyJoined": "Déjà Rejoint ✓",
+    "eventEnded": "Événement Terminé",
+    "noActivities": "Aucune activité trouvée",
+    "noActivitiesSubtitle": "C'est un peu calme ici. Soyez le pionnier et lancez un nouvel événement aujourd'hui !",
+    "launchFirst": "🚀 Lancer le Premier Événement",
+    "tapToJoin": "Appuyez pour Rejoindre",
+    "newActivity": "Nouvelle Activité",
+    "cancel": "Annuler",
+    "eventTitle": "Titre de l'Événement",
+    "activityType": "Type d'Activité",
+    "date": "Date (AAAA-MM-JJ)",
+    "time": "Heure (HH:MM)",
+    "description": "Description",
+    "selectLocation": "📍 Sélectionner l'Emplacement (Sur la carte)",
+    "publishEvent": "Publier l'Événement",
+    "creating": "Création...",
+    "organizedByMe": "Organisés par Moi",
+    "joinedByMe": "Rejoints par Moi",
+    "noCreated": "Vous n'avez pas encore créé d'événements.",
+    "noJoined": "Vous n'avez pas encore rejoint d'événements.",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible.",
+    "capacityReached": "Capacité Atteinte",
+    "full": "Complet",
+    "status": {
+      "upcoming": "À venir",
+      "ongoing": "En cours",
+      "finished": "Terminé"
+    }
+  },
+  "footer": {
+    "about": "À Propos de WellMate",
+    "aboutDesc": "WellMate est votre compagnon santé personnel propulsé par l'IA, vous aidant à suivre votre nutrition, vos activités et vos habitudes pour une vie meilleure.",
+    "quickLinks": "Liens Rapides",
+    "contactUs": "Contactez-nous",
+    "address": "123 Rue de la Santé, Ville Bien-être",
+    "phone": "+216 50 462 848",
+    "email": "support@wellmate.com",
+    "rights": "Tous droits réservés."
   }
 }

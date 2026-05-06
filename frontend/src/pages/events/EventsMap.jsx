@@ -2,6 +2,7 @@ import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 // Fix for default marker icons in React-Leaflet
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -28,6 +29,7 @@ const activityIcons = {
 };
 
 const EventsMap = ({ events, onJoin }) => {
+    const { t } = useLanguage();
     // Center of Tunisia
     const center = [33.8869, 9.5375];
 
@@ -46,16 +48,23 @@ const EventsMap = ({ events, onJoin }) => {
                                     <span className="text-xl">{activityIcons[event.activity_type.toLowerCase()] || activityIcons.other}</span>
                                     <h4 className="font-bold m-0 text-sm">{event.title}</h4>
                                 </div>
-                                <p className="text-xs wm-muted m-0 mb-2">
+                                <p className="text-xs wm-muted m-0 mb-1">
                                     {new Date(event.date).toLocaleDateString()} at {event.time.substring(0, 5)}
+                                </p>
+                                <p className="text-xs wm-muted m-0 mb-2">
+                                    👥 {event.participant_count}
+                                    {event.max_participants && <span> / {event.max_participants}</span>}
+                                    {event.max_participants && event.participant_count >= event.max_participants && (
+                                        <span className="text-red-600 font-bold"> (Full)</span>
+                                    )}
                                 </p>
                                 <button 
                                     className={`wm-btn small w-full ${event.hasJoined ? 'secondary' : ''}`}
                                     style={{ padding: '4px 8px', fontSize: '10px' }}
                                     onClick={() => !event.hasJoined && onJoin(event.id)}
-                                    disabled={event.hasJoined || event.status === 'Finished'}
+                                    disabled={event.hasJoined || event.status === 'Finished' || (!event.hasJoined && event.max_participants && event.participant_count >= event.max_participants)}
                                 >
-                                    {event.hasJoined ? 'Joined ✓' : 'Join'}
+                                    {event.hasJoined ? t('events.alreadyJoined') : (!event.hasJoined && event.max_participants && event.participant_count >= event.max_participants) ? t('events.full') : t('events.joinActivity')}
                                 </button>
                             </div>
                         </Popup>

@@ -142,4 +142,24 @@
     "favoriteMeals": "الوجبات المفضلة (30 يوم)",
     "personalHealthDashboard": "لوحة الصحة الشخصية الخاصة بك والإحصائيات"
   }
+
+  ,"events": {
+    "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا الحدث؟ لا يمكن التراجع عن هذا الإجراء.",
+    "status": {
+      "upcoming": "قادِم",
+      "ongoing": "جارٍ",
+      "finished": "منتهي"
+    },
+    "joining": "مشاركون",
+    "myEvents": "أحداثي",
+    "organizedByMe": "منظمّة من طرفي",
+    "joinedByMe": "انضممت إليها",
+    "noCreated": "لم تقم بإنشاء أي أحداث بعد.",
+    "noJoined": "لم تنضم لأي أحداث بعد.",
+    "eventTitle": "عنوان الحدث",
+    "activityType": "نوع النشاط",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "description": "الوصف"
+  }
 }

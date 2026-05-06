@@ -14,20 +14,22 @@ import Goals from './pages/Goals.jsx'
 import Meals from './pages/Meals.jsx'
 import Layout from './components/Layout.jsx'
 
+import ProtectedRoute from './components/ProtectedRoute.jsx'
+
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout><Dashboard /></Layout>} />
-      <Route path="/health" element={<Layout><Health /></Layout>} />
-      <Route path="/goals" element={<Layout><Goals /></Layout>} />
-      <Route path="/meals" element={<Layout><Meals /></Layout>} />
-      <Route path="/activity" element={<Layout><Activity /></Layout>} />
-      <Route path="/physical-activity" element={<Layout><PhysicalActivity /></Layout>} />
-      <Route path="/events" element={<Layout><Events /></Layout>} />
+      <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+      <Route path="/health" element={<ProtectedRoute><Layout><Health /></Layout></ProtectedRoute>} />
+      <Route path="/goals" element={<ProtectedRoute><Layout><Goals /></Layout></ProtectedRoute>} />
+      <Route path="/meals" element={<ProtectedRoute><Layout><Meals /></Layout></ProtectedRoute>} />
+      <Route path="/activity" element={<ProtectedRoute><Layout><Activity /></Layout></ProtectedRoute>} />
+      <Route path="/physical-activity" element={<ProtectedRoute><Layout><PhysicalActivity /></Layout></ProtectedRoute>} />
+      <Route path="/events" element={<ProtectedRoute><Layout><Events /></Layout></ProtectedRoute>} />
       <Route path="/contact" element={<Layout><Contact /></Layout>} />
       <Route path="/register" element={<Layout><Register /></Layout>} />
       <Route path="/login" element={<Layout><Login /></Layout>} />
-      <Route path="/profile" element={<Layout><Profile /></Layout>} />
+      <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
     </Routes>
   )
 }

@@ -19,7 +19,12 @@ const activityIcons: Record<string, string> = {
     other: '🎯'
 };
 
+import { useTheme } from '../../context/ThemeContext';
+
 export default function EventsMap({ events, onJoin }: EventsMapProps) {
+    const { isDarkMode } = useTheme();
+    const isLight = !isDarkMode;
+
     // Center of Tunisia
     const initialRegion = {
         latitude: 33.8869,
@@ -33,7 +38,7 @@ export default function EventsMap({ events, onJoin }: EventsMapProps) {
             <MapView
                 style={styles.map}
                 initialRegion={initialRegion}
-                userInterfaceStyle="dark"
+                userInterfaceStyle={isDarkMode ? 'dark' : 'light'}
             >
                 {events.map((event) => (
                     <Marker

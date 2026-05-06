@@ -5,16 +5,16 @@ import EventsFeed from './events/EventsFeed';
 import EventsMap from './events/EventsMap';
 import CreateEvent from './events/CreateEvent';
 import MyEvents from './events/MyEvents';
+import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function EventsScreen() {
+    const { isDarkMode } = useTheme();
+    const { t } = useLanguage();
+    const isLight = !isDarkMode;
     const [view, setView] = useState('feed'); // 'feed', 'map', 'create', 'my'
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    // Safer theme detection
-    const systemColorScheme = useColorScheme();
-    const [colorScheme, setColorScheme] = useState(systemColorScheme || Appearance.getColorScheme() || 'dark');
-    const isLight = colorScheme === 'light';
 
     const fetchEvents = useCallback(async () => {
         setLoading(true);
@@ -78,19 +78,19 @@ export default function EventsScreen() {
     const renderHeader = () => (
         <View style={[styles.header, isLight && styles.headerLight]}>
             <View style={styles.hero}>
-                <Text style={[styles.heroTitle, isLight && styles.heroTitleLight]}>Move Together</Text>
-                <Text style={styles.heroSubtitle}>Join local activities and stay healthy.</Text>
+                <Text style={[styles.heroTitle, isLight && styles.heroTitleLight]}>{t('events.title').replace(', Stay Healthy.', '')}</Text>
+                <Text style={styles.heroSubtitle}>{t('events.subtitle')}</Text>
                 
                 <View style={styles.stats}>
                     <View style={[styles.statBox, isLight && styles.statBoxLight]}>
                         <Text style={[styles.statVal, isLight && styles.statValLight]}>{events.length}</Text>
-                        <Text style={styles.statLab}>Events</Text>
+                        <Text style={styles.statLab}>{t('events.activeEvents')}</Text>
                     </View>
                     <View style={[styles.statBox, isLight && styles.statBoxLight]}>
                         <Text style={[styles.statVal, isLight && styles.statValLight]}>
                             {events.reduce((acc: number, e: any) => acc + (e.participant_count || 0), 0)}
                         </Text>
-                        <Text style={styles.statLab}>People</Text>
+                        <Text style={styles.statLab}>{t('events.participants')}</Text>
                     </View>
                 </View>
             </View>
@@ -100,25 +100,25 @@ export default function EventsScreen() {
                     style={[styles.navBtn, isLight && styles.navBtnLight, view === 'feed' && styles.navBtnActive]} 
                     onPress={() => setView('feed')}
                 >
-                    <Text style={[styles.navBtnText, isLight && styles.navBtnTextLight, view === 'feed' && styles.navBtnTextActive]}>📰 Feed</Text>
+                    <Text style={[styles.navBtnText, isLight && styles.navBtnTextLight, view === 'feed' && styles.navBtnTextActive]}>{t('events.feed')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={[styles.navBtn, isLight && styles.navBtnLight, view === 'map' && styles.navBtnActive]} 
                     onPress={() => setView('map')}
                 >
-                    <Text style={[styles.navBtnText, isLight && styles.navBtnTextLight, view === 'map' && styles.navBtnTextActive]}>📍 Map View</Text>
+                    <Text style={[styles.navBtnText, isLight && styles.navBtnTextLight, view === 'map' && styles.navBtnTextActive]}>{t('events.mapView')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={[styles.navBtn, styles.navBtnSuccess]} 
                     onPress={() => setView('create')}
                 >
-                    <Text style={styles.navBtnTextWhite}>✨ Create</Text>
+                    <Text style={styles.navBtnTextWhite}>{t('events.createEvent')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                     style={[styles.navBtn, isLight && styles.navBtnLight, view === 'my' && styles.navBtnActive]} 
                     onPress={() => setView('my')}
                 >
-                    <Text style={[styles.navBtnText, isLight && styles.navBtnTextLight, view === 'my' && styles.navBtnTextActive]}>👤 My Events</Text>
+                    <Text style={[styles.navBtnText, isLight && styles.navBtnTextLight, view === 'my' && styles.navBtnTextActive]}>{t('events.myEvents')}</Text>
                 </TouchableOpacity>
             </ScrollView>
         </View>

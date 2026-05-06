@@ -2,8 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
 const LANGUAGES = [
-  { code: 'en', label: 'English', flag: '🇬🇧' },
-  { code: 'fr', label: 'Français', flag: '🇫🇷' },
+  { code: 'en', label: 'English', flag: 'EN' },
+  { code: 'fr', label: 'Français', flag: 'FR' },
 ]
 
 export default function LanguageSelector() {

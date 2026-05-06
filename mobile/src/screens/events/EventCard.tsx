@@ -1,6 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, useColorScheme, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Calendar, Users, User } from 'lucide-react-native';
+import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 const activityImages: Record<string, any> = {
     running: require('../../../assets/events/Running.png'),
@@ -11,26 +13,29 @@ const activityImages: Record<string, any> = {
     swimming: require('../../../assets/events/Swimming.png'),
     fitness: require('../../../assets/events/Fitness.png'),
     football: require('../../../assets/events/Football.png'),
-    other: require('../../../assets/events/Running.png') // Fallback
+    other: require('../../../assets/events/Running.png'),
 };
 
 interface EventCardProps {
     event: any;
-    onJoin: (id: number) => void;
+    onJoin: (id: number, hasJoined: boolean) => void;
+    onDelete?: (id: number) => void;
+    onEdit?: (id: number) => void;
 }
 
-export default function EventCard({ event, onJoin }: EventCardProps) {
-    const colorScheme = useColorScheme();
-    const isLight = colorScheme === 'light';
+export default function EventCard({ event, onJoin, onDelete }: EventCardProps) {
+    const { isDarkMode } = useTheme();
+    const { t } = useLanguage();
+    const isLight = !isDarkMode;
     const isFinished = event.status === 'Finished';
-    const isOngoing = event.status === 'Ongoing';
+    const isFull = event.max_participants && event.participant_count >= event.max_participants;
 
     return (
         <View style={[styles.card, isLight && styles.cardLight]}>
             <View style={styles.header}>
                 <View style={styles.activityContainer}>
-                    <Image 
-                        source={activityImages[event.activity_type.toLowerCase()] || activityImages.other} 
+                    <Image
+                        source={activityImages[event.activity_type?.toLowerCase()] || activityImages.other}
                         style={styles.activityImg}
                     />
                     <View>
@@ -38,49 +43,75 @@ export default function EventCard({ event, onJoin }: EventCardProps) {
                         <Text style={styles.activityType}>{event.activity_type}</Text>
                     </View>
                 </View>
-                <View style={[
-                    styles.badge, 
-                    event.status === 'Upcoming' ? styles.badgeSuccess : 
-                    event.status === 'Ongoing' ? styles.badgeWarn : styles.badgeDanger
-                ]}>
+                <View
+                    style={[
+                        styles.badge,
+                        event.status === 'Upcoming' && styles.badgeSuccess,
+                        event.status === 'Ongoing' && styles.badgeWarn,
+                        event.status === 'Finished' && styles.badgeDanger,
+                    ]}
+                >
                     <Text style={styles.badgeText}>{event.status}</Text>
                 </View>
             </View>
 
             <View style={styles.details}>
                 <View style={styles.detailRow}>
-                    <Calendar size={16} color={isLight ? "#64748b" : "#94a3b8"} />
-                    <Text style={[styles.detailText, isLight && styles.detailTextLight]}>
-                        {new Date(event.date).toLocaleDateString()} @ {event.time.substring(0, 5)}
+                    <Calendar size={16} color={isLight ? '#64748b' : '#94a3b8'} />
+                    <Text style={[styles.detailText, isLight && styles.detailTextLight]}
+                        >{`${new Date(event.date).toLocaleDateString()} @ ${event.time.substring(0, 5)}`}
                     </Text>
                 </View>
                 <View style={styles.detailRow}>
-                    <User size={16} color={isLight ? "#64748b" : "#94a3b8"} />
-                    <Text style={[styles.detailText, isLight && styles.detailTextLight]}>Host: <Text style={styles.bold}>{event.creator_name}</Text></Text>
+                    <User size={16} color={isLight ? '#64748b' : '#94a3b8'} />
+                    <Text style={[styles.detailText, isLight && styles.detailTextLight]}
+                        >{`${t('events.host')}: `}
+                        <Text style={styles.bold}>{event.creator_name}</Text>
+                    </Text>
                 </View>
                 <View style={styles.detailRow}>
-                    <Users size={16} color={isLight ? "#64748b" : "#94a3b8"} />
-                    <Text style={[styles.detailText, isLight && styles.detailTextLight]}>{event.participant_count} joining</Text>
+                    <Users size={16} color={isLight ? '#64748b' : '#94a3b8'} />
+                    <Text style={[styles.detailText, isLight && styles.detailTextLight]}
+                        >{`${event.participant_count} ${t('events.joining')}`}
+                    </Text>
                 </View>
+                <TouchableOpacity
+                    style={[
+                        styles.joinButton,
+                        event.hasJoined && styles.joinedButton,
+                        isLight && styles.joinedButtonLight,
+                        (isFinished || isFull) && styles.disabledButton,
+                    ]}
+                    onPress={() => onJoin(event.id, event.hasJoined)}
+                    disabled={isFinished || isFull}
+                >
+                    <Text style={[styles.joinButtonText, event.hasJoined && isLight && styles.joinButtonTextLight]}
+                    >{event.hasJoined
+                        ? t('events.alreadyJoined')
+                        : isFinished
+                        ? t('events.eventEnded')
+                        : isFull
+                        ? t('events.capacityReach')
+                        : t('events.joinActivity')}
+                    </Text>
+                </TouchableOpacity>
+                {onDelete && (
+                    <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => onDelete(event.id)}
+                    >
+                        <Text style={styles.deleteButtonText}>{t('events.delete')}</Text>
+                    </TouchableOpacity>
+                )}
+                {onEdit && (
+                    <TouchableOpacity
+                        style={styles.editButton}
+                        onPress={() => onEdit(event.id)}
+                    >
+                        <Text style={styles.editButtonText}>{t('events.edit')}</Text>
+                    </TouchableOpacity>
+                )}
             </View>
-
-            <TouchableOpacity 
-                style={[
-                    styles.joinButton, 
-                    event.hasJoined && styles.joinedButton,
-                    event.hasJoined && isLight && styles.joinedButtonLight,
-                    isFinished && styles.disabledButton
-                ]}
-                onPress={() => !isFinished && onJoin(event.id, event.hasJoined)}
-                disabled={isFinished}
-            >
-                <Text style={[
-                    styles.joinButtonText,
-                    event.hasJoined && isLight && styles.joinButtonTextLight
-                ]}>
-                    {event.hasJoined ? 'Already Joined ✓' : isFinished ? 'Event Ended' : 'Join Activity'}
-                </Text>
-            </TouchableOpacity>
         </View>
     );
 }
@@ -192,5 +223,13 @@ const styles = StyleSheet.create({
     },
     joinButtonTextLight: {
         color: '#64748b',
+    },
+    deleteButton: {
+        marginTop: 8,
+        alignSelf: 'flex-end',
+    },
+    deleteButtonText: {
+        color: '#ef4444',
+        fontWeight: 'bold',
     },
 });
