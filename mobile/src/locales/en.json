@@ -29,6 +29,7 @@
     "date": "Date",
     "notes": "Notes (optional)",
     "save": "Save Activity",
+    "saveSuccess": "Activity recorded successfully!",
     "todayActivities": "Today's Activities",
     "noActivities": "No activities recorded today.",
     "totalCalories": "Total: {calories} kcal",
@@ -71,6 +72,7 @@
     "placeholder": "What did you eat? (e.g. Caesar salad)",
     "estimate": "Estimate",
     "save": "Save",
+    "saveSuccess": "Meal recorded!",
     "estimatedCalories": "Estimated Calories",
     "breakdown": "DETAILS:",
     "today": "Today",
@@ -87,10 +89,18 @@
     "targetWeight": "Target Weight (kg)",
     "confirm": "Confirm & Save",
     "noGoal": "No goal set yet.",
-    "calculate": "Calculate with AI"
+    "calculate": "Calculate with AI",
+    "perte_de_poids": "Weight Loss",
+    "prise_de_masse": "Muscle Gain",
+    "maintien": "Maintenance",
+    "performance": "Performance",
+    "sante_generale": "General Health",
+    "maintain": "Maintenance",
+    "lose": "Weight Loss",
+    "gain": "Muscle Gain"
   },
   "dashboard": {
-    "welcome": "Welcome, {name}!",
+    "welcome": "Welcome {name} 👋",
     "subtitle": "Your personal health dashboard",
     "healthProfile": "Health Profile",
     "age": "Age",
@@ -106,7 +116,11 @@
     "manageMeals": "Manage Meals",
     "quickActions": "Quick Actions",
     "meals": "Meals",
-    "health": "Health"
+    "health": "Health",
+    "aiPersonalCoach": "✨ Coach Wellie",
+    "aiCoachDefaultTip": "Consistency is key. You're doing great with your calorie tracking today. Remember to stay hydrated!",
+    "aiCoachHeartyTip": "You've had a hearty day! Try a light 20-minute walk tonight to help with digestion and maintain your metabolic momentum.",
+    "aiCoachSignature": "🤖 Insight by Coach Wellie"
   },
   "profile": {
     "title": "My Profile",
@@ -131,12 +145,12 @@
     "savedSuccess": "Your profile has been updated successfully."
   },
   "chatbot": {
-    "title": "WellMate AI",
-    "subtitle": "Health Assistant",
-    "welcome": "Welcome to WellMate Chat!",
-    "description": "I'm here to help with health, BMI, nutrition, physical activity, and daily habits. Ask me anything!",
-    "placeholder": "Ask a health question...",
-    "thinking": "Thinking...",
+    "title": "Coach Wellie",
+    "subtitle": "Your AI Health Coach",
+    "welcome": "Welcome! I'm Coach Wellie 👋",
+    "description": "I'm here to help with your health, nutrition, and fitness goals. Ask me anything!",
+    "placeholder": "Ask Coach Wellie...",
+    "thinking": "Coach Wellie is thinking...",
     "tip": "💡 TRY: \"What is BMI?\", \"How many calories in a pizza?\"",
     "error": "Sorry, I could not process your message."
   },
@@ -194,7 +208,7 @@
     "myEvents": "👤 My Events",
     "searchPlaceholder": "Search events...",
     "allActivities": "All Activities",
-    "host": "Host",
+    "organizer": "Organizer",
     "joining": "joining",
     "joinActivity": "Join Activity",
     "alreadyJoined": "Already Joined ✓",

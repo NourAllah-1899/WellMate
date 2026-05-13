@@ -101,20 +101,9 @@ export default function Health() {
   return (
     <div className="wm-container space-y-10">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tighter">
-            {t('health.title')} <span className="text-brand-primary">{t('health.ai')}</span>
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium mt-2">
-            {t('health.cockpitSubtitle')}
-          </p>
-        </div>
-        <HealthSettings 
-          currentGoal={nutrition?.calorieGoal} 
-          currentType={nutrition?.goalType} 
-          onUpdate={handleUpdateGoal} 
-        />
+      <div className="wm-header-card">
+        <h1>{t('health.title')} <span className="opacity-60">{t('health.ai')}</span></h1>
+        <p className="wm-subtitle">{t('health.cockpitSubtitle')}</p>
       </div>
 
       {/* Vital Signs Row */}
@@ -140,7 +129,14 @@ export default function Health() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Tracker & Tools */}
         <div className="lg:col-span-4 space-y-8">
-          <NutritionProgress summary={nutrition} />
+          <div className="space-y-4">
+            <NutritionProgress summary={nutrition} />
+            <HealthSettings 
+              currentGoal={nutrition?.calorieGoal} 
+              currentType={nutrition?.goalType} 
+              onUpdate={handleUpdateGoal} 
+            />
+          </div>
           <SmokingTracker stats={smokingStats} onLog={handleLogSmoking} />
           
           {/* Water Intake */}

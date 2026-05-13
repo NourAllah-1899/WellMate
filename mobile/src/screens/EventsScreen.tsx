@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Alert, useColorScheme, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Alert, useColorScheme, StatusBar, Image } from 'react-native';
 import apiClient from '../api/apiClient';
 import EventsFeed from './events/EventsFeed';
 import EventsMap from './events/EventsMap';
@@ -7,10 +7,13 @@ import CreateEvent from './events/CreateEvent';
 import MyEvents from './events/MyEvents';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
+import { Colors } from '../constants/Colors';
+import { Feather } from '@expo/vector-icons';
 
 export default function EventsScreen() {
-    const { isDarkMode } = useTheme();
-    const { t } = useLanguage();
+    const { isDarkMode, toggleTheme } = useTheme();
+    const { t, language, setLanguage } = useLanguage();
+    const theme = isDarkMode ? Colors.dark : Colors.light;
     const isLight = !isDarkMode;
     const [view, setView] = useState('feed'); // 'feed', 'map', 'create', 'my'
     const [events, setEvents] = useState([]);
@@ -25,7 +28,7 @@ export default function EventsScreen() {
             }
         } catch (err) {
             console.error('Failed to fetch events:', err);
-            Alert.alert('Error', 'Failed to load events. Please try again later.');
+            Alert.alert(t('common.error', 'Error'), t('events.loadFailed', 'Failed to load events. Please try again later.'));
         } finally {
             setLoading(false);
         }
@@ -40,22 +43,22 @@ export default function EventsScreen() {
     const handleJoin = async (eventId: number, hasJoined: boolean) => {
         if (hasJoined) {
             Alert.alert(
-                'Leave Activity',
-                'Are you sure you want to leave this event?',
+                t('events.leaveTitle', 'Leave Activity'),
+                t('events.leaveConfirm', 'Are you sure you want to leave this event?'),
                 [
-                    { text: 'Cancel', style: 'cancel' },
+                    { text: t('common.cancel', 'Cancel'), style: 'cancel' },
                     { 
-                        text: 'Yes, Leave', 
+                        text: t('events.leaveYes', 'Yes, Leave'), 
                         style: 'destructive',
                         onPress: async () => {
                             try {
                                 const res = await apiClient.delete(`/events/${eventId}/join`);
                                 if (res.data.success) {
                                     fetchEvents();
-                                    Alert.alert('Success', 'Successfully left the event.');
+                                    Alert.alert(t('common.success', 'Success'), t('events.leaveSuccess', 'Successfully left the event.'));
                                 }
                             } catch (err: any) {
-                                Alert.alert('Error', 'Failed to leave event.');
+                                Alert.alert(t('common.error', 'Error'), t('events.leaveFailed', 'Failed to leave event.'));
                             }
                         }
                     }
@@ -68,32 +71,58 @@ export default function EventsScreen() {
             const res = await apiClient.post(`/events/${eventId}/join`, {});
             if (res.data.success) {
                 fetchEvents();
-                Alert.alert('Success', 'Successfully joined the event!');
+                Alert.alert(t('common.success', 'Success'), t('events.joinSuccess', 'Successfully joined the event!'));
             }
         } catch (err: any) {
-            Alert.alert('Error', err.response?.data?.message || 'Action failed.');
+            Alert.alert(t('common.error', 'Error'), err.response?.data?.message || t('events.actionFailed', 'Action failed.'));
         }
     };
 
-    const renderHeader = () => (
-        <View style={[styles.header, isLight && styles.headerLight]}>
-            <View style={styles.hero}>
-                <Text style={[styles.heroTitle, isLight && styles.heroTitleLight]}>{t('events.title').replace(', Stay Healthy.', '')}</Text>
-                <Text style={styles.heroSubtitle}>{t('events.subtitle')}</Text>
-                
-                <View style={styles.stats}>
-                    <View style={[styles.statBox, isLight && styles.statBoxLight]}>
-                        <Text style={[styles.statVal, isLight && styles.statValLight]}>{events.length}</Text>
-                        <Text style={styles.statLab}>{t('events.activeEvents')}</Text>
-                    </View>
-                    <View style={[styles.statBox, isLight && styles.statBoxLight]}>
-                        <Text style={[styles.statVal, isLight && styles.statValLight]}>
-                            {events.reduce((acc: number, e: any) => acc + (e.participant_count || 0), 0)}
-                        </Text>
-                        <Text style={styles.statLab}>{t('events.participants')}</Text>
-                    </View>
+
+    const renderHero = () => (
+        <View style={styles.hero}>
+            <Text style={[styles.heroTitle, { color: theme.text }]}>{t('events.title')}</Text>
+            <Text style={[styles.heroSubtitle, { color: theme.secondaryText }]}>{t('events.subtitle')}</Text>
+            
+            <View style={styles.stats}>
+                <View style={[styles.statBox, isLight && styles.statBoxLight]}>
+                    <Text style={[styles.statVal, isLight && styles.statValLight]}>{events.length}</Text>
+                    <Text style={styles.statLab}>{t('events.activeEvents')}</Text>
+                </View>
+                <View style={[styles.statBox, isLight && styles.statBoxLight]}>
+                    <Text style={[styles.statVal, isLight && styles.statValLight]}>
+                        {events.reduce((acc: number, e: any) => acc + (e.participant_count || 0), 0)}
+                    </Text>
+                    <Text style={styles.statLab}>{t('events.participants')}</Text>
                 </View>
             </View>
+        </View>
+    );
+
+    const renderHeader = () => (
+        <View style={[styles.header, { borderBottomColor: theme.border }]}>
+            <View style={styles.headerTop}>
+                <View style={styles.logoContainer}>
+                    <Image
+                        source={isDarkMode ? require('../../assets/WellMate_dark.png') : require('../../assets/WellMate_light.png')}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
+                </View>
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                    <TouchableOpacity 
+                        onPress={() => setLanguage(language === 'fr' ? 'en' : 'fr')} 
+                        style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0', width: 'auto', paddingHorizontal: 10 }]}
+                    >
+                        <Text style={{ color: isLight ? '#0f172a' : '#fff', fontWeight: 'bold', fontSize: 12 }}>{language === 'fr' ? 'EN' : 'FR'}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={toggleTheme} style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0' }]}>
+                        <Feather name={isDarkMode ? 'moon' : 'sun'} size={20} color={isDarkMode ? '#fbbf24' : '#f59e0b'} />
+                    </TouchableOpacity>
+                </View>
+            </View>
+
+            {renderHero()}
 
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.navScroll}>
                 <TouchableOpacity 
@@ -147,9 +176,9 @@ export default function EventsScreen() {
     };
 
     return (
-        <SafeAreaView style={[styles.container, isLight && styles.containerLight]}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <StatusBar barStyle={isLight ? 'dark-content' : 'light-content'} />
-            {(view === 'feed' || view === 'map') && renderHeader()}
+            {renderHeader()}
             <View style={styles.content}>
                 {renderContent()}
             </View>
@@ -158,32 +187,29 @@ export default function EventsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#0f172a' },
-    containerLight: { backgroundColor: '#f8fafc' },
+    container: { flex: 1 },
     header: {
-        padding: 20,
-        backgroundColor: '#1e293b',
+        paddingBottom: 10,
         borderBottomWidth: 1,
-        borderBottomColor: '#334155',
+        marginTop: 30,
+        paddingHorizontal: 20,
     },
     headerLight: {
-        backgroundColor: '#fff',
         borderBottomColor: '#e2e8f0',
     },
+    headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+    logoContainer: {},
+    logo: { width: 160, height: 60 },
+    themeBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
     hero: {
         marginBottom: 20,
     },
     heroTitle: {
-        fontSize: 32,
+        fontSize: 24,
         fontWeight: 'bold',
-        color: '#fff',
-    },
-    heroTitleLight: {
-        color: '#0f172a',
     },
     heroSubtitle: {
         fontSize: 14,
-        color: '#94a3b8',
         marginTop: 4,
     },
     stats: {

@@ -8,24 +8,45 @@
 }
 
 .header-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-action) 100%);
   color: white;
-  padding: 30px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  border-radius: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+  position: relative;
+  overflow: hidden;
+  border: none;
 }
 
 .header-card h1 {
   margin: 0;
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  position: relative;
+  z-index: 1;
 }
 
 .header-card .wm-subtitle {
-  margin-top: 8px;
-  opacity: 0.95;
-  font-size: 14px;
+  margin-top: 10px;
+  opacity: 0.9;
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+.header-card::after {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 100px;
 }
 
 .stat-card {
@@ -317,4 +338,70 @@
   .calorie-value {
     font-size: 28px;
   }
+}
+
+/* AI Insight Card */
+.ai-insight-card {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  padding: 24px;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-main);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+body.dark .ai-insight-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.ai-insight-card::before {
+  content: '🤖';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 80px;
+  opacity: 0.05;
+  transform: rotate(15deg);
+}
+
+body.dark .ai-insight-card::before {
+  opacity: 0.1;
+}
+
+.ai-insight-card h3 {
+  color: var(--brand-primary) !important;
+  margin-bottom: 12px !important;
+  font-size: 14px !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.coach-text {
+  font-size: 15px;
+  line-height: 1.6;
+  font-style: italic;
+  color: var(--text-primary);
+  position: relative;
+  z-index: 1;
+}
+
+body.dark .coach-text {
+  color: #e2e8f0;
+}
+
+.coach-signature {
+  margin-top: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0.8;
 }

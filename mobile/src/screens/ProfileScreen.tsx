@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import apiClient from '../api/apiClient';
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export default function ProfileScreen({ navigation }: Props) {
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, toggleTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const theme = isDarkMode ? Colors.dark : Colors.light;
   const [user, setUser] = useState<any>(null);
@@ -51,8 +51,28 @@ export default function ProfileScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
        <View style={styles.header}>
-         <Text style={[styles.title, { color: theme.heading }]}>{t('profile.title')}</Text>
-         <Text style={[styles.subtitle, { color: theme.secondaryText }]}>{t('profile.subtitle')}</Text>
+         <View style={styles.headerTop}>
+            <View style={styles.logoContainer}>
+              <Image
+                source={isDarkMode ? require('../../assets/WellMate_dark.png') : require('../../assets/WellMate_light.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity 
+                onPress={() => setLanguage(language === 'fr' ? 'en' : 'fr')} 
+                style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0', width: 'auto', paddingHorizontal: 10 }]}
+              >
+                <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 12 }}>{language === 'fr' ? 'EN' : 'FR'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={toggleTheme} style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0' }]}>
+                <Feather name={isDarkMode ? 'moon' : 'sun'} size={20} color={isDarkMode ? '#fbbf24' : '#f59e0b'} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          <Text style={[styles.title, { color: theme.heading }]}>{t('profile.title')}</Text>
+          <Text style={[styles.subtitle, { color: theme.secondaryText }]}>{t('profile.subtitle')}</Text>
       </View>
       <ScrollView contentContainerStyle={styles.content}>
         
@@ -117,8 +137,12 @@ export default function ProfileScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20 },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 5 },
+  header: { marginBottom: 30, marginTop: 30, paddingHorizontal: 20 },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  logoContainer: {},
+  logo: { width: 160, height: 60 },
+  themeBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 5 },
   subtitle: { fontSize: 16 },
   content: { padding: 20 },
   card: {

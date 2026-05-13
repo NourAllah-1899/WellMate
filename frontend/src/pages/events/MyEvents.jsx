@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import api from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
+
+const LocationPicker = ({ position, setPosition }) => {
+    useMapEvents({
+        click(e) {
+            setPosition(e.latlng);
+        },
+    });
+
+    return position ? <Marker position={position} /> : null;
+};
 
 const MyEvents = ({ onBack }) => {
     const { t } = useLanguage();
@@ -16,6 +29,7 @@ const MyEvents = ({ onBack }) => {
         description: '',
         max_participants: null,
     });
+    const [editPosition, setEditPosition] = useState(null);
     const [saving, setSaving] = useState(false);
 
     const fetchData = async () => {
@@ -41,6 +55,7 @@ const MyEvents = ({ onBack }) => {
             description: ev.description || '',
             max_participants: ev.max_participants || null,
         });
+        setEditPosition(ev.latitude && ev.longitude ? { lat: ev.latitude, lng: ev.longitude } : null);
     };
 
     const cancelEdit = () => {
@@ -50,6 +65,10 @@ const MyEvents = ({ onBack }) => {
 
     const saveEdit = async () => {
         if (!editingId) return;
+        if (!editPosition) {
+            alert(t('events.locationRequired'));
+            return;
+        }
         setSaving(true);
         try {
             const res = await api.put(`/api/events/${editingId}`, {
@@ -59,6 +78,8 @@ const MyEvents = ({ onBack }) => {
                 time: editForm.time,
                 description: editForm.description,
                 max_participants: editForm.max_participants,
+                latitude: editPosition.lat,
+                longitude: editPosition.lng,
             });
 
             if (res.data.success) {
@@ -202,15 +223,32 @@ const MyEvents = ({ onBack }) => {
                                 </label>
 
                                 <label className="wm-field">
-                                    Maximum Participants (Optional)
+                                    {t('events.maxParticipants')}
                                     <input
                                         type="number"
                                         className="wm-input"
-                                        placeholder="Leave empty for unlimited"
+                                        placeholder={t('events.maxParticipantsPlaceholder')}
                                         min="1"
                                         value={editForm.max_participants || ''}
                                         onChange={(e) => setEditForm({ ...editForm, max_participants: e.target.value ? parseInt(e.target.value) : null })}
                                     />
+                                </label>
+
+                                <label className="wm-field md:col-span-2">
+                                    {t('events.selectLocation')}
+                                    <div className="relative w-full h-64 rounded-lg overflow-hidden border border-border-main mt-2">
+                                        <MapContainer
+                                            center={editPosition || { lat: 33.8869, lng: 9.5375 }}
+                                            zoom={13}
+                                            style={{ width: '100%', height: '100%' }}
+                                        >
+                                            <TileLayer
+                                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                                attribution='&copy; OpenStreetMap contributors'
+                                            />
+                                            <LocationPicker position={editPosition} setPosition={setEditPosition} />
+                                        </MapContainer>
+                                    </div>
                                 </label>
 
                                 <div className="md:col-span-2 flex gap-3">

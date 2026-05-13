@@ -49,13 +49,13 @@ const EventsMap = ({ events, onJoin }) => {
                                     <h4 className="font-bold m-0 text-sm">{event.title}</h4>
                                 </div>
                                 <p className="text-xs wm-muted m-0 mb-1">
-                                    {new Date(event.date).toLocaleDateString()} at {event.time.substring(0, 5)}
+                                    {new Date(event.date).toLocaleDateString()} {t('events.at')} {event.time.substring(0, 5)}
                                 </p>
                                 <p className="text-xs wm-muted m-0 mb-2">
                                     👥 {event.participant_count}
                                     {event.max_participants && <span> / {event.max_participants}</span>}
                                     {event.max_participants && event.participant_count >= event.max_participants && (
-                                        <span className="text-red-600 font-bold"> (Full)</span>
+                                        <span className="text-red-600 font-bold"> ({t('events.full')})</span>
                                     )}
                                 </p>
                                 <button 

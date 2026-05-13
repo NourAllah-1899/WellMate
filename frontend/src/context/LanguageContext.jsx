@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
 import en from '../locales/en.json'
 import fr from '../locales/fr.json'
-import ar from '../locales/ar.json' // Not used anymore but kept file
 import api from '../api/client.js'
 
 const LanguageContext = createContext()
@@ -42,7 +41,7 @@ export const LanguageProvider = ({ children }) => {
     }
   }
 
-  const t = useCallback((key) => {
+  const t = useCallback((key, fallback) => {
     const keys = key.split('.')
     let value = translations[language]
     
@@ -50,15 +49,20 @@ export const LanguageProvider = ({ children }) => {
       if (value && typeof value === 'object') {
         value = value[k]
       } else {
-        return key // Return key if translation not found
+        return fallback ?? key // Return fallback (or key) if translation not found
       }
     }
     
-    return value || key
+    return value || fallback || key
   }, [language])
 
-  const translate = useCallback((key, replacements = {}) => {
-    let text = t(key)
+  const translate = useCallback((key, arg2 = undefined, arg3 = undefined) => {
+    const fallback = typeof arg2 === 'string' ? arg2 : undefined
+    const replacements = typeof arg2 === 'object' && arg2 !== null
+      ? arg2
+      : (typeof arg3 === 'object' && arg3 !== null ? arg3 : {})
+
+    let text = t(key, fallback)
     
     // Replace placeholders
     Object.entries(replacements).forEach(([placeholder, value]) => {

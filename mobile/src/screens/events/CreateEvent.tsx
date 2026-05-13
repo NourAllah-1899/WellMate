@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform, useColorScheme, Appearance } from 'react-native';
 import MapView, { Marker, MapPressEvent } from 'react-native-maps';
 import apiClient from '../../api/apiClient';
+import { useLanguage } from '../../context/LanguageContext';
 
 const activityTypes = ['Running', 'Walking', 'Cycling', 'Yoga', 'Basketball', 'Football', 'Swimming', 'Fitness', 'Other'];
 
@@ -14,6 +15,7 @@ import { useTheme } from '../../context/ThemeContext';
 
 export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
     const { isDarkMode } = useTheme();
+    const { t } = useLanguage();
     const isLight = !isDarkMode;
     const [formData, setFormData] = useState({
         title: '',
@@ -47,7 +49,7 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
                 latitude: position.latitude,
                 longitude: position.longitude
             });
-            Alert.alert('Success', 'Event created successfully!');
+            Alert.alert(t('common.success'), t('events.createSuccess'));
             onCreated();
         } catch (err: any) {
             Alert.alert('Error', err.response?.data?.message || 'Failed to create event.');
@@ -63,23 +65,22 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
         >
             <ScrollView style={[styles.container, isLight && styles.containerLight]} contentContainerStyle={styles.content}>
                 <View style={styles.header}>
-                    <Text style={[styles.title, isLight && styles.titleLight]}>New Activity</Text>
+                    <Text style={[styles.title, isLight && styles.titleLight]}>{t('events.newActivity')}</Text>
                     <TouchableOpacity onPress={onCancel}>
-                        <Text style={styles.cancelText}>Cancel</Text>
+                        <Text style={styles.cancelText}>{t('common.cancel')}</Text>
                     </TouchableOpacity>
                 </View>
-
                 <View style={styles.form}>
-                    <Text style={[styles.label, isLight && styles.labelLight]}>Event Title</Text>
+                    <Text style={[styles.label, isLight && styles.labelLight]}>{t('events.eventTitle')}</Text>
                     <TextInput 
                         style={[styles.input, isLight && styles.inputLight]}
-                        placeholder="Morning Run at the Park"
+                        placeholder={t('events.eventTitlePlaceholder', 'Morning Run at the Park')}
                         placeholderTextColor={isLight ? "#94a3b8" : "#64748b"}
                         value={formData.title}
                         onChangeText={text => setFormData({...formData, title: text})}
                     />
 
-                    <Text style={[styles.label, isLight && styles.labelLight]}>Activity Type</Text>
+                    <Text style={[styles.label, isLight && styles.labelLight]}>{t('events.activityType')}</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
                         {activityTypes.map(type => (
                             <TouchableOpacity 
@@ -104,7 +105,7 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
 
                     <View style={styles.row}>
                         <View style={{ flex: 1, marginRight: 8 }}>
-                            <Text style={[styles.label, isLight && styles.labelLight]}>Date (YYYY-MM-DD)</Text>
+                            <Text style={[styles.label, isLight && styles.labelLight]}>{t('events.date')}</Text>
                             <TextInput 
                                 style={[styles.input, isLight && styles.inputLight]}
                                 placeholder="2026-05-15"
@@ -114,7 +115,7 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
                             />
                         </View>
                         <View style={{ flex: 1, marginLeft: 8 }}>
-                            <Text style={[styles.label, isLight && styles.labelLight]}>Time (HH:MM)</Text>
+                            <Text style={[styles.label, isLight && styles.labelLight]}>{t('events.time')}</Text>
                             <TextInput 
                                 style={[styles.input, isLight && styles.inputLight]}
                                 placeholder="08:00"
@@ -125,10 +126,10 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
                         </View>
                     </View>
 
-                    <Text style={[styles.label, isLight && styles.labelLight]}>Description</Text>
+                    <Text style={[styles.label, isLight && styles.labelLight]}>{t('events.description')}</Text>
                     <TextInput 
                         style={[styles.input, styles.textArea, isLight && styles.inputLight]}
-                        placeholder="Tell others more about this event..."
+                        placeholder={t('events.descriptionPlaceholder')}
                         placeholderTextColor={isLight ? "#94a3b8" : "#64748b"}
                         multiline
                         numberOfLines={3}
@@ -136,17 +137,17 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
                         onChangeText={text => setFormData({...formData, description: text})}
                     />
 
-                    <Text style={[styles.label, isLight && styles.labelLight]}>Maximum Participants (Optional)</Text>
+                    <Text style={[styles.label, isLight && styles.labelLight]}>{t('events.maxParticipants')}</Text>
                     <TextInput 
                         style={[styles.input, isLight && styles.inputLight]}
-                        placeholder="e.g., 11 for 11v11 football"
+                        placeholder={t('events.maxParticipantsPlaceholder')}
                         placeholderTextColor={isLight ? "#94a3b8" : "#64748b"}
                         keyboardType="number-pad"
                         value={formData.max_participants ? String(formData.max_participants) : ''}
                         onChangeText={text => setFormData({...formData, max_participants: text ? parseInt(text) : null})}
                     />
 
-                    <Text style={[styles.label, isLight && styles.labelLight]}>📍 Select Location (Tap on Map)</Text>
+                    <Text style={[styles.label, isLight && styles.labelLight]}>{t('events.selectLocation')}</Text>
                     <View style={styles.mapContainer}>
                         <MapView
                             style={styles.map}
@@ -169,7 +170,7 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
                         disabled={loading}
                     >
                         <Text style={styles.submitButtonText}>
-                            {loading ? 'Creating...' : 'Publish Event'}
+                            {loading ? t('events.creating') : t('events.publishEvent')}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -181,10 +182,10 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#0f172a',
+        backgroundColor: 'transparent',
     },
     containerLight: {
-        backgroundColor: '#f8fafc',
+        backgroundColor: 'transparent',
     },
     content: {
         padding: 20,

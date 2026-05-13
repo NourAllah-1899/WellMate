@@ -50,8 +50,7 @@ export default function HomeScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
-
+      <>
         {/* Updated Header with Logo Image, Theme & Language Toggles */}
         <View style={styles.header}>
           <View style={styles.headerTop}>
@@ -63,8 +62,8 @@ export default function HomeScreen({ navigation }: Props) {
               />
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <TouchableOpacity 
-                onPress={() => setLanguage(language === 'fr' ? 'en' : 'fr')} 
+              <TouchableOpacity
+                onPress={() => setLanguage(language === 'fr' ? 'en' : 'fr')}
                 style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0', width: 'auto', paddingHorizontal: 10 }]}
               >
                 <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 12 }}>{language === 'fr' ? 'EN' : 'FR'}</Text>
@@ -78,93 +77,93 @@ export default function HomeScreen({ navigation }: Props) {
           <Text style={[styles.subtitle, { color: theme.secondaryText }]}>{t('dashboard.subtitle')}</Text>
         </View>
 
-        {/* Profile Card */}
-        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <Text style={[styles.cardTitle, { color: Colors.brand.primary }]}>💪 {t('dashboard.healthProfile')}</Text>
-          <View style={styles.grid}>
-            <View style={styles.gridItem}>
-              <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.age')}</Text>
-              <Text style={[styles.gridValue, { color: theme.text }]}>{user?.age || '—'}</Text>
-            </View>
-            <View style={styles.gridItem}>
-              <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.height')}</Text>
-              <Text style={[styles.gridValue, { color: theme.text }]}>{user?.height_cm ? `${user.height_cm} cm` : '—'}</Text>
-            </View>
-            <View style={styles.gridItem}>
-              <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.weight')}</Text>
-              <Text style={[styles.gridValue, { color: theme.text }]}>{user?.weight_kg ? `${user.weight_kg} kg` : '—'}</Text>
-            </View>
-            <View style={styles.gridItem}>
-              <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.bmi')}</Text>
-              <Text style={[styles.gridValue, { color: theme.text }]}>{user?.bmi || '—'}</Text>
-            </View>
-          </View>
-        </View>
+        <ScrollView contentContainerStyle={styles.content}>
 
-        {/* Goal Card */}
-        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <Text style={[styles.cardTitle, { color: Colors.brand.action }]}>🎯 {t('dashboard.weightGoal')}</Text>
-          {goal ? (
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
-              <View style={{ backgroundColor: Colors.brand.primary, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, marginRight: 12 }}>
-                <Text style={{ color: '#fff', fontWeight: '900', fontSize: 12 }}>{goal.direction.toUpperCase()}</Text>
+          {/* Profile Card */}
+          <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Text style={[styles.cardTitle, { color: Colors.brand.primary }]}>💪 {t('dashboard.healthProfile')}</Text>
+            <View style={styles.grid}>
+              <View style={styles.gridItem}>
+                <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.age')}</Text>
+                <Text style={[styles.gridValue, { color: theme.text }]}>{user?.age || '—'}</Text>
               </View>
-              <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 24 }}>{goal.target_weight_kg} kg</Text>
+              <View style={styles.gridItem}>
+                <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.height')}</Text>
+                <Text style={[styles.gridValue, { color: theme.text }]}>{user?.height_cm ? `${user.height_cm} cm` : '—'}</Text>
+              </View>
+              <View style={styles.gridItem}>
+                <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.weight')}</Text>
+                <Text style={[styles.gridValue, { color: theme.text }]}>{user?.weight_kg ? `${user.weight_kg} kg` : '—'}</Text>
+              </View>
+              <View style={styles.gridItem}>
+                <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.bmi')}</Text>
+                <Text style={[styles.gridValue, { color: theme.text }]}>{user?.bmi || '—'}</Text>
+              </View>
             </View>
-          ) : (
-            <Text style={{ color: theme.muted, marginBottom: 15 }}>{t('dashboard.noGoal')}</Text>
-          )}
-          <TouchableOpacity
-            style={[styles.inlineButton, { backgroundColor: isDarkMode ? '#2d3748' : '#edf2f7' }]}
-            onPress={() => navigation.navigate('Goals')}
-          >
-            <Text style={[styles.inlineButtonText, { color: theme.text }]}>{goal ? t('dashboard.editGoal') : t('dashboard.setGoal')}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Calories Card */}
-        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <Text style={[styles.cardTitle, { color: Colors.brand.accent }]}>🍽️ {t('dashboard.todaysCalories')}</Text>
-          <View style={{ alignItems: 'center', marginVertical: 10 }}>
-            <Text style={[styles.bigValue, { color: theme.text }]}>{today?.total_calories || 0}</Text>
-            <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.kcalConsumed')}</Text>
           </View>
-          <TouchableOpacity
-            style={[styles.inlineButton, { backgroundColor: isDarkMode ? '#2d3748' : '#edf2f7' }]}
-            onPress={() => navigation.navigate('Meals')}
-          >
-            <Text style={[styles.inlineButtonText, { color: theme.text }]}>{t('dashboard.manageMeals')}</Text>
-          </TouchableOpacity>
-        </View>
 
-        {/* Quick Actions */}
-        <View style={[styles.card, { backgroundColor: 'transparent', borderColor: 'transparent', paddingHorizontal: 0 }]}>
-          <Text style={[styles.cardTitle, { color: Colors.brand.highlight }]}>⚡ {t('dashboard.quickActions')}</Text>
-          <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
-            <TouchableOpacity style={[styles.quickButton, { backgroundColor: Colors.brand.primary, flex: 1, minWidth: '30%' }]} onPress={() => navigation.navigate('Meals')}>
-              <Feather name="plus" size={18} color="#fff" />
-              <Text style={styles.quickText}>{t('dashboard.meals')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.quickButton, { backgroundColor: Colors.brand.action, flex: 1, minWidth: '30%' }]} onPress={() => navigation.navigate('Health', { screen: 'Health' })}>
-              <Feather name="heart" size={18} color="#fff" />
-              <Text style={styles.quickText}>{t('dashboard.health')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.quickButton, { backgroundColor: '#8b5cf6', flex: 1, minWidth: '30%' }]} onPress={() => navigation.navigate('Chatbot')}>
-              <Feather name="message-square" size={18} color="#fff" />
-              <Text style={styles.quickText}>IA</Text>
+          {/* Goal Card */}
+          <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Text style={[styles.cardTitle, { color: Colors.brand.action }]}>🎯 {t('dashboard.weightGoal')}</Text>
+            {goal ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
+                <View style={{ backgroundColor: Colors.brand.primary, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, marginRight: 12 }}>
+                  <Text style={{ color: '#fff', fontWeight: '900', fontSize: 12 }}>{goal.direction.toUpperCase()}</Text>
+                </View>
+                <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 24 }}>{goal.target_weight_kg} kg</Text>
+              </View>
+            ) : (
+              <Text style={{ color: theme.muted, marginBottom: 15 }}>{t('dashboard.noGoal')}</Text>
+            )}
+            <TouchableOpacity
+              style={[styles.inlineButton, { backgroundColor: isDarkMode ? '#2d3748' : '#edf2f7' }]}
+              onPress={() => navigation.navigate('Goals')}
+            >
+              <Text style={[styles.inlineButtonText, { color: theme.text }]}>{goal ? t('dashboard.editGoal') : t('dashboard.setGoal')}</Text>
             </TouchableOpacity>
           </View>
-        </View>
 
-      </ScrollView>
+          {/* Calories Card */}
+          <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <Text style={[styles.cardTitle, { color: Colors.brand.accent }]}>🍽️ {t('dashboard.todaysCalories')}</Text>
+            <View style={{ alignItems: 'center', marginVertical: 10 }}>
+              <Text style={[styles.bigValue, { color: theme.text }]}>{today?.total_calories || 0}</Text>
+              <Text style={[styles.gridLabel, { color: theme.muted }]}>{t('dashboard.kcalConsumed')}</Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.inlineButton, { backgroundColor: isDarkMode ? '#2d3748' : '#edf2f7' }]}
+              onPress={() => navigation.navigate('Meals')}
+            >
+              <Text style={[styles.inlineButtonText, { color: theme.text }]}>{t('dashboard.manageMeals')}</Text>
+            </TouchableOpacity>
+          </View>
 
-      {/* Floating Chatbot Button */}
-      <TouchableOpacity 
-        style={styles.fab} 
-        onPress={() => navigation.navigate('Chatbot')}
-      >
-        <Text style={{ fontSize: 24 }}>🤖</Text>
-      </TouchableOpacity>
+          {/* AI Personal Coach Card */}
+          <View style={[styles.aiCard, { 
+            backgroundColor: theme.card, 
+            borderColor: theme.border 
+          }]}>
+            <Text style={styles.aiCardBgEmoji}>🤖</Text>
+            <Text style={[styles.aiCardTitle, { color: Colors.brand.primary }]}>{t('dashboard.aiPersonalCoach')}</Text>
+            <Text style={[styles.aiCoachText, { color: isDarkMode ? '#e2e8f0' : '#334155' }]}>
+              {goal?.ai_summary || (today?.total_calories > 2000 
+                ? t('dashboard.aiCoachHeartyTip')
+                : t('dashboard.aiCoachDefaultTip'))}
+            </Text>
+            <Text style={[styles.aiSignature, { color: Colors.brand.primary }]}>{t('dashboard.aiCoachSignature')}</Text>
+          </View>
+
+
+        </ScrollView>
+
+        {/* Floating Chatbot Button */}
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => navigation.navigate('Chatbot')}
+        >
+          <Text style={{ fontSize: 24 }}>🤖</Text>
+        </TouchableOpacity>
+      </>
     </SafeAreaView>
   );
 }
@@ -172,7 +171,7 @@ export default function HomeScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 20 },
-  header: { marginBottom: 30, marginTop: 10 },
+  header: { marginBottom: 30, marginTop: 30, paddingHorizontal: 20 },
   headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   logoContainer: {},
   logo: { width: 160, height: 60 },
@@ -215,5 +214,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+  },
+  aiCard: { padding: 24, borderRadius: 20, marginBottom: 25, borderWidth: 1, overflow: 'hidden' },
+  aiCardTitle: { fontSize: 12, fontWeight: 'bold', marginBottom: 12, letterSpacing: 1, textTransform: 'uppercase' },
+  aiCoachText: { fontSize: 15, lineHeight: 22, fontStyle: 'italic' },
+  aiCardBgEmoji: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    fontSize: 80,
+    opacity: 0.1,
+    transform: [{ rotate: '15deg' }],
   },
 });

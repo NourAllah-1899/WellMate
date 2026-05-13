@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Dimensions, Image } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Colors } from '../constants/Colors';
@@ -9,8 +9,8 @@ import { Feather } from '@expo/vector-icons';
 const { width } = Dimensions.get('window');
 
 export default function HealthScreen() {
-  const { isDarkMode } = useTheme();
-  const { t, language } = useLanguage();
+  const { isDarkMode, toggleTheme } = useTheme();
+  const { t, language, setLanguage } = useLanguage();
   const theme = isDarkMode ? Colors.dark : Colors.light;
 
   const [nutrition, setNutrition] = useState<any>(null);
@@ -122,17 +122,37 @@ export default function HealthScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: theme.text }]}>
-            {t('health.title')} <Text style={{ color: Colors.brand.primary }}>{t('health.ai')}</Text>
-          </Text>
-          <Text style={[styles.subtitle, { color: theme.secondaryText }]}>
-            {t('health.cockpitSubtitle')}
-          </Text>
+      {/* Updated Header with Logo, Theme & Language Toggles */}
+      <View style={styles.header}>
+        <View style={styles.headerTop}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={isDarkMode ? require('../../assets/WellMate_dark.png') : require('../../assets/WellMate_light.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          </View>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <TouchableOpacity 
+              onPress={() => setLanguage(language === 'fr' ? 'en' : 'fr')} 
+              style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0', width: 'auto', paddingHorizontal: 10 }]}
+            >
+              <Text style={{ color: theme.text, fontWeight: 'bold', fontSize: 12 }}>{language === 'fr' ? 'EN' : 'FR'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={toggleTheme} style={[styles.themeBtn, { backgroundColor: isDarkMode ? '#1e293b' : '#e2e8f0' }]}>
+              <Feather name={isDarkMode ? 'moon' : 'sun'} size={20} color={isDarkMode ? '#fbbf24' : '#f59e0b'} />
+            </TouchableOpacity>
+          </View>
         </View>
+        <Text style={[styles.title, { color: theme.text }]}>
+          {t('health.title')} <Text style={{ color: Colors.brand.primary }}>{t('health.ai')}</Text>
+        </Text>
+        <Text style={[styles.subtitle, { color: theme.secondaryText }]}>
+          {t('health.cockpitSubtitle')}
+        </Text>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
         {/* Vital Signs Grid */}
         <View style={styles.vitalsGrid}>
@@ -347,9 +367,13 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scrollContent: { padding: 20, paddingBottom: 40 },
-  header: { marginBottom: 25 },
-  title: { fontSize: 32, fontWeight: 'bold', tracking: -1 },
-  subtitle: { fontSize: 15, marginTop: 5, lineHeight: 22 },
+  header: { marginBottom: 30, marginTop: 30, paddingHorizontal: 20 },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+  logoContainer: {},
+  logo: { width: 160, height: 60 },
+  themeBtn: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 5 },
+  subtitle: { fontSize: 16 },
   
   vitalsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 25 },
   vitalCard: { width: (width - 50) / 2, padding: 12, borderRadius: 16, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 10 },

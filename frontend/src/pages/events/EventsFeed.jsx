@@ -30,7 +30,7 @@ const EventsFeed = ({ events, onJoin, loading, setView, onEventDeleted }) => {
     if (loading) return (
         <div className="flex flex-col items-center justify-center p-20">
             <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 wm-muted font-bold">Discovering events near you...</p>
+            <p className="mt-4 wm-muted font-bold">{t('events.loadingNearby')}</p>
         </div>
     );
 
@@ -52,16 +52,16 @@ const EventsFeed = ({ events, onJoin, loading, setView, onEventDeleted }) => {
             {events.map(event => (
                 <div key={event.id} className="wm-card !p-0 flex flex-col overflow-hidden hover:-translate-y-2 transition-all duration-300 group hover:shadow-2xl cursor-pointer relative">
                     <div className="h-32 relative bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden">
-                    <div className="absolute inset-0">
-                        <img 
-                            src={activityImages[event.activity_type.toLowerCase()] || activityImages.other} 
-                            alt={event.activity_type}
-                            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                    </div>
+                        <div className="absolute inset-0">
+                            <img
+                                src={activityImages[event.activity_type.toLowerCase()] || activityImages.other}
+                                alt={event.activity_type}
+                                className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                        </div>
                         <div className="absolute top-3 right-3">
-                             <div className={`wm-badge ${event.status === 'Upcoming' ? 'success' : event.status === 'Ongoing' ? 'warn' : 'danger'}`}>
+                            <div className={`wm-badge ${event.status === 'Upcoming' ? 'success' : event.status === 'Ongoing' ? 'warn' : 'danger'}`}>
                                 {event.status ? t(`events.status.${event.status.toLowerCase()}`) : ''}
                             </div>
                         </div>
@@ -80,7 +80,7 @@ const EventsFeed = ({ events, onJoin, loading, setView, onEventDeleted }) => {
                             </div>
                             <div className="flex items-center gap-3 wm-muted">
                                 <span className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-lg">👤</span>
-                                <span>{t('events.host')}: <span className="text-primary font-bold">{event.creator_name}</span></span>
+                                <span>{t('events.organizer')}: <span className="text-primary font-bold">{event.creator_name}</span></span>
                             </div>
                             <div className="flex items-center gap-3 wm-muted">
                                 <span className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-lg">👥</span>
@@ -96,7 +96,7 @@ const EventsFeed = ({ events, onJoin, loading, setView, onEventDeleted }) => {
                             </div>
                         </div>
 
-                        <button 
+                        <button
                             className={`wm-btn !mt-auto ${event.hasJoined ? 'secondary border-red-500 hover:bg-red-500 hover:text-white group/btn' : ''}`}
                             onClick={(e) => {
                                 e.stopPropagation();

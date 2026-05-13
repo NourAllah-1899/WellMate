@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, ActivityIndicator, Alert, TextInput } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, ActivityIndicator, Alert, TextInput, Image } from 'react-native';
 import apiClient from '../api/apiClient';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Colors } from '../constants/Colors';
+import { Feather } from '@expo/vector-icons';
 
 export default function GoalsScreen() {
-  const { isDarkMode } = useTheme();
-  const { t } = useLanguage();
+  const { isDarkMode, toggleTheme } = useTheme();
+  const { t, language, setLanguage } = useLanguage();
   const theme = isDarkMode ? Colors.dark : Colors.light;
 
   const [activeGoal, setActiveGoal] = useState<any>(null);
@@ -124,8 +125,8 @@ export default function GoalsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: { padding: 20 },
-  header: { marginBottom: 30 },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 5 },
+  header: { marginBottom: 30, marginTop: 10 },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 5 },
   subtitle: { fontSize: 16 },
   card: { padding: 24, borderRadius: 20, borderWidth: 1 },
   cardTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },

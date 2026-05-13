@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert, Image } from 'react-native';
 import apiClient from '../api/apiClient';
 import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
@@ -7,8 +7,8 @@ import { useLanguage } from '../context/LanguageContext';
 import { Colors } from '../constants/Colors';
 
 export default function MealsScreen() {
-  const { isDarkMode } = useTheme();
-  const { t } = useLanguage();
+  const { isDarkMode, toggleTheme } = useTheme();
+  const { t, language, setLanguage } = useLanguage();
   const theme = isDarkMode ? Colors.dark : Colors.light;
 
   const [description, setDescription] = useState('');
@@ -16,7 +16,7 @@ export default function MealsScreen() {
   const [loadingMeals, setLoadingMeals] = useState(true);
   const [meals, setMeals] = useState<any[]>([]);
   const [totalCalories, setTotalCalories] = useState(0);
-  
+
   // AI Estimate state
   const [estimate, setEstimate] = useState<any>(null);
 
@@ -67,7 +67,7 @@ export default function MealsScreen() {
       Alert.alert(t('common.error'), t('meals.placeholder'));
       return;
     }
-    
+
     setLoading(true);
     try {
       const payload: any = {
@@ -75,12 +75,12 @@ export default function MealsScreen() {
         estimatedCalories: estimate ? estimate.totalCalories : null,
         eatenAt: new Date().toISOString()
       };
-      
+
       await apiClient.post('/meals', payload);
 
       setDescription('');
       setEstimate(null);
-      Alert.alert(t('common.success'), t('common.success'));
+      Alert.alert(t('meals.saveSuccess'), '');
       fetchTodayMeals();
     } catch (error: any) {
       console.log('Error adding meal:', error.response?.data || error.message);
@@ -121,8 +121,8 @@ export default function MealsScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-         <Text style={[styles.title, { color: Colors.brand.accent }]}>{t('meals.title')}</Text>
-         <Text style={[styles.subtitle, { color: theme.secondaryText }]}>{t('meals.subtitle')}</Text>
+        <Text style={[styles.title, { color: Colors.brand.accent }]}>{t('meals.title')}</Text>
+        <Text style={[styles.subtitle, { color: theme.secondaryText }]}>{t('meals.subtitle')}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -148,17 +148,17 @@ export default function MealsScreen() {
           )}
 
           <View style={styles.buttonRow}>
-            <TouchableOpacity 
-              style={[styles.actionButton, { backgroundColor: 'transparent', borderWidth: 1, borderColor: Colors.brand.accent }]} 
-              onPress={handleEstimate} 
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: 'transparent', borderWidth: 1, borderColor: Colors.brand.accent }]}
+              onPress={handleEstimate}
               disabled={loading}
             >
               <Text style={[styles.actionButtonText, { color: Colors.brand.accent }]}>{t('meals.estimate')}</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.actionButton, { backgroundColor: Colors.brand.accent }]} 
-              onPress={handleSaveMeal} 
+
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: Colors.brand.accent }]}
+              onPress={handleSaveMeal}
               disabled={loading}
             >
               {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.actionButtonText}>{t('meals.save')}</Text>}
@@ -169,19 +169,19 @@ export default function MealsScreen() {
         {/* Aujourd'hui Summary */}
         <View style={styles.summaryCard}>
           <View style={styles.summaryHeader}>
-             <Text style={[styles.summaryTitle, { color: theme.text }]}>{t('meals.today')}</Text>
-             <View style={[styles.badge, { backgroundColor: Colors.brand.accent }]}>
-                <Text style={styles.badgeText}>{totalCalories} kcal</Text>
-             </View>
+            <Text style={[styles.summaryTitle, { color: theme.text }]}>{t('meals.today')}</Text>
+            <View style={[styles.badge, { backgroundColor: Colors.brand.accent }]}>
+              <Text style={styles.badgeText}>{totalCalories} kcal</Text>
+            </View>
           </View>
         </View>
 
         {/* Repas d'aujourd'hui */}
         <View style={{ gap: 15 }}>
           {loadingMeals ? (
-             <ActivityIndicator size="large" color={Colors.brand.accent} style={{ marginTop: 20 }} />
+            <ActivityIndicator size="large" color={Colors.brand.accent} style={{ marginTop: 20 }} />
           ) : meals.length === 0 ? (
-             <Text style={[styles.emptyText, { color: theme.muted }]}>{t('meals.noMeals')}</Text>
+            <Text style={[styles.emptyText, { color: theme.muted }]}>{t('meals.noMeals')}</Text>
           ) : (
             meals.map((meal) => (
               <View key={meal.id} style={[styles.mealCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
@@ -194,7 +194,7 @@ export default function MealsScreen() {
                   </View>
                   <Text style={[styles.mealCalories, { color: Colors.brand.accent }]}>{meal.estimated_calories} kcal</Text>
                 </View>
-                
+
                 {meal.breakdown_json && (
                   <View style={{ marginTop: 10, borderTopWidth: 1, borderTopColor: theme.border, paddingTop: 10 }}>
                     <Text style={[styles.breakdownLabel, { color: theme.muted }]}>{t('meals.breakdown')}</Text>
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   actionButtonText: { fontSize: 16, fontWeight: 'bold', color: '#fff' },
-  
+
   estimateBox: {
     padding: 15,
     borderRadius: 12,
@@ -272,26 +272,26 @@ const styles = StyleSheet.create({
   },
   estimateTitle: { fontSize: 12, fontWeight: '900', textTransform: 'uppercase', marginBottom: 5 },
   estimateValue: { fontSize: 24, fontWeight: '900', marginBottom: 10 },
-  
+
   summaryCard: { marginBottom: 15, paddingHorizontal: 5 },
   summaryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   summaryTitle: { fontSize: 22, fontWeight: 'bold' },
   badge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20 },
   badgeText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
-  
+
   mealCard: { padding: 18, borderRadius: 16, borderWidth: 1 },
   mealHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   mealInfo: { flex: 1, paddingRight: 10 },
   mealDescription: { fontSize: 16, fontWeight: 'bold', marginBottom: 4 },
   mealDate: { fontSize: 12 },
   mealCalories: { fontSize: 18, fontWeight: 'bold' },
-  
+
   breakdownContainer: { marginTop: 8 },
   breakdownItem: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   breakdownName: { fontSize: 13, fontWeight: '600' },
   breakdownDetail: { fontSize: 12 },
   breakdownLabel: { fontSize: 10, fontWeight: '900', marginTop: 10, marginBottom: 5 },
   assumptions: { fontSize: 11, fontStyle: 'italic', marginTop: 8 },
-  
+
   emptyText: { fontStyle: 'italic', textAlign: 'center', marginTop: 20 },
 });

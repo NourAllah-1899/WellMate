@@ -107,15 +107,14 @@ export default function Profile() {
 
   return (
     <div className="wm-container">
-      <div className="wm-card" style={{ maxWidth: 560, margin: '0 auto' }}>
-        <div className="wm-header">
+        <div className="wm-header-card">
           <h1>{t('dashboard.healthProfile') || 'Health profile'}</h1>
+          <p className="wm-subtitle">
+            Fill your personal data. Your BMI (IMC) is calculated automatically.
+          </p>
         </div>
 
-        <p className="wm-subtitle">
-          {/* Missing pure generic text, fallback or simple strings */}
-          Fill your personal data. Your BMI (IMC) is calculated automatically.
-        </p>
+        <div className="wm-card">
 
         <form onSubmit={onSave} className="wm-form">
           <label className="wm-field">

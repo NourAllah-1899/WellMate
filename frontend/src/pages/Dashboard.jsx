@@ -92,13 +92,9 @@ export default function Dashboard() {
       {me && !loading && data ? (
         <>
           {/* Welcome Header */}
-          <div className="wm-card header-card">
-            <div className="wm-header">
-              <div>
-                <h1>{t('dashboard.welcome')}, {user?.full_name || user?.username}! 👋</h1>
-                <p className="wm-subtitle">{t('dashboard.personalHealthDashboard')}</p>
-              </div>
-            </div>
+          <div className="wm-header-card">
+            <h1>{t('dashboard.welcome')} {user?.full_name || user?.username} 👋</h1>
+            <p className="wm-subtitle">{t('dashboard.personalHealthDashboard')}</p>
           </div>
 
           {/* Main Stats Grid */}
@@ -201,17 +197,19 @@ export default function Dashboard() {
                 </>
               )}
             </div>
-
-            {/* Quick Actions Card */}
-            <div className="wm-card stat-card">
-              <h3>⚡ {t('dashboard.quickActions')}</h3>
-              <div className="action-grid">
-                <Link to="/meals" className="wm-btn small">{t('dashboard.addMeal')}</Link>
-                <Link to="/health" className="wm-btn small">{t('dashboard.logHealth')}</Link>
-                <Link to="/events" className="wm-btn small">{t('common.events')}</Link>
-                <Link to="/goals" className="wm-btn small">{t('common.goals')}</Link>
+            {/* AI Personal Coach Card */}
+            <div className="wm-card ai-insight-card">
+              <h3>{t('dashboard.aiPersonalCoach')}</h3>
+              <p className="coach-text">
+                {goal?.ai_summary || (today?.total_calories > 2000
+                  ? t('dashboard.aiCoachHeartyTip')
+                  : t('dashboard.aiCoachDefaultTip'))}
+              </p>
+              <div className="coach-signature">
+                <span>{t('dashboard.aiCoachSignature')}</span>
               </div>
             </div>
+
           </div>
 
           {/* Health Events Section */}

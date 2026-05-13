@@ -11,16 +11,18 @@ interface EventsFeedProps {
 }
 
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function EventsFeed({ events, loading, onJoin, onRefresh, setView }: EventsFeedProps) {
     const { isDarkMode } = useTheme();
+    const { t } = useLanguage();
     const isLight = !isDarkMode;
 
     if (loading && events.length === 0) {
         return (
             <View style={styles.center}>
                 <ActivityIndicator size="large" color="#7c3aed" />
-                <Text style={styles.loadingText}>Discovering events...</Text>
+                <Text style={styles.loadingText}>{t('events.loadingNearby', 'Discovering events...')}</Text>
             </View>
         );
     }
@@ -28,15 +30,15 @@ export default function EventsFeed({ events, loading, onJoin, onRefresh, setView
     const renderEmpty = () => (
         <View style={styles.emptyContainer}>
             <Text style={styles.emptyIcon}>🏃‍♂️💨</Text>
-            <Text style={[styles.emptyTitle, isLight && styles.emptyTitleLight]}>No activities found</Text>
+            <Text style={[styles.emptyTitle, isLight && styles.emptyTitleLight]}>{t('events.noActivities', 'No activities found')}</Text>
             <Text style={[styles.emptySubtitle, isLight && styles.emptySubtitleLight]}>
-                It's a bit quiet here. Be the pioneer and start a new community event today!
+                {t('events.noActivitiesSubtitle')}
             </Text>
             <TouchableOpacity 
                 style={styles.createButton}
                 onPress={() => setView('create')}
             >
-                <Text style={styles.createButtonText}>🚀 Launch First Event</Text>
+                <Text style={styles.createButtonText}>{t('events.launchFirst')}</Text>
             </TouchableOpacity>
         </View>
     );

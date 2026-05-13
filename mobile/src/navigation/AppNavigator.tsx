@@ -1,5 +1,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { TouchableOpacity, Text } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import LoginScreen from '../screens/Login';
 import RegisterScreen from '../screens/Register';
 import MainTabNavigator from './MainTabNavigator';
@@ -26,7 +28,10 @@ export default function AppNavigator() {
         headerStyle: { backgroundColor: theme.card },
         headerTintColor: theme.text,
         headerTitleStyle: { fontWeight: 'bold' },
+        headerTitleAlign: 'center',
         headerShadowVisible: false,
+        headerLeftContainerStyle: { paddingLeft: 10 },
+        headerRightContainerStyle: { paddingRight: 10 },
       }}
     >
       <Stack.Screen 
@@ -47,22 +52,74 @@ export default function AppNavigator() {
       <Stack.Screen 
         name="Meals" 
         component={MealsScreen} 
-        options={{ title: t('common.meals'), headerBackTitle: t('common.cancel') }} 
+        options={({ navigation }) => ({ 
+          title: t('common.meals'), 
+          headerBackVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity 
+              onPress={() => navigation.pop()} 
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 50 }}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10 }}
+            >
+              <Feather name="chevron-left" size={32} color={theme.text} />
+              <Text style={{ color: theme.text, fontSize: 18, fontWeight: 'bold' }}>{t('common.cancel')}</Text>
+            </TouchableOpacity>
+          )
+        })} 
       />
       <Stack.Screen 
         name="Goals" 
         component={GoalsScreen} 
-        options={{ title: t('common.goals'), headerBackTitle: t('common.cancel') }} 
+        options={({ navigation }) => ({ 
+          title: t('common.goals'), 
+          headerBackVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity 
+              onPress={() => navigation.pop()} 
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 50 }}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10 }}
+            >
+              <Feather name="chevron-left" size={32} color={theme.text} />
+              <Text style={{ color: theme.text, fontSize: 18, fontWeight: 'bold' }}>{t('common.cancel')}</Text>
+            </TouchableOpacity>
+          )
+        })} 
       />
       <Stack.Screen 
         name="Chatbot" 
         component={ChatbotScreen} 
-        options={{ title: t('common.chatbot'), headerBackTitle: t('common.cancel') }} 
+        options={({ navigation }) => ({ 
+          title: t('common.chatbot'), 
+          headerBackVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity 
+              onPress={() => navigation.pop()} 
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 50 }}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10 }}
+            >
+              <Feather name="chevron-left" size={32} color={theme.text} />
+              <Text style={{ color: theme.text, fontSize: 18, fontWeight: 'bold' }}>{t('common.cancel')}</Text>
+            </TouchableOpacity>
+          )
+        })} 
       />
       <Stack.Screen 
         name="EditProfile" 
         component={EditProfileScreen} 
-        options={{ title: t('editProfile.title'), headerBackTitle: t('common.cancel') }} 
+        options={({ navigation }) => ({ 
+          title: t('editProfile.title'), 
+          headerBackVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity 
+              onPress={() => navigation.pop()} 
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 50 }}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10 }}
+            >
+              <Feather name="chevron-left" size={32} color={theme.text} />
+              <Text style={{ color: theme.text, fontSize: 18, fontWeight: 'bold' }}>{t('common.cancel')}</Text>
+            </TouchableOpacity>
+          )
+        })} 
       />
     </Stack.Navigator>
   );

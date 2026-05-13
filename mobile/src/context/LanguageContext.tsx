@@ -6,7 +6,7 @@ type Language = 'fr' | 'en';
 type LanguageContextType = {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string, params?: Record<string, any>) => string;
+  t: (key: string, paramsOrFallback?: Record<string, any> | string, params?: Record<string, any>) => string;
 };
 
 const translations: Record<Language, any> = {
@@ -34,7 +34,12 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     await AsyncStorage.setItem('language', lang);
   };
 
-  const t = (path: string, params?: Record<string, any>) => {
+  const t = (path: string, paramsOrFallback?: Record<string, any> | string, params?: Record<string, any>) => {
+    const fallback = typeof paramsOrFallback === 'string' ? paramsOrFallback : undefined;
+    const replacements = (typeof paramsOrFallback === 'object' && paramsOrFallback !== null)
+      ? paramsOrFallback
+      : (params && typeof params === 'object' ? params : undefined);
+
     const keys = path.split('.');
     let value = translations[language];
     
@@ -42,10 +47,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value = value?.[key];
     }
 
-    if (typeof value !== 'string') return path;
+    if (typeof value !== 'string') return fallback ?? path;
 
-    if (params) {
-      Object.entries(params).forEach(([key, val]) => {
+    if (replacements) {
+      Object.entries(replacements).forEach(([key, val]) => {
         value = (value as string).replace(`{${key}}`, String(val));
       });
     }

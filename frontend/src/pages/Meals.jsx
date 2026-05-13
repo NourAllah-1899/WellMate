@@ -148,13 +148,12 @@ export default function Meals() {
 
   return (
     <div className="wm-container">
-      <div className="wm-card" style={{ maxWidth: 820, margin: '0 auto' }}>
-        <div className="wm-header">
-          <div>
-            <h1>{editingMealId ? 'Modifier le repas' : t('meals.title')}</h1>
-            <p className="wm-subtitle">{t('meals.subtitle')}</p>
-          </div>
+        <div className="wm-header-card">
+          <h1>{editingMealId ? 'Modifier le repas' : t('meals.title')}</h1>
+          <p className="wm-subtitle">{t('meals.subtitle')}</p>
         </div>
+
+        <div className="wm-card">
 
         {apiError ? <div className="wm-alert error">{apiError}</div> : null}
 
@@ -284,5 +283,5 @@ export default function Meals() {
         </div>
       </div>
     </div>
-  )
+)
 }

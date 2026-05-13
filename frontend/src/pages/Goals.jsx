@@ -98,13 +98,12 @@ export default function Goals() {
 
   return (
     <div className="wm-container">
-      <div className="wm-card" style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div className="wm-header">
-          <div>
-            <h1>{t('goals.title')}</h1>
-            <p className="wm-subtitle">{t('goals.subtitle')}</p>
-          </div>
+        <div className="wm-header-card">
+          <h1>{t('goals.title')}</h1>
+          <p className="wm-subtitle">{t('goals.subtitle')}</p>
         </div>
+
+        <div className="wm-card">
 
         {apiError ? <div className="wm-alert error">{apiError}</div> : null}
 
@@ -181,5 +180,5 @@ export default function Goals() {
         ) : null}
       </div>
     </div>
-  )
+)
 }

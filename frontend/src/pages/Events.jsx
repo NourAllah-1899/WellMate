@@ -76,20 +76,16 @@ export default function Events() {
     };
 
     return (
-        <div className="wm-container max-w-[1100px]">
+        <div className="wm-container">
             {/* Hero Section */}
-            {(view === 'feed' || view === 'map') && (
-                <div className="relative overflow-hidden rounded-3xl mb-8 p-8 md:p-12 border border-white/20 shadow-2xl" 
-                     style={{ 
-                         background: 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-action) 100%)',
-                         color: 'white'
-                     }}>
+            {(view === 'feed' || view === 'map' || view === 'create' || view === 'my') && (
+                <div className="wm-header-card !p-8 md:!p-12">
                     <div className="relative z-10 max-w-2xl">
                         <h1 className="text-white text-4xl md:text-5xl mb-4 leading-tight" dangerouslySetInnerHTML={{ __html: t('events.title').replace(', ', ', <br/>') }}></h1>
-                        <p className="text-white/80 text-lg mb-8 max-w-md">
+                        <p className="wm-subtitle">
                             {t('events.subtitle')}
                         </p>
-                        <div className="flex flex-wrap gap-4">
+                        <div className="flex flex-wrap gap-4 mt-8">
                             <div className="bg-white/10 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/20">
                                 <span className="block text-2xl font-black">{events.length}</span>
                                 <span className="text-xs uppercase tracking-wider opacity-70">{t('events.activeEvents')}</span>
@@ -100,9 +96,6 @@ export default function Events() {
                             </div>
                         </div>
                     </div>
-                    {/* Decorative element */}
-                    <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
-                    <div className="absolute right-10 top-10 w-40 h-40 bg-brand-hover/20 rounded-full blur-2xl"></div>
                 </div>
             )}
 

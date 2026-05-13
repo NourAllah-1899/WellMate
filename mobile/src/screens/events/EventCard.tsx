@@ -23,7 +23,7 @@ interface EventCardProps {
     onEdit?: (id: number) => void;
 }
 
-export default function EventCard({ event, onJoin, onDelete }: EventCardProps) {
+export default function EventCard({ event, onJoin, onDelete, onEdit }: EventCardProps) {
     const { isDarkMode } = useTheme();
     const { t } = useLanguage();
     const isLight = !isDarkMode;
@@ -59,28 +59,29 @@ export default function EventCard({ event, onJoin, onDelete }: EventCardProps) {
                 <View style={styles.detailRow}>
                     <Calendar size={16} color={isLight ? '#64748b' : '#94a3b8'} />
                     <Text style={[styles.detailText, isLight && styles.detailTextLight]}
-                        >{`${new Date(event.date).toLocaleDateString()} @ ${event.time.substring(0, 5)}`}
+                    >{`${new Date(event.date).toLocaleDateString()} @ ${event.time.substring(0, 5)}`}
                     </Text>
                 </View>
                 <View style={styles.detailRow}>
                     <User size={16} color={isLight ? '#64748b' : '#94a3b8'} />
                     <Text style={[styles.detailText, isLight && styles.detailTextLight]}
-                        >{`${t('events.host')}: `}
+                    >{`${t('events.organizer')}: `}
                         <Text style={styles.bold}>{event.creator_name}</Text>
                     </Text>
                 </View>
                 <View style={styles.detailRow}>
                     <Users size={16} color={isLight ? '#64748b' : '#94a3b8'} />
                     <Text style={[styles.detailText, isLight && styles.detailTextLight]}
-                        >{`${event.participant_count} ${t('events.joining')}`}
+                    >{`${event.participant_count} ${t('events.joining')}`}
                     </Text>
                 </View>
                 <TouchableOpacity
                     style={[
                         styles.joinButton,
                         event.hasJoined && styles.joinedButton,
-                        isLight && styles.joinedButtonLight,
+                        isLight && event.hasJoined && styles.joinedButtonLight,
                         (isFinished || isFull) && styles.disabledButton,
+                        (onEdit || onDelete) && styles.joinButtonWithActions,
                     ]}
                     onPress={() => onJoin(event.id, event.hasJoined)}
                     disabled={isFinished || isFull}
@@ -89,27 +90,31 @@ export default function EventCard({ event, onJoin, onDelete }: EventCardProps) {
                     >{event.hasJoined
                         ? t('events.alreadyJoined')
                         : isFinished
-                        ? t('events.eventEnded')
-                        : isFull
-                        ? t('events.capacityReach')
-                        : t('events.joinActivity')}
+                            ? t('events.eventEnded')
+                            : isFull
+                                ? t('events.capacityReach')
+                                : t('events.joinActivity')}
                     </Text>
                 </TouchableOpacity>
-                {onDelete && (
-                    <TouchableOpacity
-                        style={styles.deleteButton}
-                        onPress={() => onDelete(event.id)}
-                    >
-                        <Text style={styles.deleteButtonText}>{t('events.delete')}</Text>
-                    </TouchableOpacity>
-                )}
-                {onEdit && (
-                    <TouchableOpacity
-                        style={styles.editButton}
-                        onPress={() => onEdit(event.id)}
-                    >
-                        <Text style={styles.editButtonText}>{t('events.edit')}</Text>
-                    </TouchableOpacity>
+                {(onEdit || onDelete) && (
+                    <View style={styles.actionButtonsContainer}>
+                        {onEdit && (
+                            <TouchableOpacity
+                                style={[styles.actionButton, styles.editButton, isLight && styles.editButtonLight]}
+                                onPress={() => onEdit(event.id)}
+                            >
+                                <Text style={[styles.actionButtonText, isLight && styles.editButtonTextLight]}>{t('common.edit')}</Text>
+                            </TouchableOpacity>
+                        )}
+                        {onDelete && (
+                            <TouchableOpacity
+                                style={[styles.actionButton, styles.deleteButton, isLight && styles.deleteButtonLight]}
+                                onPress={() => onDelete(event.id)}
+                            >
+                                <Text style={[styles.actionButtonText, styles.deleteButtonText]}>{t('common.delete')}</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
                 )}
             </View>
         </View>
@@ -224,12 +229,47 @@ const styles = StyleSheet.create({
     joinButtonTextLight: {
         color: '#64748b',
     },
+    joinButtonWithActions: {
+        marginBottom: 12,
+    },
+    actionButtonsContainer: {
+        flexDirection: 'row',
+        gap: 8,
+        justifyContent: 'flex-end',
+    },
+    actionButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        borderWidth: 1,
+        alignItems: 'center',
+        minWidth: 80,
+    },
+    editButton: {
+        backgroundColor: '#334155',
+        borderColor: '#475569',
+    },
+    editButtonLight: {
+        backgroundColor: '#f1f5f9',
+        borderColor: '#e2e8f0',
+    },
     deleteButton: {
-        marginTop: 8,
-        alignSelf: 'flex-end',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        borderColor: '#ef4444',
+    },
+    deleteButtonLight: {
+        backgroundColor: 'rgba(239, 68, 68, 0.05)',
+        borderColor: '#ef4444',
+    },
+    actionButtonText: {
+        color: '#cbd5e1',
+        fontWeight: '600',
+        fontSize: 12,
+    },
+    editButtonTextLight: {
+        color: '#475569',
     },
     deleteButtonText: {
         color: '#ef4444',
-        fontWeight: 'bold',
     },
 });
