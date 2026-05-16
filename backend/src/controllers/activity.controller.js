@@ -1,4 +1,5 @@
 import pool from '../config/db.js'
+import { checkAndAwardBadges } from '../services/gamification.service.js'
 
 export const recordActivity = async (req, res) => {
   try {
@@ -39,6 +40,9 @@ export const recordActivity = async (req, res) => {
         activityDate,
       },
     })
+
+    // Gamification hook
+    checkAndAwardBadges(userId, { type: 'sport_session' }).catch(err => console.error('Badge error:', err));
   } catch (err) {
     console.error('Error recording activity:', err)
     res.status(500).json({ message: 'Failed to record activity' })

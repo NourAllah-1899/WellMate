@@ -300,3 +300,107 @@ export const deleteMeal = async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to delete meal.' });
     }
 };
+
+const MEAL_PLAN_SYSTEM = `You are a professional nutritionist and meal planner.
+Return ONLY valid JSON. No markdown, no extra text.
+
+JSON schema:
+{
+  "planTitle": string,
+  "totalDayCalories": number,
+  "meals": [
+    {
+      "mealType": string (one of: "breakfast", "lunch", "dinner", "snack"),
+      "name": string,
+      "description": string,
+      "ingredients": [string],
+      "calories": number,
+      "protein_g": number,
+      "carbs_g": number,
+      "fat_g": number,
+      "prepTime": string,
+      "recipe": string
+    }
+  ],
+  "tips": string,
+  "macroSummary": {
+    "totalProtein": number,
+    "totalCarbs": number,
+    "totalFat": number
+  }
+}
+
+Rules:
+- Generate a complete day plan with breakfast, lunch, dinner, and 1-2 snacks.
+- Respect the user's calorie goal, dietary restrictions, and allergies.
+- Use available ingredients when provided, but you can suggest additional ones.
+- Provide realistic, practical recipes with prep times.
+- totalDayCalories must match the sum of all meal calories.
+- All macro values must be positive numbers.
+`;
+
+// POST /api/meals/generate-plan (protected) — AI Meal Plan Generator
+export const generateMealPlan = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        const { goal, allergies, ingredients, language } = req.body;
+
+        // Get user data for personalization
+        const [[user]] = await pool.query(
+            'SELECT weight_kg, height_cm, age, calorie_goal, goal_type FROM users WHERE id = ?',
+            [userId]
+        );
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        const calorieTarget = user.calorie_goal || 2000;
+        const userGoal = goal || user.goal_type || 'maintenance';
+
+        const lang = language === 'ar' ? 'Arabic' : language === 'en' ? 'English' : 'French';
+
+        const userPrompt = `Generate a complete daily meal plan with the following parameters:
+
+- **Calorie Target**: ${calorieTarget} kcal/day
+- **Goal**: ${userGoal} (${userGoal === 'loss' ? 'weight loss - prioritize high protein, low carb' : userGoal === 'gain' ? 'muscle gain - prioritize high protein, high carb' : 'maintain weight - balanced macros'})
+- **User Profile**: ${user.weight_kg || 'unknown'}kg, ${user.height_cm || 'unknown'}cm, age ${user.age || 'unknown'}
+- **Allergies/Restrictions**: ${allergies && allergies.length > 0 ? allergies.join(', ') : 'None specified'}
+- **Available Ingredients**: ${ingredients && ingredients.length > 0 ? ingredients.join(', ') : 'No specific ingredients - suggest common ones'}
+
+Please respond in ${lang}.
+Return JSON only following the schema.`;
+
+        console.log(`[Meal Plan] Generating plan for user ${userId}, goal: ${userGoal}, target: ${calorieTarget}kcal`);
+
+        let raw;
+        try {
+            raw = await openaiGenerateJson({
+                systemInstruction: MEAL_PLAN_SYSTEM,
+                userPrompt,
+                maxTokens: 2048,
+            });
+            console.log('[Meal Plan] AI response received');
+        } catch (apiErr) {
+            console.error('[Meal Plan] OpenAI error:', apiErr.message);
+            return res.status(apiErr.status || 502).json({
+                success: false,
+                message: `AI service error: ${apiErr.message}`
+            });
+        }
+
+        if (!raw || !raw.meals || !Array.isArray(raw.meals)) {
+            console.warn('[Meal Plan] Invalid AI response format');
+            return res.status(500).json({
+                success: false,
+                message: 'AI returned an invalid meal plan format. Please try again.'
+            });
+        }
+
+        console.log(`[Meal Plan] Success: ${raw.meals.length} meals, ${raw.totalDayCalories} kcal`);
+        res.json({ success: true, plan: raw });
+    } catch (err) {
+        console.error('[Meal Plan] error:', err);
+        res.status(500).json({ success: false, message: 'Failed to generate meal plan.' });
+    }
+};

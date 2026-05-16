@@ -7,7 +7,8 @@ import {
     getHealthReports,
     updateHealthGoal,
     logWater,
-    getWaterStats
+    getWaterStats,
+    getWeeklyChartStats
 } from '../controllers/health.controller.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 
@@ -21,5 +22,6 @@ router.get('/water/stats', authenticate, getWaterStats);
 router.post('/generate-report', authenticate, generateAIReport);
 router.get('/reports', authenticate, getHealthReports);
 router.post('/update-goal', authenticate, updateHealthGoal);
+router.get('/weekly-chart-stats', authenticate, getWeeklyChartStats);
 
 export default router;

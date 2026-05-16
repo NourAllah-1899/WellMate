@@ -4,6 +4,8 @@ import NutritionProgress from '../components/health/NutritionProgress';
 import SmokingTracker from '../components/health/SmokingTracker';
 import SmartReports from '../components/health/SmartReports';
 import HealthSettings from '../components/health/HealthSettings';
+import BadgeBoard from '../components/gamification/BadgeBoard';
+import StreakCounter from '../components/gamification/StreakCounter';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function Health() {
@@ -16,15 +18,21 @@ export default function Health() {
   const [loading, setLoading] = useState(true);
   const [reportLoading, setReportLoading] = useState(false);
   const [reportError, setReportError] = useState(null);
+  
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [badges, setBadges] = useState([]);
+  const [streak, setStreak] = useState(null);
 
   const fetchData = useCallback(async () => {
     try {
-      const [nutritionRes, smokingRes, reportsRes, userRes, waterRes] = await Promise.all([
+      const [nutritionRes, smokingRes, reportsRes, userRes, waterRes, badgesRes, streakRes] = await Promise.all([
         api.get('/api/health/nutrition-summary'),
         api.get('/api/health/smoking/stats'),
         api.get('/api/health/reports'),
         api.get('/api/auth/me'),
-        api.get('/api/health/water/stats').catch(() => ({ data: { stats: { today: 0 } } }))
+        api.get('/api/health/water/stats').catch(() => ({ data: { stats: { today: 0 } } })),
+        api.get('/api/gamification/badges').catch(() => ({ data: { badges: [] } })),
+        api.get('/api/gamification/streak').catch(() => ({ data: { streak: null } }))
       ]);
 
       setNutrition(nutritionRes.data.summary);
@@ -33,6 +41,12 @@ export default function Health() {
       setUserData(userRes.data.user);
       if (waterRes && waterRes.data) {
         setWaterStats(waterRes.data.stats);
+      }
+      if (badgesRes && badgesRes.data) {
+        setBadges(badgesRes.data.badges);
+      }
+      if (streakRes && streakRes.data) {
+        setStreak(streakRes.data.streak);
       }
     } catch (err) {
       console.error('Failed to fetch health data:', err);
@@ -106,7 +120,39 @@ export default function Health() {
         <p className="wm-subtitle">{t('health.cockpitSubtitle')}</p>
       </div>
 
-      {/* Vital Signs Row */}
+      {/* Tabs */}
+      <div className="flex gap-4 border-b border-slate-200 dark:border-slate-800 pb-px">
+        <button
+          onClick={() => setActiveTab('dashboard')}
+          className={`pb-4 px-2 text-sm font-bold transition-colors relative ${
+            activeTab === 'dashboard' 
+              ? 'text-brand-primary' 
+              : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+          }`}
+        >
+          📊 Tableau de bord
+          {activeTab === 'dashboard' && (
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-brand-primary rounded-t-full"></div>
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('gamification')}
+          className={`pb-4 px-2 text-sm font-bold transition-colors relative ${
+            activeTab === 'gamification' 
+              ? 'text-brand-primary' 
+              : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+          }`}
+        >
+          🏆 Récompenses
+          {activeTab === 'gamification' && (
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-brand-primary rounded-t-full"></div>
+          )}
+        </button>
+      </div>
+
+      {activeTab === 'dashboard' ? (
+        <>
+          {/* Vital Signs Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: t('health.vitals.weight'), value: `${userData?.weight_kg || '--'} kg`, icon: '⚖️', color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-400' },
@@ -196,6 +242,13 @@ export default function Health() {
           />
         </div>
       </div>
+      </>
+      ) : (
+        <div className="space-y-8 animate-fade-in">
+          <StreakCounter streak={streak} />
+          <BadgeBoard badges={badges} />
+        </div>
+      )}
     </div>
   );
 }

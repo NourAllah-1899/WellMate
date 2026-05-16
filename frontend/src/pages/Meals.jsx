@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import api from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import MealPlanGenerator from '../components/meals/MealPlanGenerator.jsx'
 
 export default function Meals() {
   const { me } = useAuth()
   const { t } = useLanguage()
   const navigate = useNavigate()
   const [apiError, setApiError] = useState('')
+  const [activeTab, setActiveTab] = useState('log')
 
   const [description, setDescription] = useState('')
   const [estimate, setEstimate] = useState(null)
@@ -113,6 +115,7 @@ export default function Meals() {
     setEditingMealId(m.id);
     setDescription(m.description);
     setEstimate(null);
+    setActiveTab('log');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -153,135 +156,171 @@ export default function Meals() {
           <p className="wm-subtitle">{t('meals.subtitle')}</p>
         </div>
 
-        <div className="wm-card">
-
-        {apiError ? <div className="wm-alert error">{apiError}</div> : null}
-
-        <label className="wm-field">
-          {t('meals.description')}
-          <textarea
-            className="wm-input"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            rows={3}
-            placeholder='e.g. "2 eggs, bread, and a glass of milk"'
-          />
-        </label>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 14 }}>
-          <button className="wm-btn secondary" type="button" onClick={onEstimate} disabled={!canEstimate}>
-            {actionLoading ? t('meals.working') : t('meals.estimate')}
+        {/* Tab Navigation */}
+        <div className="flex gap-2 mb-6">
+          <button
+            type="button"
+            onClick={() => setActiveTab('log')}
+            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+              activeTab === 'log'
+                ? 'bg-indigo-500 text-white border-indigo-600 shadow-lg shadow-indigo-200 dark:shadow-none'
+                : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700'
+            }`}
+            style={activeTab !== 'log' ? { backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' } : {}}
+          >
+            🍽️ {t('meals.title')}
           </button>
-          <button className="wm-btn" type="button" onClick={onSave} disabled={!canEstimate}>
-            {actionLoading ? t('meals.working') : editingMealId ? 'Mettre à jour' : t('meals.saveMeal')}
+          <button
+            type="button"
+            onClick={() => setActiveTab('plan')}
+            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+              activeTab === 'plan'
+                ? 'bg-indigo-500 text-white border-indigo-600 shadow-lg shadow-indigo-200 dark:shadow-none'
+                : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700'
+            }`}
+            style={activeTab !== 'plan' ? { backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' } : {}}
+          >
+            🤖 Plan IA
           </button>
-          {editingMealId ? (
-            <button className="wm-btn secondary" type="button" onClick={onCancelEdit} disabled={actionLoading}>
-              Annuler
-            </button>
-          ) : null}
         </div>
 
-        {estimate ? (
-          <div className="wm-panel" style={{ marginTop: 14 }}>
-            <div className="wm-kpi-label">{t('meals.estimatedCalories')}</div>
-            <div className="wm-kpi">{estimate.totalCalories} kcal</div>
-            {Array.isArray(estimate.items) && estimate.items.length ? (
-              <div style={{ marginTop: 10 }}>
-                <div className="wm-muted" style={{ fontWeight: 900, marginBottom: 6 }}>{t('meals.breakdown')}</div>
-                <div className="wm-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
-                  {estimate.items.map((it, idx) => (
-                    <div key={idx} className="wm-panel" style={{ padding: 10 }}>
-                      <div style={{ fontWeight: 900 }}>{it.name}</div>
-                      <div className="wm-muted">{it.quantity}</div>
-                      <div style={{ marginTop: 6, fontWeight: 900 }}>{it.calories} kcal</div>
+        {/* Tab: Log Meals */}
+        {activeTab === 'log' && (
+          <div className="wm-card">
+            {apiError ? <div className="wm-alert error">{apiError}</div> : null}
+
+            <label className="wm-field">
+              {t('meals.description')}
+              <textarea
+                className="wm-input"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                placeholder='e.g. "2 eggs, bread, and a glass of milk"'
+              />
+            </label>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 14 }}>
+              <button className="wm-btn secondary" type="button" onClick={onEstimate} disabled={!canEstimate}>
+                {actionLoading ? t('meals.working') : t('meals.estimate')}
+              </button>
+              <button className="wm-btn" type="button" onClick={onSave} disabled={!canEstimate}>
+                {actionLoading ? t('meals.working') : editingMealId ? 'Mettre à jour' : t('meals.saveMeal')}
+              </button>
+              {editingMealId ? (
+                <button className="wm-btn secondary" type="button" onClick={onCancelEdit} disabled={actionLoading}>
+                  Annuler
+                </button>
+              ) : null}
+            </div>
+
+            {estimate ? (
+              <div className="wm-panel" style={{ marginTop: 14 }}>
+                <div className="wm-kpi-label">{t('meals.estimatedCalories')}</div>
+                <div className="wm-kpi">{estimate.totalCalories} kcal</div>
+                {Array.isArray(estimate.items) && estimate.items.length ? (
+                  <div style={{ marginTop: 10 }}>
+                    <div className="wm-muted" style={{ fontWeight: 900, marginBottom: 6 }}>{t('meals.breakdown')}</div>
+                    <div className="wm-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+                      {estimate.items.map((it, idx) => (
+                        <div key={idx} className="wm-panel" style={{ padding: 10 }}>
+                          <div style={{ fontWeight: 900 }}>{it.name}</div>
+                          <div className="wm-muted">{it.quantity}</div>
+                          <div style={{ marginTop: 6, fontWeight: 900 }}>{it.calories} kcal</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+                {estimate.assumptions ? (
+                  <div className="wm-muted" style={{ marginTop: 10 }}>{estimate.assumptions}</div>
+                ) : null}
+              </div>
+            ) : null}
+
+            <div className="wm-panel" style={{ marginTop: 18 }}>
+              <div className="wm-header" style={{ marginBottom: 10 }}>
+                <h2 style={{ margin: 0 }}>{t('meals.today')}</h2>
+                <div className="wm-badge">Total: {totalCalories} kcal</div>
+              </div>
+
+              {listLoading ? <div className="wm-muted">{t('common.loading')}</div> : null}
+
+              {!listLoading && meals.length === 0 ? (
+                <div className="wm-muted">{t('meals.noMeals')}</div>
+              ) : null}
+
+              {!listLoading && meals.length ? (
+                <div style={{ display: 'grid', gap: 10 }}>
+                  {meals.map((m) => (
+                    <div key={m.id} className="wm-panel" style={{ padding: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline' }}>
+                        <div style={{ fontWeight: 900 }}>{m.description}</div>
+                        <div className="wm-badge">{m.estimated_calories} kcal</div>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+                        <div className="wm-muted">
+                          {m.eaten_at ? new Date(m.eaten_at).toLocaleString() : ''}
+                        </div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          {m.id === lastMealId && (
+                            <>
+                              <button className="wm-btn secondary small" onClick={() => onEdit(m)}>Éditer</button>
+                              <button className="wm-btn error small" onClick={() => onDelete(m.id)}>Supprimer</button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
+              ) : null}
+            </div>
+
+            <div className="wm-panel" style={{ marginTop: 18 }}>
+              <div className="wm-header" style={{ marginBottom: 10 }}>
+                <h2 style={{ margin: 0 }}>Historique (30 jours)</h2>
               </div>
-            ) : null}
-            {estimate.assumptions ? (
-              <div className="wm-muted" style={{ marginTop: 10 }}>{estimate.assumptions}</div>
-            ) : null}
-          </div>
-        ) : null}
 
-        <div className="wm-panel" style={{ marginTop: 18 }}>
-          <div className="wm-header" style={{ marginBottom: 10 }}>
-            <h2 style={{ margin: 0 }}>{t('meals.today')}</h2>
-            <div className="wm-badge">Total: {totalCalories} kcal</div>
-          </div>
+              {listLoading ? <div className="wm-muted">{t('common.loading')}</div> : null}
 
-          {listLoading ? <div className="wm-muted">{t('common.loading')}</div> : null}
+              {!listLoading && historyMeals.length === 0 ? (
+                <div className="wm-muted">Aucun repas dans l'historique récent.</div>
+              ) : null}
 
-          {!listLoading && meals.length === 0 ? (
-            <div className="wm-muted">{t('meals.noMeals')}</div>
-          ) : null}
-
-          {!listLoading && meals.length ? (
-            <div style={{ display: 'grid', gap: 10 }}>
-              {meals.map((m) => (
-                <div key={m.id} className="wm-panel" style={{ padding: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline' }}>
-                    <div style={{ fontWeight: 900 }}>{m.description}</div>
-                    <div className="wm-badge">{m.estimated_calories} kcal</div>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
-                    <div className="wm-muted">
-                      {m.eaten_at ? new Date(m.eaten_at).toLocaleString() : ''}
+              {!listLoading && historyMeals.length ? (
+                <div style={{ display: 'grid', gap: 10 }}>
+                  {historyMeals.map((m) => (
+                    <div key={m.id} className="wm-panel" style={{ padding: 12 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline' }}>
+                        <div style={{ fontWeight: 900 }}>{m.description}</div>
+                        <div className="wm-badge">{m.estimated_calories} kcal</div>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+                        <div className="wm-muted">
+                          {m.eaten_at ? new Date(m.eaten_at).toLocaleString() : ''}
+                        </div>
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          {m.id === lastMealId && (
+                            <>
+                              <button className="wm-btn secondary small" onClick={() => onEdit(m)}>Éditer</button>
+                              <button className="wm-btn error small" onClick={() => onDelete(m.id)}>Supprimer</button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      {m.id === lastMealId && (
-                        <>
-                          <button className="wm-btn secondary small" onClick={() => onEdit(m)}>Éditer</button>
-                          <button className="wm-btn error small" onClick={() => onDelete(m.id)}>Supprimer</button>
-                        </>
-                      )}
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              ) : null}
             </div>
-          ) : null}
-        </div>
-
-        <div className="wm-panel" style={{ marginTop: 18 }}>
-          <div className="wm-header" style={{ marginBottom: 10 }}>
-            <h2 style={{ margin: 0 }}>Historique (30 jours)</h2>
           </div>
+        )}
 
-          {listLoading ? <div className="wm-muted">{t('common.loading')}</div> : null}
-
-          {!listLoading && historyMeals.length === 0 ? (
-            <div className="wm-muted">Aucun repas dans l'historique récent.</div>
-          ) : null}
-
-          {!listLoading && historyMeals.length ? (
-            <div style={{ display: 'grid', gap: 10 }}>
-              {historyMeals.map((m) => (
-                <div key={m.id} className="wm-panel" style={{ padding: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline' }}>
-                    <div style={{ fontWeight: 900 }}>{m.description}</div>
-                    <div className="wm-badge">{m.estimated_calories} kcal</div>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
-                    <div className="wm-muted">
-                      {m.eaten_at ? new Date(m.eaten_at).toLocaleString() : ''}
-                    </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      {m.id === lastMealId && (
-                        <>
-                          <button className="wm-btn secondary small" onClick={() => onEdit(m)}>Éditer</button>
-                          <button className="wm-btn error small" onClick={() => onDelete(m.id)}>Supprimer</button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      </div>
+        {/* Tab: AI Meal Plan */}
+        {activeTab === 'plan' && (
+          <MealPlanGenerator />
+        )}
     </div>
-)
+  )
 }
+

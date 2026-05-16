@@ -1,5 +1,6 @@
 import pool from '../config/db.js';
 import { openaiGenerateJson } from '../services/openai.service.js';
+import { checkAndAwardBadges } from '../services/gamification.service.js';
 
 /**
  * @desc    Get nutrition summary (calorie goal vs consumed today)
@@ -77,6 +78,11 @@ export const logSmoking = async (req, res) => {
             message: 'Smoking log recorded successfully',
             log: { cigarettesCount }
         });
+
+        // Gamification hook
+        if (cigarettesCount === 0) {
+            checkAndAwardBadges(userId, { type: 'smoke_free_days' }).catch(err => console.error('Badge error:', err));
+        }
     } catch (err) {
         console.error('[logSmoking] error:', err);
         res.status(500).json({ success: false, message: 'Failed to log smoking data.' });
@@ -158,6 +164,9 @@ export const logWater = async (req, res) => {
         );
 
         res.json({ success: true, message: 'Water intake logged' });
+
+        // Gamification hook
+        checkAndAwardBadges(userId, { type: 'water_log' }).catch(err => console.error('Badge error:', err));
     } catch (err) {
         console.error('[logWater] error:', err);
         res.status(500).json({ success: false, message: 'Failed to log water intake.' });
@@ -376,5 +385,89 @@ export const updateHealthGoal = async (req, res) => {
     } catch (err) {
         console.error('[updateHealthGoal] error:', err);
         res.status(500).json({ success: false, message: 'Failed to update health goals.' });
+    }
+};
+
+/**
+ * @desc    Get weekly chart stats for weight, sports, and meals
+ * @route   GET /api/health/weekly-chart-stats
+ * @access  Private
+ */
+export const getWeeklyChartStats = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+
+        // Generate the last 7 dates
+        const dates = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            dates.push(d.toISOString().split('T')[0]);
+        }
+
+        // Get Meals data
+        const [mealsData] = await pool.query(
+            `SELECT DATE(eaten_at) as date, SUM(estimated_calories) as calories 
+             FROM meals 
+             WHERE user_id = ? AND eaten_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+             GROUP BY DATE(eaten_at)`,
+            [userId]
+        );
+
+        // Get Sports data
+        const [sportsData] = await pool.query(
+            `SELECT DATE(activity_date) as date, SUM(duration_minutes) as duration 
+             FROM physical_activities 
+             WHERE user_id = ? AND activity_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+             GROUP BY DATE(activity_date)`,
+            [userId]
+        );
+
+        // Get Weight data
+        const [weightData] = await pool.query(
+            `SELECT DATE(recorded_date) as date, AVG(weight_kg) as weight 
+             FROM health_logs 
+             WHERE user_id = ? AND recorded_date >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+             GROUP BY DATE(recorded_date)`,
+            [userId]
+        );
+
+        // Default to user's current weight if no logs are found
+        const [[user]] = await pool.query('SELECT weight_kg FROM users WHERE id = ?', [userId]);
+        const currentWeight = user?.weight_kg || 0;
+
+        // Combine
+        const chartData = dates.map(dateStr => {
+            const mealDay = mealsData.find(m => {
+                if(!m.date) return false;
+                const d = new Date(m.date);
+                d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+                return d.toISOString().split('T')[0] === dateStr;
+            });
+            const sportDay = sportsData.find(s => {
+                if(!s.date) return false;
+                const d = new Date(s.date);
+                d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+                return d.toISOString().split('T')[0] === dateStr;
+            });
+            const weightDay = weightData.find(w => {
+                if(!w.date) return false;
+                const d = new Date(w.date);
+                d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+                return d.toISOString().split('T')[0] === dateStr;
+            });
+
+            return {
+                date: dateStr,
+                calories: mealDay ? Number(mealDay.calories) : 0,
+                sportDuration: sportDay ? Number(sportDay.duration) : 0,
+                weight: weightDay ? Number(weightDay.weight) : currentWeight
+            };
+        });
+
+        res.json({ success: true, data: chartData });
+    } catch (err) {
+        console.error('[getWeeklyChartStats] error:', err);
+        res.status(500).json({ success: false, message: 'Failed to fetch weekly chart stats.' });
     }
 };

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext.jsx';
+import WeeklyCharts from './WeeklyCharts.jsx';
 
 const SmartReports = ({ reports, onGenerate, loading, error }) => {
   const { t } = useLanguage();
-  const [expandedId, setExpandedId] = React.useState(reports[0]?.id || null);
+  const [expandedId, setExpandedId] = useState(reports[0]?.id || null);
+  const [showCharts, setShowCharts] = useState(false);
 
   React.useEffect(() => {
     if (!expandedId && reports.length > 0) {
@@ -18,6 +20,16 @@ const SmartReports = ({ reports, onGenerate, loading, error }) => {
           <span>🧠</span> {t('health.reports.title')}
         </h2>
         <div className="flex gap-2">
+          <button 
+            onClick={() => setShowCharts(!showCharts)}
+            className={`text-[10px] font-black px-4 py-2 rounded-xl transition-all uppercase tracking-widest border ${
+              showCharts 
+                ? 'bg-blue-500 text-white border-blue-600 dark:bg-blue-600 dark:border-blue-700' 
+                : 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 border-blue-100 dark:border-blue-800/50 hover:bg-blue-100'
+            }`}
+          >
+            📊 Graphiques
+          </button>
           <button 
             onClick={() => onGenerate('daily')}
             disabled={loading}
@@ -42,6 +54,7 @@ const SmartReports = ({ reports, onGenerate, loading, error }) => {
       )}
 
       <div className="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+        {showCharts && <WeeklyCharts />}
         {reports.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center py-16 px-6 text-center h-full">
             <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner">
