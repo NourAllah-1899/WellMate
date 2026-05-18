@@ -49,9 +49,13 @@ export default function Login() {
       const token = res?.data?.token
       if (token) localStorage.setItem('token', token)
 
-      await refreshMe()
+      const user = await refreshMe()
 
-      navigate('/')
+      if (user?.role === 'admin') {
+        navigate('/admin')
+      } else {
+        navigate('/')
+      }
     } catch (err) {
       const msg = err?.response?.data?.message || 'Login failed.'
       setApiError(msg)

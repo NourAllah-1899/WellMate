@@ -14,6 +14,7 @@ import smokingRouter from './routes/smoking.route.js';
 import programRouter from './routes/program.route.js';
 import chatbotRouter from './routes/chatbot.route.js';
 import gamificationRouter from './routes/gamification.route.js';
+import adminRouter from './routes/admin.route.js';
 
 const app = express();
 
@@ -43,6 +44,7 @@ app.use('/api/smoking', smokingRouter);
 app.use('/api/programs', programRouter);
 app.use('/api/chatbot', chatbotRouter);
 app.use('/api/gamification', gamificationRouter);
+app.use('/api/admin', adminRouter);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 app.use((_req, res) => {

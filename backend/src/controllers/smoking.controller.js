@@ -11,6 +11,18 @@ export const logSmoking = async (req, res) => {
       })
     }
 
+    if (cigarettesCount < 0) {
+      return res.status(400).json({
+        message: 'Cigarettes count cannot be negative',
+      })
+    }
+
+    if (cigarettesCount > 100) {
+      return res.status(400).json({
+        message: 'Cigarettes count seems abnormally high. Please enter a realistic value (max 100).',
+      })
+    }
+
     const query = `
       INSERT INTO smoking_logs (user_id, cigarettes_count, log_date)
       VALUES (?, ?, ?)

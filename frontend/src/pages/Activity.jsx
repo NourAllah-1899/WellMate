@@ -94,10 +94,21 @@ export default function Activity() {
       return
     }
 
+    const cigarettesCount = Number(cigarettes)
+    if (isNaN(cigarettesCount) || cigarettesCount < 0) {
+      setApiError('Cigarettes count cannot be negative')
+      return
+    }
+
+    if (cigarettesCount > 100) {
+      setApiError('Cigarettes count seems abnormally high. Please enter a realistic value (max 100).')
+      return
+    }
+
     setLoading(true)
     try {
       await api.post('/api/smoking', {
-        cigarettesCount: Number(cigarettes),
+        cigarettesCount,
         logDate: new Date().toISOString().split('T')[0],
       })
       setCigarettes('')

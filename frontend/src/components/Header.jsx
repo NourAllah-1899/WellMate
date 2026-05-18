@@ -57,6 +57,19 @@ export default function Header() {
 
               {open ? (
                 <div className="wm-menu" role="menu">
+                  {me?.role === 'admin' && (
+                    <button
+                      type="button"
+                      className="wm-menu-item"
+                      style={{ color: 'var(--brand-primary)', fontWeight: '900' }}
+                      onClick={() => {
+                        setOpen(false)
+                        navigate('/admin')
+                      }}
+                    >
+                      🛡️ Espace Admin
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="wm-menu-item"

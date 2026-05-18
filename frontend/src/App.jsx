@@ -15,6 +15,11 @@ import Meals from './pages/Meals.jsx'
 import Layout from './components/Layout.jsx'
 
 import ProtectedRoute from './components/ProtectedRoute.jsx'
+import AdminRoute from './components/AdminRoute.jsx'
+import AdminLayout from './components/AdminLayout.jsx'
+import AdminDashboard from './pages/admin/AdminDashboard.jsx'
+import AdminUsers from './pages/admin/AdminUsers.jsx'
+import AdminEvents from './pages/admin/AdminEvents.jsx'
 
 function App() {
   return (
@@ -30,8 +35,14 @@ function App() {
       <Route path="/register" element={<Layout><Register /></Layout>} />
       <Route path="/login" element={<Layout><Login /></Layout>} />
       <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
+
+      {/* Admin Routes */}
+      <Route path="/admin" element={<AdminRoute><AdminLayout><AdminDashboard /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/users" element={<AdminRoute><AdminLayout><AdminUsers /></AdminLayout></AdminRoute>} />
+      <Route path="/admin/events" element={<AdminRoute><AdminLayout><AdminEvents /></AdminLayout></AdminRoute>} />
     </Routes>
   )
 }
 
 export default App
+

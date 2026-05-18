@@ -3,8 +3,8 @@ import jwt from 'jsonwebtoken';
 import pool from '../config/db.js';
 import { validationResult } from 'express-validator';
 
-const signToken = (user_id, username) =>
-    jwt.sign({ user_id, username }, process.env.JWT_SECRET, {
+const signToken = (user_id, username, role = 'user') =>
+    jwt.sign({ user_id, username, role }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     });
 
@@ -79,13 +79,13 @@ export const login = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
 
-        const token = signToken(user.id, user.username);
+        const token = signToken(user.id, user.username, user.role || 'user');
 
         res.json({
             success: true,
             message: 'Logged in successfully.',
             token,
-            user: { id: user.id, username: user.username, email: user.email },
+            user: { id: user.id, username: user.username, email: user.email, role: user.role || 'user' },
         });
     } catch (err) {
         console.error('Login error:', err);
@@ -97,7 +97,7 @@ export const login = async (req, res) => {
 export const getMe = async (req, res) => {
     try {
         const [rows] = await pool.query(
-            'SELECT id, username, email, full_name, age, height_cm, weight_kg, bmi, created_at, updated_at FROM users WHERE id = ?',
+            'SELECT id, username, email, full_name, age, height_cm, weight_kg, bmi, role, created_at, updated_at FROM users WHERE id = ?',
             [req.user.user_id]
         );
         if (rows.length === 0) {

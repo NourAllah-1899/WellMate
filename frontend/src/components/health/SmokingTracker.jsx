@@ -5,15 +5,33 @@ const SmokingTracker = ({ stats, onLog }) => {
   const { t } = useLanguage();
   const [count, setCount] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!count || isNaN(count)) return;
+    setError('');
+
+    const cigarettesCount = parseInt(count);
+
+    if (isNaN(cigarettesCount) || cigarettesCount < 0) {
+      setError('Le nombre de cigarettes ne peut pas être négatif.');
+      return;
+    }
+
+    if (cigarettesCount > 100) {
+      setError('Valeur inhabituelle. Veuillez entrer un nombre réaliste (max 100).');
+      return;
+    }
     
     setLoading(true);
-    await onLog(parseInt(count));
-    setCount('');
-    setLoading(false);
+    try {
+      await onLog(cigarettesCount);
+      setCount('');
+    } catch (err) {
+      setError('Une erreur est survenue lors de l\'enregistrement.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getWarningMessage = () => {
@@ -55,13 +73,21 @@ const SmokingTracker = ({ stats, onLog }) => {
       </h2>
 
       <form onSubmit={handleSubmit} className="mb-8">
+        {error && (
+          <div className="bg-rose-50 border-l-4 border-rose-500 text-rose-700 p-3 mb-4 rounded-xl text-xs font-bold animate-shake flex items-center gap-2">
+            <span>⚠️</span> {error}
+          </div>
+        )}
         <div className="flex gap-2">
           <input
             type="number"
             value={count}
-            onChange={(e) => setCount(e.target.value)}
+            onChange={(e) => {
+              setCount(e.target.value);
+              if (error) setError('');
+            }}
             placeholder={t('smokingTracker.placeholder')}
-            className="wm-input mt-0 flex-1"
+            className={`wm-input mt-0 flex-1 ${error ? 'border-rose-400 focus:border-rose-500' : ''}`}
           />
           <button 
             type="submit" 

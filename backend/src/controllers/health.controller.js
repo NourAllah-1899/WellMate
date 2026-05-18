@@ -65,6 +65,14 @@ export const logSmoking = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Cigarettes count is required' });
         }
 
+        if (cigarettesCount < 0) {
+            return res.status(400).json({ success: false, message: 'Le nombre de cigarettes ne peut pas être négatif.' });
+        }
+
+        if (cigarettesCount > 100) {
+            return res.status(400).json({ success: false, message: 'Valeur inhabituelle. Veuillez entrer un nombre réaliste (max 100).' });
+        }
+
         const query = `
             INSERT INTO smoking_logs (user_id, cigarettes_count, log_date)
             VALUES (?, ?, CURDATE())
