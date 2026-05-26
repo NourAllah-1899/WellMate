@@ -55,6 +55,8 @@
   border: 1px solid var(--border-main);
   background-color: var(--bg-card);
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .stat-card:hover {

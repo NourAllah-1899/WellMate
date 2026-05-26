@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Calendar, Users, User } from 'lucide-react-native';
+import { Calendar, Users, User, MapPin } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -64,11 +64,18 @@ export default function EventCard({ event, onJoin, onDelete, onEdit }: EventCard
                 </View>
                 <View style={styles.detailRow}>
                     <User size={16} color={isLight ? '#64748b' : '#94a3b8'} />
-                    <Text style={[styles.detailText, isLight && styles.detailTextLight]}
-                    >{`${t('events.organizer')}: `}
-                        <Text style={styles.bold}>{event.creator_name}</Text>
+                    <Text style={[styles.detailText, isLight && styles.detailTextLight]}>
+                        {t('events.organizer')}{': '}<Text style={styles.bold}>{event.creator_name}</Text>
                     </Text>
                 </View>
+                {!!event.location && (
+                    <View style={styles.detailRow}>
+                        <MapPin size={16} color={isLight ? '#64748b' : '#94a3b8'} />
+                        <Text style={[styles.detailText, isLight && styles.detailTextLight]}>
+                            {t('events.location')}{': '}<Text style={styles.bold}>{event.location}</Text>
+                        </Text>
+                    </View>
+                )}
                 <View style={styles.detailRow}>
                     <Users size={16} color={isLight ? '#64748b' : '#94a3b8'} />
                     <Text style={[styles.detailText, isLight && styles.detailTextLight]}

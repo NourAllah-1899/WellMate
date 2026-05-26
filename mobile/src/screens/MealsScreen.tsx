@@ -5,6 +5,7 @@ import { Feather } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Colors } from '../constants/Colors';
+import MealPlanGenerator from '../components/meals/MealPlanGenerator';
 
 export default function MealsScreen() {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -21,6 +22,7 @@ export default function MealsScreen() {
   const [estimate, setEstimate] = useState<any>(null);
 
   const [historyMeals, setHistoryMeals] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'log' | 'plan'>('log');
 
   const fetchTodayMeals = async () => {
     try {
@@ -125,10 +127,29 @@ export default function MealsScreen() {
         <Text style={[styles.subtitle, { color: theme.secondaryText }]}>{t('meals.subtitle')}</Text>
       </View>
 
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'log' ? { backgroundColor: Colors.brand.accent, borderColor: Colors.brand.accent } : { backgroundColor: theme.background, borderColor: theme.border }]}
+          onPress={() => setActiveTab('log')}
+        >
+          <Text style={[styles.tabText, { color: activeTab === 'log' ? '#fff' : theme.text }]}>🍽️ {t('meals.title')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'plan' ? { backgroundColor: Colors.brand.accent, borderColor: Colors.brand.accent } : { backgroundColor: theme.background, borderColor: theme.border }]}
+          onPress={() => setActiveTab('plan')}
+        >
+          <Text style={[styles.tabText, { color: activeTab === 'plan' ? '#fff' : theme.text }]}>🤖 Plan IA</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Ajouter un repas */}
-        <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <Text style={[styles.cardTitle, { color: theme.text }]}>🍽️ {t('meals.addMeal')}</Text>
+        {activeTab === 'plan' ? (
+          <MealPlanGenerator />
+        ) : (
+          <>
+            {/* Ajouter un repas */}
+            <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
+              <Text style={[styles.cardTitle, { color: theme.text }]}>🍽️ {t('meals.addMeal')}</Text>
           <TextInput
             style={[styles.input, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]}
             placeholder={t('meals.placeholder')}
@@ -227,6 +248,8 @@ export default function MealsScreen() {
             </View>
           </View>
         )}
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -234,9 +257,12 @@ export default function MealsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 20 },
+  header: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 10 },
   title: { fontSize: 28, fontWeight: 'bold', marginBottom: 5 },
   subtitle: { fontSize: 16 },
+  tabContainer: { flexDirection: 'row', paddingHorizontal: 20, gap: 10, marginBottom: 5 },
+  tabButton: { flex: 1, paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center' },
+  tabText: { fontWeight: 'bold', fontSize: 14 },
   content: { padding: 16 },
   card: {
     padding: 20,

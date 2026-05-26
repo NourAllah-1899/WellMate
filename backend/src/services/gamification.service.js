@@ -26,11 +26,10 @@ export const getUserBadges = async (userId) => {
  * activityData example: { type: 'smoke_log', date: '2024-05-14' } or { type: 'sport_session', count: 1 }
  */
 export const checkAndAwardBadges = async (userId, activityData) => {
-  // Load all badges definitions
   const [badges] = await pool.query('SELECT * FROM badges');
   const earned = [];
+
   for (const badge of badges) {
-    // Skip if already earned
     const [[already]] = await pool.query(
       'SELECT 1 FROM user_badges WHERE user_id = ? AND badge_id = ?',
       [userId, badge.id]
@@ -38,29 +37,34 @@ export const checkAndAwardBadges = async (userId, activityData) => {
     if (already) continue;
 
     let meet = false;
-    // Evaluate each criteria type
+
     switch (badge.criteria_type) {
       case 'smoke_free_days': {
-        // Count consecutive days without smoking up to today
+        // Fetch all smoke-free log dates in the last daysNeeded days
         const daysNeeded = badge.criteria_value;
-        const [[row]] = await pool.query(
-          `SELECT COUNT(*) as cnt FROM (
-             SELECT log_date FROM smoking_logs WHERE user_id = ? AND cigarettes_count = 0
-             ORDER BY log_date DESC LIMIT ?
-           ) sub WHERE DATEDIFF(CURDATE(), log_date) = seq-1`,
+        const [rows] = await pool.query(
+          'SELECT DISTINCT DATE(log_date) as d FROM smoking_logs WHERE user_id = ? AND cigarettes_count = 0 AND log_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)',
           [userId, daysNeeded]
         );
-        // Simple approach: check if there are at least daysNeeded records for consecutive dates
-        // For brevity, we just check total smoke‑free days in last daysNeeded days
-        const [[cnt]] = await pool.query(
-          'SELECT COUNT(*) as cnt FROM smoking_logs WHERE user_id = ? AND cigarettes_count = 0 AND log_date >= DATE_SUB(CURDATE(), INTERVAL ? DAY)',
-          [userId, daysNeeded]
-        );
-        meet = cnt.cnt >= daysNeeded;
+        const smokeFreeSet = new Set(rows.map(r => new Date(r.d).toISOString().split('T')[0]));
+        // Count consecutive smoke-free days ending today
+        let consecutive = 0;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        for (let i = 0; i < daysNeeded; i++) {
+          const d = new Date(today);
+          d.setDate(d.getDate() - i);
+          const key = d.toISOString().split('T')[0];
+          if (smokeFreeSet.has(key)) {
+            consecutive++;
+          } else {
+            break;
+          }
+        }
+        meet = consecutive >= daysNeeded;
         break;
       }
       case 'sport_sessions': {
-        // Count sport sessions in the last 30 days
         const required = badge.criteria_value;
         const [[row]] = await pool.query(
           'SELECT COUNT(*) as cnt FROM physical_activities WHERE user_id = ? AND activity_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)',
@@ -69,17 +73,27 @@ export const checkAndAwardBadges = async (userId, activityData) => {
         meet = row.cnt >= required;
         break;
       }
-      case 'step_goal': {
-        // Expect activityData.steps to be provided
-        const required = badge.criteria_value;
-        if (activityData && typeof activityData.steps === 'number') {
-          meet = activityData.steps >= required;
-        }
+      case 'first_event': {
+        const [[row]] = await pool.query(
+          'SELECT COUNT(*) as cnt FROM event_participants WHERE user_id = ?',
+          [userId]
+        );
+        meet = row.cnt >= 1;
+        break;
+      }
+      case 'hydration_hero': {
+        // Check if user has ever logged >= 8 glasses in a single day
+        const [[row]] = await pool.query(
+          'SELECT MAX(glasses_count) as max_glasses FROM water_logs WHERE user_id = ?',
+          [userId]
+        );
+        meet = (row.max_glasses || 0) >= badge.criteria_value;
         break;
       }
       default:
         meet = false;
     }
+
     if (meet) {
       await pool.execute(
         'INSERT INTO user_badges (user_id, badge_id) VALUES (?, ?)',
@@ -88,7 +102,7 @@ export const checkAndAwardBadges = async (userId, activityData) => {
       earned.push(badge.code);
     }
   }
-  return earned; // array of badge codes newly earned
+  return earned;
 };
 
 /**
@@ -103,8 +117,9 @@ export const calculateStreak = async (userId) => {
         UNION ALL SELECT log_date FROM smoking_logs WHERE user_id = ?
         UNION ALL SELECT DATE(activity_date) FROM physical_activities WHERE user_id = ?
         UNION ALL SELECT DATE(recorded_date) FROM health_logs WHERE user_id = ?
+        UNION ALL SELECT log_date FROM water_logs WHERE user_id = ?
      ) AS all_dates ORDER BY log_date DESC`,
-    [userId, userId, userId, userId]
+    [userId, userId, userId, userId, userId]
   );
   let currentStreak = 0;
   let bestStreak = 0;

@@ -31,7 +31,8 @@ export default function LoginScreen({ navigation }: Props) {
       const response = await apiClient.post('/auth/login', { email, password });
       if (response.data.success && response.data.token) {
         await AsyncStorage.setItem('token', response.data.token);
-        navigation.replace('Home');
+        const role = response.data.user?.role;
+        navigation.replace(role === 'admin' ? 'AdminTab' : 'Home');
       } else {
         Alert.alert(t('common.error'), response.data.message || 'Identifiants invalides.');
       }

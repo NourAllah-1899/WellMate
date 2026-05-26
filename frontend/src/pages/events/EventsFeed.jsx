@@ -82,6 +82,12 @@ const EventsFeed = ({ events, onJoin, loading, setView, onEventDeleted }) => {
                                 <span className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-lg">👤</span>
                                 <span>{t('events.organizer')}: <span className="text-primary font-bold">{event.creator_name}</span></span>
                             </div>
+                            {event.location && (
+                                <div className="flex items-center gap-3 wm-muted">
+                                    <span className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-lg">📍</span>
+                                    <span className="font-semibold truncate">{event.location}</span>
+                                </div>
+                            )}
                             <div className="flex items-center gap-3 wm-muted">
                                 <span className="bg-slate-100 dark:bg-slate-800 p-1.5 rounded-lg">👥</span>
                                 <span className="font-bold text-primary">

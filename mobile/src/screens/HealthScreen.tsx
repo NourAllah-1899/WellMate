@@ -5,6 +5,8 @@ import { useLanguage } from '../context/LanguageContext';
 import { Colors } from '../constants/Colors';
 import apiClient from '../api/apiClient';
 import { Feather } from '@expo/vector-icons';
+import BadgeBoard from '../components/health/BadgeBoard';
+import StreakCounter from '../components/health/StreakCounter';
 
 const { width } = Dimensions.get('window');
 
@@ -22,14 +24,20 @@ export default function HealthScreen() {
   const [loadingType, setLoadingType] = useState<string | null>(null);
   const [expandedReportId, setExpandedReportId] = useState<number | null>(null);
 
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'rewards'>('dashboard');
+  const [badges, setBadges] = useState<any[]>([]);
+  const [streak, setStreak] = useState<any>(null);
+
   const fetchData = useCallback(async () => {
     try {
-      const [nutritionRes, smokingRes, reportsRes, userRes, waterRes] = await Promise.all([
+      const [nutritionRes, smokingRes, reportsRes, userRes, waterRes, badgesRes, streakRes] = await Promise.all([
         apiClient.get('/health/nutrition-summary'),
         apiClient.get('/health/smoking/stats'),
         apiClient.get('/health/reports'),
         apiClient.get('/auth/me'),
-        apiClient.get('/health/water/stats').catch(() => ({ data: { stats: { today: 0 } } }))
+        apiClient.get('/health/water/stats').catch(() => ({ data: { stats: { today: 0 } } })),
+        apiClient.get('/gamification/badges').catch(() => ({ data: { badges: [] } })),
+        apiClient.get('/gamification/streak').catch(() => ({ data: { streak: null } }))
       ]);
 
       setNutrition(nutritionRes.data.summary);
@@ -41,6 +49,12 @@ export default function HealthScreen() {
       setUserData(userRes.data.user);
       if (waterRes && waterRes.data) {
         setWaterStats(waterRes.data.stats);
+      }
+      if (badgesRes && badgesRes.data) {
+        setBadges(badgesRes.data.badges);
+      }
+      if (streakRes && streakRes.data) {
+        setStreak(streakRes.data.streak);
       }
     } catch (err) {
       console.error('Failed to fetch health data:', err);
@@ -152,10 +166,27 @@ export default function HealthScreen() {
         </Text>
       </View>
 
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'dashboard' ? { backgroundColor: Colors.brand.primary, borderColor: Colors.brand.primary } : { backgroundColor: theme.background, borderColor: theme.border }]}
+          onPress={() => setActiveTab('dashboard')}
+        >
+          <Text style={[styles.tabText, { color: activeTab === 'dashboard' ? '#fff' : theme.text }]}>📊 Tableau de bord</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === 'rewards' ? { backgroundColor: Colors.brand.primary, borderColor: Colors.brand.primary } : { backgroundColor: theme.background, borderColor: theme.border }]}
+          onPress={() => setActiveTab('rewards')}
+        >
+          <Text style={[styles.tabText, { color: activeTab === 'rewards' ? '#fff' : theme.text }]}>🏆 Récompenses</Text>
+        </TouchableOpacity>
+      </View>
+
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-        {/* Vital Signs Grid */}
-        <View style={styles.vitalsGrid}>
+        {activeTab === 'dashboard' ? (
+          <>
+            {/* Vital Signs Grid */}
+            <View style={styles.vitalsGrid}>
           <VitalCard label={t('health.vitals.weight')} value={`${userData?.weight_kg || '--'} kg`} icon="⚖️" theme={theme} />
           <VitalCard label={t('health.vitals.height')} value={`${userData?.height_cm || '--'} cm`} icon="📏" theme={theme} />
           <VitalCard label={userData?.bmi ? t('health.vitals.bmi') : 'IMC'} value={userData?.bmi || '--'} icon="📊" theme={theme} />
@@ -343,6 +374,13 @@ export default function HealthScreen() {
             )}
           </View>
         </View>
+          </>
+        ) : (
+          <View style={{ gap: 20 }}>
+            <StreakCounter streak={streak} />
+            <BadgeBoard badges={badges} />
+          </View>
+        )}
 
       </ScrollView>
     </SafeAreaView>
@@ -375,6 +413,10 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 5 },
   subtitle: { fontSize: 16 },
   
+  tabContainer: { flexDirection: 'row', paddingHorizontal: 20, gap: 10, marginBottom: 5 },
+  tabButton: { flex: 1, paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center' },
+  tabText: { fontWeight: 'bold', fontSize: 14 },
+
   vitalsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 25 },
   vitalCard: { width: (width - 50) / 2, padding: 12, borderRadius: 16, borderWidth: 1, flexDirection: 'row', alignItems: 'center', gap: 10 },
   vitalIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },

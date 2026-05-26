@@ -129,6 +129,13 @@
     "email": "Email:",
     "weight": "Weight:",
     "height": "Height:",
+    "bmi": "BMI (IMC):",
+    "bmiUnit": "kg/m²",
+    "bmiNotAvailable": "Enter height & weight to calculate",
+    "bmiUnderweight": "Underweight",
+    "bmiNormal": "Normal weight",
+    "bmiOverweight": "Overweight",
+    "bmiObese": "Obese",
     "edit": "Edit Profile",
     "logout": "Logout"
   },
@@ -195,7 +202,25 @@
       "maintain": "Maintenance",
       "notSet": "Not set"
     },
-    "reportGenerated": "Report generated successfully"
+    "reportGenerated": "Report generated successfully",
+    "gamification": {
+      "currentStreak": "Current Streak",
+      "bestStreak": "Best Streak",
+      "days": "days",
+      "streakSubtitle": "Consecutive days with at least one health log",
+      "rewards": "Rewards",
+      "trophiesBoard": "Trophy Board",
+      "earnedOn": "Earned on",
+      "noBadges": "No badges available yet.",
+      "badges": {
+        "SMOKE_FREE_7": { "title": "7 Days Smoke Free", "description": "You have been smoke free for a whole week!" },
+        "SMOKE_FREE_30": { "title": "1 Month Smoke Free", "description": "Incredible! You have been smoke free for 30 days." },
+        "SPORT_10": { "title": "Active Starter", "description": "Completed 10 sport sessions in the last 30 days." },
+        "SPORT_30": { "title": "Fitness Enthusiast", "description": "Completed 30 sport sessions in the last 30 days." },
+        "FIRST_EVENT": { "title": "Event Joiner", "description": "Joined your first community event!" },
+        "HYDRATION_HERO": { "title": "Hydration Hero", "description": "Reached your daily water goal of 8 glasses!" }
+      }
+    }
   },
   "events": {
     "title": "Move Together, Stay Healthy.",
@@ -209,6 +234,7 @@
     "searchPlaceholder": "Search events...",
     "allActivities": "All Activities",
     "organizer": "Organizer",
+    "location": "Location",
     "joining": "joining",
     "joinActivity": "Join Activity",
     "alreadyJoined": "Already Joined ✓",
@@ -231,6 +257,7 @@
     "joinedByMe": "Joined by Me",
     "noCreated": "You haven't created any events yet.",
     "noJoined": "You haven't joined any events yet.",
+    "capacityReach": "Capacity Reached",
     "capacityReached": "Capacity Reached",
     "full": "Full"
   }

@@ -125,7 +125,7 @@ export default function Dashboard() {
                   </div>
                 </div>
               </div>
-              <Link to="/profile" className="wm-btn small" style={{ marginTop: 12 }}>{t('dashboard.updateProfile')}</Link>
+              <Link to="/profile" className="wm-btn small" style={{ marginTop: 'auto', alignSelf: 'flex-start', paddingTop: 8, paddingBottom: 8 }}>{t('dashboard.updateProfile')}</Link>
             </div>
 
             {/* Weight Progress Card */}
@@ -159,7 +159,7 @@ export default function Dashboard() {
                 <div className="calorie-value">{today?.total_calories || 0}</div>
                 <div className="calorie-label">{t('dashboard.caloriesConsumed')}</div>
               </div>
-              <Link to="/meals" className="wm-btn small" style={{ marginTop: 12 }}>{t('dashboard.viewMeals')}</Link>
+              <Link to="/meals" className="wm-btn small" style={{ marginTop: 'auto', alignSelf: 'flex-start', paddingTop: 8, paddingBottom: 8 }}>{t('dashboard.viewMeals')}</Link>
             </div>
 
             {/* Weekly Stats Card */}
@@ -188,12 +188,13 @@ export default function Dashboard() {
                     <div className="goal-direction">{goal.direction}</div>
                     <div className="goal-target">{goal.target_weight_kg} kg</div>
                   </div>
-                  <p className="wm-muted">{goal.ai_summary || t('dashboard.workingTowards')}</p>
+                  <p className="wm-muted" style={{ marginBottom: '16px' }}>{goal.ai_summary || t('dashboard.workingTowards')}</p>
+                  <Link to="/goals" className="wm-btn small" style={{ marginTop: 'auto', alignSelf: 'flex-start', paddingTop: 8, paddingBottom: 8 }}>{t('dashboard.editGoal', 'Edit Goal')}</Link>
                 </>
               ) : (
                 <>
-                  <p className="wm-muted">{t('dashboard.noGoalSet')}</p>
-                  <Link to="/goals" className="wm-btn small">{t('dashboard.setGoal')}</Link>
+                  <p className="wm-muted" style={{ marginBottom: '16px' }}>{t('dashboard.noGoalSet')}</p>
+                  <Link to="/goals" className="wm-btn small" style={{ marginTop: 'auto', alignSelf: 'flex-start', paddingTop: 8, paddingBottom: 8 }}>{t('dashboard.setGoal')}</Link>
                 </>
               )}
             </div>

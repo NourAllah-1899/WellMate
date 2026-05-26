@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../../api/client.js'
+import { useLanguage } from '../../context/LanguageContext.jsx'
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [recentUsers, setRecentUsers] = useState([])
   const [recentEvents, setRecentEvents] = useState([])
+  const { t, language } = useLanguage()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,10 +39,10 @@ export default function AdminDashboard() {
   }
 
   const statCards = [
-    { label: 'Total Utilisateurs', value: stats?.totalUsers || 0, icon: '👥', color: 'from-violet-500 to-purple-600', change: `+${stats?.newUsersThisWeek || 0} cette semaine` },
-    { label: 'Total Événements', value: stats?.totalEvents || 0, icon: '📅', color: 'from-blue-500 to-cyan-600', change: `+${stats?.newEventsThisWeek || 0} cette semaine` },
-    { label: 'Total Repas', value: stats?.totalMeals || 0, icon: '🍽️', color: 'from-emerald-500 to-teal-600', change: 'Tous les repas enregistrés' },
-    { label: 'Total Activités', value: stats?.totalActivities || 0, icon: '🏃', color: 'from-amber-500 to-orange-600', change: 'Toutes les activités' },
+    { label: t('admin.totalUsers', 'Total Utilisateurs'), value: stats?.totalUsers || 0, icon: '👥', color: 'from-violet-500 to-purple-600', change: `+${stats?.newUsersThisWeek || 0} ${t('admin.thisWeek', 'cette semaine')}` },
+    { label: t('admin.totalEvents', 'Total Événements'), value: stats?.totalEvents || 0, icon: '📅', color: 'from-blue-500 to-cyan-600', change: `+${stats?.newEventsThisWeek || 0} ${t('admin.thisWeek', 'cette semaine')}` },
+    { label: t('admin.totalMeals', 'Total Repas'), value: stats?.totalMeals || 0, icon: '🍽️', color: 'from-emerald-500 to-teal-600', change: t('admin.allMeals', 'Tous les repas enregistrés') },
+    { label: t('admin.totalActivities', 'Total Activités'), value: stats?.totalActivities || 0, icon: '🏃', color: 'from-amber-500 to-orange-600', change: t('admin.allActivities', 'Toutes les activités') },
   ]
 
   return (
@@ -48,10 +50,10 @@ export default function AdminDashboard() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-black" style={{ color: 'var(--text-heading)' }}>
-          Tableau de bord <span className="opacity-50">Admin</span>
+          {t('admin.dashboard', 'Tableau de bord')} <span className="opacity-50">Admin</span>
         </h1>
         <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
-          Vue d'ensemble de la plateforme WellMate
+          {t('admin.subtitle', "Vue d'ensemble de la plateforme WellMate")}
         </p>
       </div>
 
@@ -80,15 +82,15 @@ export default function AdminDashboard() {
         <div className="wm-card">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-black flex items-center gap-2" style={{ color: 'var(--text-heading)' }}>
-              <span>👥</span> Derniers Utilisateurs
+              <span>👥</span> {t('admin.recentUsers', 'Derniers Utilisateurs')}
             </h2>
             <Link to="/admin/users" className="text-xs font-bold text-violet-600 hover:text-violet-800 no-underline">
-              Voir tout →
+              {t('admin.viewAll', 'Voir tout')} →
             </Link>
           </div>
 
           {recentUsers.length === 0 ? (
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Aucun utilisateur trouvé.</p>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{t('admin.noUsers', 'Aucun utilisateur trouvé.')}</p>
           ) : (
             <div className="space-y-3">
               {recentUsers.map((user) => (
@@ -101,13 +103,6 @@ export default function AdminDashboard() {
                       <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
                     </div>
                   </div>
-                  <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-full ${
-                    user.role === 'admin'
-                      ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
-                      : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
-                  }`}>
-                    {user.role || 'user'}
-                  </span>
                 </div>
               ))}
             </div>
@@ -118,15 +113,15 @@ export default function AdminDashboard() {
         <div className="wm-card">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-black flex items-center gap-2" style={{ color: 'var(--text-heading)' }}>
-              <span>📅</span> Derniers Événements
+              <span>📅</span> {t('admin.recentEvents', 'Derniers Événements')}
             </h2>
             <Link to="/admin/events" className="text-xs font-bold text-violet-600 hover:text-violet-800 no-underline">
-              Voir tout →
+              {t('admin.viewAll', 'Voir tout')} →
             </Link>
           </div>
 
           {recentEvents.length === 0 ? (
-            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Aucun événement trouvé.</p>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{t('admin.noEvents', 'Aucun événement trouvé.')}</p>
           ) : (
             <div className="space-y-3">
               {recentEvents.map((event) => (
@@ -135,13 +130,13 @@ export default function AdminDashboard() {
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{event.title}</p>
                     <span className="text-xs font-bold px-2 py-1 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
-                      {event.participant_count || 0} participants
+                      {event.participant_count || 0} {t('admin.participants', 'participants')}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 mt-1">
                     <span className="text-xs" style={{ color: 'var(--text-muted)' }}>📍 {event.location || 'N/A'}</span>
-                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>📆 {event.date ? new Date(event.date).toLocaleDateString('fr-FR') : 'N/A'}</span>
-                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>par {event.creator_username || 'Inconnu'}</span>
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>📆 {event.date ? new Date(event.date).toLocaleDateString(language === 'en' ? 'en-US' : 'fr-FR') : 'N/A'}</span>
+                    <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{t('admin.by', 'par')} {event.creator_username || t('admin.unknown', 'Inconnu')}</span>
                   </div>
                 </div>
               ))}

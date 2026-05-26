@@ -5,10 +5,13 @@ import { Feather } from '@expo/vector-icons';
 import LoginScreen from '../screens/Login';
 import RegisterScreen from '../screens/Register';
 import MainTabNavigator from './MainTabNavigator';
+import AdminTabNavigator from './AdminTabNavigator';
 import MealsScreen from '../screens/MealsScreen';
 import GoalsScreen from '../screens/GoalsScreen';
 import ChatbotScreen from '../screens/ChatbotScreen';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import AdminUserDetailScreen from '../screens/admin/AdminUserDetailScreen';
+import AdminEventDetailScreen from '../screens/admin/AdminEventDetailScreen';
 
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -42,8 +45,9 @@ export default function AppNavigator() {
       <Stack.Screen 
         name="Register" 
         component={RegisterScreen} 
-        options={{ title: t('common.register') }} 
+        options={{ headerShown: false }} 
       />
+
       <Stack.Screen 
         name="Home" 
         component={MainTabNavigator} 
@@ -120,6 +124,55 @@ export default function AppNavigator() {
             </TouchableOpacity>
           )
         })} 
+      />
+      <Stack.Screen
+        name="AdminTab"
+        component={AdminTabNavigator}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AdminUserDetail"
+        component={AdminUserDetailScreen}
+        options={({ navigation }) => ({
+          title: '',
+          headerBackVisible: false,
+          headerStyle: { backgroundColor: theme.card },
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 40 }}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10 }}
+            >
+              <Feather name="chevron-left" size={28} color={theme.text} />
+              <Text style={{ color: theme.text, fontSize: 16, fontWeight: 'bold' }}>
+                {t('common.cancel')}
+              </Text>
+            </TouchableOpacity>
+          ),
+        })}
+      />
+      <Stack.Screen
+        name="AdminEventDetail"
+        component={AdminEventDetailScreen}
+        options={({ navigation }) => ({
+          title: '',
+          headerBackVisible: false,
+          headerStyle: { backgroundColor: theme.card },
+          headerShadowVisible: false,
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 40 }}
+              style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 10 }}
+            >
+              <Feather name="chevron-left" size={28} color={theme.text} />
+              <Text style={{ color: theme.text, fontSize: 16, fontWeight: 'bold' }}>
+                {t('common.cancel')}
+              </Text>
+            </TouchableOpacity>
+          ),
+        })}
       />
     </Stack.Navigator>
   );

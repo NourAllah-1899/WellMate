@@ -174,7 +174,7 @@ export const logWater = async (req, res) => {
         res.json({ success: true, message: 'Water intake logged' });
 
         // Gamification hook
-        checkAndAwardBadges(userId, { type: 'water_log' }).catch(err => console.error('Badge error:', err));
+        checkAndAwardBadges(userId, { type: 'water_log', glassesCount }).catch(err => console.error('Badge error:', err));
     } catch (err) {
         console.error('[logWater] error:', err);
         res.status(500).json({ success: false, message: 'Failed to log water intake.' });

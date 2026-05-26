@@ -7,10 +7,11 @@ import { useLanguage } from '../../context/LanguageContext';
 
 const activityTypes = ['Running', 'Walking', 'Cycling', 'Yoga', 'Basketball', 'Football', 'Swimming', 'Fitness', 'Other'];
 
-const LocationPicker = ({ position, setPosition }) => {
+const LocationPicker = ({ position, setPosition, onLocationPicked }) => {
     useMapEvents({
         click(e) {
             setPosition(e.latlng);
+            onLocationPicked(e.latlng);
         },
     });
 
@@ -28,8 +29,29 @@ const CreateEvent = ({ onCreated, onCancel }) => {
         max_participants: null,
     });
     const [position, setPosition] = useState(null);
+    const [locationName, setLocationName] = useState('');
+    const [geocoding, setGeocoding] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    const reverseGeocode = async (latlng) => {
+        setGeocoding(true);
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&accept-language=en`,
+                { headers: { 'Accept-Language': 'en' } }
+            );
+            const data = await res.json();
+            const a = data.address || {};
+            const city = a.city || a.town || a.village || a.county || a.state || '';
+            const country = a.country || '';
+            setLocationName(city && country ? `${city}, ${country}` : data.display_name?.split(',').slice(0, 2).join(',').trim() || '');
+        } catch {
+            setLocationName('');
+        } finally {
+            setGeocoding(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -45,7 +67,8 @@ const CreateEvent = ({ onCreated, onCancel }) => {
             const res = await api.post('/api/events', {
                 ...formData,
                 latitude: position.lat,
-                longitude: position.lng
+                longitude: position.lng,
+                location: locationName || `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`
             });
 
             if (res.data.success) {
@@ -151,14 +174,14 @@ const CreateEvent = ({ onCreated, onCancel }) => {
                         <span>{t('events.location')}</span>
                         {position && (
                             <span className="text-[10px] bg-brand-action/10 text-brand-action px-2 py-0.5 rounded-full font-bold">
-                                GPS: {position.lat.toFixed(4)}, {position.lng.toFixed(4)}
+                                {geocoding ? '⏳ ...' : locationName || `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`}
                             </span>
                         )}
                     </label>
                     <div className="rounded-3xl overflow-hidden border-2 border-border-main shadow-inner group relative" style={{ height: '350px' }}>
                         <MapContainer center={[33.8869, 9.5375]} zoom={6} style={{ height: '100%', width: '100%' }}>
                             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                            <LocationPicker position={position} setPosition={setPosition} />
+                            <LocationPicker position={position} setPosition={setPosition} onLocationPicked={reverseGeocode} />
                         </MapContainer>
                         {!position && (
                             <div className="absolute inset-0 bg-black/5 flex items-center justify-center pointer-events-none">

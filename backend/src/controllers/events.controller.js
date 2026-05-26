@@ -1,4 +1,5 @@
 import pool from '../config/db.js';
+import { checkAndAwardBadges } from '../services/gamification.service.js';
 
 // Helper to get status SQL snippet
 const statusSql = `
@@ -105,7 +106,7 @@ export const getEventDetails = async (req, res) => {
 
 // POST /api/events
 export const postEvent = async (req, res) => {
-    const { title, activity_type, date, time, latitude, longitude, description, max_participants } = req.body;
+    const { title, activity_type, date, time, latitude, longitude, location, description, max_participants } = req.body;
 
     if (!title || !activity_type || !date || !time || latitude === undefined || longitude === undefined) {
         return res.status(400).json({ success: false, message: 'Title, activity type, date, time, and location are required.' });
@@ -124,9 +125,9 @@ export const postEvent = async (req, res) => {
 
     try {
         const [result] = await pool.query(
-            `INSERT INTO events (user_id, title, activity_type, description, date, time, latitude, longitude, max_participants)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [req.user.user_id, title, activity_type, description || null, date, time, latitude, longitude, max_participants || null]
+            `INSERT INTO events (user_id, title, activity_type, description, date, time, latitude, longitude, location, max_participants)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [req.user.user_id, title, activity_type, description || null, date, time, latitude, longitude, location || null, max_participants || null]
         );
 
         res.status(201).json({ 
@@ -162,6 +163,7 @@ export const joinEvent = async (req, res) => {
         
         await pool.query('INSERT IGNORE INTO event_participants (event_id, user_id) VALUES (?, ?)', [eventId, userId]);
         res.json({ success: true, message: 'Joined event!' });
+        checkAndAwardBadges(userId, { type: 'first_event' }).catch(err => console.error('Badge error:', err));
     } catch (err) {
         console.error('JoinEvent error:', err);
         res.status(500).json({ success: false, message: 'Failed to join event.' });

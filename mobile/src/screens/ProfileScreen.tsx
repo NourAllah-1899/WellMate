@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, ActivityIndicator, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -7,6 +7,14 @@ import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Colors } from '../constants/Colors';
 import { Feather } from '@expo/vector-icons';
+
+const calcBmi = (heightCm: any, weightKg: any): number | null => {
+  const h = Number(heightCm);
+  const w = Number(weightKg);
+  if (!Number.isFinite(h) || !Number.isFinite(w) || h <= 0 || w <= 0) return null;
+  const m = h / 100;
+  return Number((w / (m * m)).toFixed(1));
+};
 
 type Props = {
   navigation: NativeStackNavigationProp<any>;
@@ -18,6 +26,18 @@ export default function ProfileScreen({ navigation }: Props) {
   const theme = isDarkMode ? Colors.dark : Colors.light;
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const bmi = useMemo(() => calcBmi(user?.height_cm, user?.weight_kg), [user]);
+
+  const getBmiCategory = (val: number | null) => {
+    if (val === null) return { label: t('profile.bmiNotAvailable'), color: '#94a3b8' };
+    if (val < 18.5) return { label: t('profile.bmiUnderweight'), color: '#3b82f6' };
+    if (val < 25)   return { label: t('profile.bmiNormal'),      color: '#22c55e' };
+    if (val < 30)   return { label: t('profile.bmiOverweight'),  color: '#f59e0b' };
+    return           { label: t('profile.bmiObese'),             color: '#ef4444' };
+  };
+
+  const bmiInfo = getBmiCategory(bmi);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', fetchProfile);
@@ -93,7 +113,22 @@ export default function ProfileScreen({ navigation }: Props) {
                 <Text style={[styles.label, { color: theme.muted }]}>{t('profile.height')}</Text>
                 <Text style={[styles.value, { color: theme.text }]}>{user?.height_cm ? `${user.height_cm} cm` : '--'}</Text>
             </View>
-            
+
+            {/* BMI Row */}
+            <View style={[styles.row, { borderBottomColor: theme.border }]}>
+                <Text style={[styles.label, { color: theme.muted }]}>{t('profile.bmi')}</Text>
+                <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                  {bmi !== null ? (
+                    <Text style={[styles.value, { color: theme.text }]}>
+                      {bmi} <Text style={{ fontSize: 11, color: theme.muted }}>{t('profile.bmiUnit')}</Text>
+                    </Text>
+                  ) : null}
+                  <View style={[styles.bmiBadge, { backgroundColor: bmiInfo.color + '22', borderColor: bmiInfo.color }]}>
+                    <Text style={[styles.bmiBadgeText, { color: bmiInfo.color }]}>{bmiInfo.label}</Text>
+                  </View>
+                </View>
+            </View>
+
             {/* Language Switcher in Profile */}
             <View style={[styles.row, { borderBottomColor: 'transparent', marginTop: 10 }]}>
                 <Text style={[styles.label, { color: theme.muted }]}>{t('common.language')}</Text>
@@ -122,6 +157,18 @@ export default function ProfileScreen({ navigation }: Props) {
                 <Text style={[styles.editButtonText, { color: '#fff' }]}>{t('profile.edit')}</Text>
             </TouchableOpacity>
         </View>
+
+        {user?.role === 'admin' && (
+          <TouchableOpacity
+            style={[styles.adminButton, { borderColor: '#8b5cf6', backgroundColor: isDarkMode ? 'rgba(139,92,246,0.1)' : 'rgba(139,92,246,0.07)' }]}
+            onPress={() => navigation.navigate('AdminDashboard')}
+          >
+            <Feather name="shield" size={18} color="#8b5cf6" style={{ marginRight: 8 }} />
+            <Text style={[styles.adminButtonText, { color: '#8b5cf6' }]}>
+              {language === 'en' ? 'Admin Panel' : 'Panneau Admin'}
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity 
           style={[styles.logoutButton, { borderColor: Colors.error }]} 
@@ -156,6 +203,8 @@ const styles = StyleSheet.create({
   value: { fontSize: 15, fontWeight: '700' },
   langBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, borderColor: Colors.brand.primary },
   langBtnText: { fontWeight: 'bold', fontSize: 12 },
+  bmiBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, borderWidth: 1, alignSelf: 'flex-end' },
+  bmiBadgeText: { fontSize: 11, fontWeight: '700' },
   editButton: { marginTop: 25, padding: 14, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' },
   editButtonText: { fontSize: 13, fontWeight: '600' },
   logoutButton: {
@@ -168,5 +217,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20,
   },
-  logoutText: { fontWeight: 'bold', fontSize: 16 }
+  logoutText: { fontWeight: 'bold', fontSize: 16 },
+  adminButton: {
+    borderWidth: 1,
+    padding: 16,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+  },
+  adminButtonText: { fontWeight: 'bold', fontSize: 16 },
 });

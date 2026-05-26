@@ -1,10 +1,13 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 
 export default function BadgeBoard({ badges }) {
+  const { t } = useLanguage();
+
   if (!badges || badges.length === 0) {
     return (
       <div className="wm-card p-6 text-center text-slate-500">
-        Aucun badge disponible pour le moment.
+        {t('health.gamification.noBadges')}
       </div>
     );
   }
@@ -12,7 +15,7 @@ export default function BadgeBoard({ badges }) {
   return (
     <div className="wm-card p-6">
       <h3 className="font-bold text-lg mb-6 flex items-center gap-2" style={{ color: 'var(--text-heading)' }}>
-        <span>🏆</span> Tableau des Trophées
+        <span>🏆</span> {t('health.gamification.trophiesBoard')}
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {badges.map((badge) => (
@@ -28,14 +31,14 @@ export default function BadgeBoard({ badges }) {
               {badge.icon || '🏅'}
             </div>
             <h4 className="font-bold text-sm mb-1" style={{ color: 'var(--text-primary)' }}>
-              {badge.title}
+              {t(`health.gamification.badges.${badge.code}.title`, badge.title)}
             </h4>
             <p className="text-xs font-medium opacity-70" style={{ color: 'var(--text-secondary)' }}>
-              {badge.description}
+              {t(`health.gamification.badges.${badge.code}.description`, badge.description)}
             </p>
             {badge.earned && badge.earned_at && (
               <div className="mt-3 text-[10px] font-bold uppercase tracking-wider text-indigo-500 bg-indigo-100 dark:bg-indigo-900/40 px-2 py-1 rounded-full">
-                Obtenu le {new Date(badge.earned_at).toLocaleDateString()}
+                {t('health.gamification.earnedOn')} {new Date(badge.earned_at).toLocaleDateString()}
               </div>
             )}
             {!badge.earned && (

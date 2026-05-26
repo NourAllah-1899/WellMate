@@ -1,9 +1,16 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
+import LanguageSelector from './LanguageSelector.jsx'
+import logoLight from '../assets/WellMate_light.png'
+import logoDark from '../assets/WellMate_dark.png'
 
 export default function AdminLayout({ children }) {
   const { me, logout } = useAuth()
+  const { t } = useLanguage()
+  const { isDarkMode, toggleTheme } = useTheme()
   const location = useLocation()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -19,9 +26,9 @@ export default function AdminLayout({ children }) {
   }, [])
 
   const navItems = [
-    { path: '/admin', label: 'Tableau de bord', icon: '📊' },
-    { path: '/admin/users', label: 'Utilisateurs', icon: '👥' },
-    { path: '/admin/events', label: 'Événements', icon: '📅' },
+    { path: '/admin', label: t('admin.dashboard', 'Tableau de bord') },
+    { path: '/admin/users', label: t('admin.users', 'Utilisateurs') },
+    { path: '/admin/events', label: t('admin.events', 'Événements') },
   ]
 
   const isActive = (path) => {
@@ -36,19 +43,14 @@ export default function AdminLayout({ children }) {
         <div className="max-w-[1400px] mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link to="/admin" className="flex items-center gap-2 no-underline">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-lg">
-                WM
-              </div>
-              <div>
-                <span className="font-black text-lg" style={{ color: 'var(--text-heading)' }}>WellMate</span>
-                <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
-                  ADMIN
-                </span>
-              </div>
+              <img key={isDarkMode ? 'dark' : 'light'} className="wm-logo" src={isDarkMode ? logoDark : logoLight} alt="WellMate" />
+              <span className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400">
+                ADMIN
+              </span>
             </Link>
           </div>
 
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-6">
             {navItems.map((item) => (
               <Link
                 key={item.path}
@@ -60,13 +62,24 @@ export default function AdminLayout({ children }) {
                 }`}
                 style={{ color: isActive(item.path) ? undefined : 'var(--text-secondary)' }}
               >
-                <span>{item.icon}</span>
                 <span className="hidden sm:inline">{item.label}</span>
               </Link>
             ))}
           </nav>
 
           <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <button 
+                type="button" 
+                className="wm-lang-btn" 
+                onClick={toggleTheme} 
+                aria-label="Toggle theme"
+              >
+                {isDarkMode ? '🌙' : '☀️'}
+              </button>
+              <LanguageSelector />
+            </div>
+
             <div className="relative" ref={menuRef}>
               <button 
                 type="button" 
@@ -90,7 +103,7 @@ export default function AdminLayout({ children }) {
                     }}
                     className="w-full text-left px-4 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors"
                   >
-                    🚪 Se déconnecter
+                    {t('admin.logout', 'Se déconnecter')}
                   </button>
                 </div>
               )}

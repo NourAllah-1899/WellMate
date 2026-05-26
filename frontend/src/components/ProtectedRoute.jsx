@@ -16,8 +16,6 @@ export default function ProtectedRoute({ children }) {
     return <Navigate to="/login" replace />
   }
 
-  // If the user is an admin, they should not see the normal user interface.
-  // Redirect them directly to the admin panel.
   if (me.role === 'admin') {
     return <Navigate to="/admin" replace />
   }

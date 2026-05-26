@@ -29,7 +29,7 @@
     "date": "Date",
     "notes": "Notes (optionnel)",
     "save": "Enregistrer",
-    "saveSuccess": "Activité enregistrée !",
+    "saveSuccess": "Activité enregistrée avec succès!",
     "todayActivities": "Activités d'aujourd'hui",
     "noActivities": "Aucune activité enregistrée aujourd'hui.",
     "totalCalories": "Total: {calories} kcal",
@@ -129,6 +129,13 @@
     "email": "Email:",
     "weight": "Poids:",
     "height": "Taille:",
+    "bmi": "IMC (BMI):",
+    "bmiUnit": "kg/m²",
+    "bmiNotAvailable": "Entrez taille et poids pour calculer",
+    "bmiUnderweight": "Insuffisance pondérale",
+    "bmiNormal": "Poids normal",
+    "bmiOverweight": "Surpoids",
+    "bmiObese": "Obésité",
     "edit": "Modifier le profil",
     "logout": "Se déconnecter"
   },
@@ -195,7 +202,25 @@
       "maintain": "Maintien",
       "notSet": "Non défini"
     },
-    "reportGenerated": "Bilan généré avec succès"
+    "reportGenerated": "Bilan généré avec succès",
+    "gamification": {
+      "currentStreak": "Série Actuelle",
+      "bestStreak": "Meilleure Série",
+      "days": "jours",
+      "streakSubtitle": "Jours consécutifs d'activité santé",
+      "rewards": "Récompenses",
+      "trophiesBoard": "Tableau des Trophées",
+      "earnedOn": "Obtenu le",
+      "noBadges": "Aucun badge disponible pour le moment.",
+      "badges": {
+        "SMOKE_FREE_7": { "title": "7 Jours Sans Tabac", "description": "Vous êtes sans tabac depuis une semaine entière !" },
+        "SMOKE_FREE_30": { "title": "1 Mois Sans Tabac", "description": "Incroyable ! Vous êtes sans tabac depuis 30 jours." },
+        "SPORT_10": { "title": "Débutant Actif", "description": "10 séances de sport complétées en 30 jours." },
+        "SPORT_30": { "title": "Passionné de Fitness", "description": "30 séances de sport complétées en 30 jours." },
+        "FIRST_EVENT": { "title": "Participant Événement", "description": "Vous avez rejoint votre premier événement communautaire !" },
+        "HYDRATION_HERO": { "title": "Héros de l'Hydratation", "description": "Objectif hydratation atteint : 8 verres d'eau !" }
+      }
+    }
   },
   "events": {
     "title": "Bougez Ensemble, Restez en Forme.",
@@ -209,6 +234,7 @@
     "searchPlaceholder": "Rechercher des événements...",
     "allActivities": "Toutes les Activités",
     "organizer": "Organisateur",
+    "location": "Lieu",
     "joining": "participants",
     "joinActivity": "Rejoindre",
     "alreadyJoined": "Déjà Rejoint ✓",

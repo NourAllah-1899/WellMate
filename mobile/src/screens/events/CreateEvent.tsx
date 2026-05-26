@@ -23,13 +23,36 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
         date: '',
         time: '',
         description: '',
-        max_participants: null,
+        max_participants: null as number | null,
     });
     const [position, setPosition] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [locationName, setLocationName] = useState('');
+    const [geocoding, setGeocoding] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const reverseGeocode = async (coords: { latitude: number; longitude: number }) => {
+        setGeocoding(true);
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}&accept-language=en`,
+                { headers: { 'Accept-Language': 'en' } }
+            );
+            const data = await res.json();
+            const a = data.address || {};
+            const city = a.city || a.town || a.village || a.county || a.state || '';
+            const country = a.country || '';
+            setLocationName(city && country ? `${city}, ${country}` : data.display_name?.split(',').slice(0, 2).join(',').trim() || '');
+        } catch {
+            setLocationName('');
+        } finally {
+            setGeocoding(false);
+        }
+    };
+
     const handleMapPress = (e: MapPressEvent) => {
-        setPosition(e.nativeEvent.coordinate);
+        const coords = e.nativeEvent.coordinate;
+        setPosition(coords);
+        reverseGeocode(coords);
     };
 
     const handleSubmit = async () => {
@@ -46,8 +69,9 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
             await apiClient.post('/events', {
                 ...formData,
                 max_participants: formData.max_participants ? parseInt(formData.max_participants as any) : null,
-                latitude: position.latitude,
-                longitude: position.longitude
+                latitude: finalPosition.latitude,
+                longitude: finalPosition.longitude,
+                location: locationName || `${finalPosition.latitude.toFixed(4)}, ${finalPosition.longitude.toFixed(4)}`
             });
             Alert.alert(t('common.success'), t('events.createSuccess'));
             onCreated();
@@ -163,6 +187,13 @@ export default function CreateEvent({ onCreated, onCancel }: CreateEventProps) {
                             {position && <Marker coordinate={position} pinColor="#7c3aed" />}
                         </MapView>
                     </View>
+                    {position && (
+                        <View style={[styles.locationBadge, isLight && styles.locationBadgeLight]}>
+                            <Text style={[styles.locationBadgeText, isLight && styles.locationBadgeTextLight]}>
+                                📍 {geocoding ? '⏳ ...' : locationName || `${position.latitude.toFixed(4)}, ${position.longitude.toFixed(4)}`}
+                            </Text>
+                        </View>
+                    )}
 
                     <TouchableOpacity 
                         style={[styles.submitButton, loading && styles.disabledButton]}
@@ -314,5 +345,26 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
         fontSize: 16,
+    },
+    locationBadge: {
+        marginTop: 8,
+        backgroundColor: 'rgba(124, 58, 237, 0.15)',
+        borderRadius: 10,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderWidth: 1,
+        borderColor: 'rgba(124, 58, 237, 0.3)',
+        alignSelf: 'flex-start',
+    },
+    locationBadgeLight: {
+        backgroundColor: 'rgba(124, 58, 237, 0.08)',
+    },
+    locationBadgeText: {
+        color: '#a78bfa',
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    locationBadgeTextLight: {
+        color: '#7c3aed',
     },
 });

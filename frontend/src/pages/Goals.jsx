@@ -1,50 +1,42 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import api from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
 
+
+
 export default function Goals() {
   const { me } = useAuth()
   const { t } = useLanguage()
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
-  const [apiError, setApiError] = useState('')
 
-  const [activeGoal, setActiveGoal] = useState(null)
+  const [loading, setLoading]           = useState(false)
+  const [saving, setSaving]             = useState(false)
+  const [recLoading, setRecLoading]     = useState(false)
+  const [apiError, setApiError]         = useState('')
 
-  const [recLoading, setRecLoading] = useState(false)
-  const [recommendation, setRecommendation] = useState(null)
+  const [activeGoal, setActiveGoal]     = useState(null)
+  const [showForm, setShowForm]         = useState(false)
 
-  const [direction, setDirection] = useState('maintain')
+  // Form state
+  const [direction, setDirection]       = useState('maintain')
   const [targetWeightKg, setTargetWeightKg] = useState('')
-  const [aiSummary, setAiSummary] = useState('')
+  const [aiSummary, setAiSummary]       = useState('')
+  const [recommendation, setRecommendation] = useState(null)
 
   const fetchActive = async () => {
     const res = await api.get('/api/goals/active')
-    setActiveGoal(res?.data?.goal || null)
+    const goal = res?.data?.goal || null
+    setActiveGoal(goal)
+    setShowForm(!goal)
   }
 
   useEffect(() => {
-    const run = async () => {
-      if (!me) return
-      setApiError('')
-      setLoading(true)
-      try {
-        await fetchActive()
-      } catch (err) {
-        const msg = err?.response?.data?.message || 'Failed to load goal.'
-        setApiError(msg)
-      } finally {
-        setLoading(false)
-      }
-    }
-    run()
+    if (!me) return
+    setLoading(true)
+    fetchActive().catch(err => {
+      setApiError(err?.response?.data?.message || 'Failed to load goal.')
+    }).finally(() => setLoading(false))
   }, [me])
-
-  const canRecommend = useMemo(() => {
-    return !!me && !recLoading
-  }, [me, recLoading])
 
   const onRecommend = async () => {
     setApiError('')
@@ -53,21 +45,23 @@ export default function Goals() {
       const res = await api.post('/api/goals/recommendation', {})
       const rec = res?.data?.recommendation
       setRecommendation(rec || null)
-
-      if (rec?.direction) setDirection(rec.direction)
+      if (rec?.direction)               setDirection(rec.direction)
       if (rec?.suggestedTargetWeightKg) setTargetWeightKg(String(rec.suggestedTargetWeightKg))
-      if (rec?.explanation) setAiSummary(String(rec.explanation))
+      if (rec?.explanation)             setAiSummary(String(rec.explanation))
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Failed to get recommendation.'
-      setApiError(msg)
+      setApiError(err?.response?.data?.message || 'Failed to get recommendation. Make sure your height & weight are set in Profile.')
     } finally {
       setRecLoading(false)
     }
   }
 
   const onSave = async () => {
+    if (!targetWeightKg || isNaN(Number(targetWeightKg))) {
+      setApiError('Please enter a valid target weight.')
+      return
+    }
     setApiError('')
-    setLoading(true)
+    setSaving(true)
     try {
       const res = await api.post('/api/goals', {
         direction,
@@ -76,13 +70,21 @@ export default function Goals() {
         suggestedCalories: recommendation?.suggestedCalories
       })
       setActiveGoal(res?.data?.goal || null)
-      navigate('/')
+      setShowForm(false)
+      setRecommendation(null)
     } catch (err) {
-      const msg = err?.response?.data?.message || 'Failed to save goal.'
-      setApiError(msg)
+      setApiError(err?.response?.data?.message || 'Failed to save goal.')
     } finally {
-      setLoading(false)
+      setSaving(false)
     }
+  }
+
+  const startNewGoal = () => {
+    setShowForm(true)
+    setRecommendation(null)
+    setAiSummary('')
+    setTargetWeightKg('')
+    setDirection('maintain')
   }
 
   if (!me) {
@@ -98,55 +100,62 @@ export default function Goals() {
 
   return (
     <div className="wm-container">
-        <div className="wm-header-card">
-          <h1>{t('goals.title')}</h1>
-          <p className="wm-subtitle">{t('goals.subtitle')}</p>
-        </div>
+      <div className="wm-header-card">
+        <h1>{t('goals.title')}</h1>
+        <p className="wm-subtitle">{t('goals.subtitle')}</p>
+      </div>
 
-        <div className="wm-card">
+      <div className="wm-card">
+        {apiError ? <div className="wm-alert error" style={{ marginBottom: 16 }}>{apiError}</div> : null}
+        {loading  ? <div className="wm-panel">{t('common.loading')}</div> : null}
 
-        {apiError ? <div className="wm-alert error">{apiError}</div> : null}
+        {/* ── Active goal display ── */}
+        {activeGoal && !showForm ? (
+          <div className="wm-panel" style={{ marginBottom: 20 }}>
+            <div className="wm-kpi-label" style={{ marginBottom: 12, fontWeight: 'bold' }}>{t('goals.activeGoal')}</div>
 
-        {loading ? <div className="wm-panel">{t('common.loading')}</div> : null}
-
-        {activeGoal ? (
-          <div className="wm-panel">
-            <div className="wm-kpi-label">{t('goals.currentGoal')}</div>
-            <div className="wm-kpi">{activeGoal.direction} → {activeGoal.target_weight_kg} kg</div>
-            {activeGoal.ai_summary ? <div className="wm-muted" style={{ marginTop: 10 }}>{activeGoal.ai_summary}</div> : null}
-          </div>
-        ) : (
-          <div className="wm-panel">
-            <div className="wm-muted">{t('dashboard.noGoalSet')}</div>
-          </div>
-        )}
-
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <button className="wm-btn" type="button" onClick={onRecommend} disabled={!canRecommend}>
-            {recLoading ? t('goals.generating') : t('goals.getRecommendation')}
-          </button>
-        </div>
-
-        {recommendation ? (
-          <div className="wm-panel" style={{ marginTop: 14 }}>
-            <div className="wm-kpi-label">{t('goals.recommendation')}</div>
-            <div style={{ marginTop: 8 }}>
-              <div className="wm-muted">{t('goals.bmi')}: <b>{recommendation.bmi}</b> — <b>{recommendation.bmiCategory}</b></div>
-              {recommendation.explanation ? (
-                <div className="wm-muted" style={{ marginTop: 8 }}>{recommendation.explanation}</div>
-              ) : null}
-              {recommendation.notes ? (
-                <div className="wm-muted" style={{ marginTop: 8 }}>{recommendation.notes}</div>
-              ) : null}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 10 }}>
+              <span className="wm-kpi" style={{ margin: 0 }}>{activeGoal.direction} → {activeGoal.target_weight_kg} kg</span>
             </div>
 
-            <div className="wm-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', marginTop: 14 }}>
+            {activeGoal.ai_summary
+              ? <div className="wm-muted" style={{ fontStyle: 'italic', marginBottom: 16 }}>{activeGoal.ai_summary}</div>
+              : null}
+
+            <button className="wm-btn" type="button" onClick={startNewGoal} style={{ fontWeight: 'bold' }}>
+              {t('goals.newGoal')}
+            </button>
+          </div>
+        ) : null}
+
+        {/* ── Goal-setting form ── */}
+        {showForm ? (
+          <div>
+            <div className="wm-kpi-label" style={{ marginBottom: 16 }}>
+              {activeGoal ? t('goals.newGoal') : t('goals.noGoal')}
+            </div>
+
+            {/* AI recommendation box */}
+            {recommendation ? (
+              <div className="wm-panel" style={{ marginBottom: 20, borderLeft: '3px solid #6366f1' }}>
+                <div style={{ fontWeight: 700, color: '#6366f1', marginBottom: 6 }}>{t('goals.recommendation')}</div>
+                {recommendation.bmi
+                  ? <div className="wm-muted" style={{ marginBottom: 6 }}>{t('goals.bmi')}: <b>{recommendation.bmi}</b> — <b>{recommendation.bmiCategory}</b></div>
+                  : null}
+                {recommendation.explanation
+                  ? <div className="wm-muted" style={{ fontStyle: 'italic' }}>{recommendation.explanation}</div>
+                  : null}
+              </div>
+            ) : null}
+
+            {/* Direction selector and Target weight */}
+            <div className="wm-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', marginBottom: 18 }}>
               <label className="wm-field">
                 {t('goals.direction')}
                 <select className="wm-input" value={direction} onChange={(e) => setDirection(e.target.value)}>
-                  <option value="lose">lose</option>
-                  <option value="gain">gain</option>
-                  <option value="maintain">maintain</option>
+                  <option value="lose">{t('goals.lose')}</option>
+                  <option value="gain">{t('goals.gain')}</option>
+                  <option value="maintain">{t('goals.maintain')}</option>
                 </select>
               </label>
 
@@ -155,30 +164,40 @@ export default function Goals() {
                 <input
                   className="wm-input"
                   value={targetWeightKg}
-                  onChange={(e) => setTargetWeightKg(e.target.value)}
+                  onChange={e => setTargetWeightKg(e.target.value)}
                   placeholder="e.g. 70"
                   inputMode="decimal"
                 />
               </label>
             </div>
 
-            <label className="wm-field">
-              {t('goals.summary')}
-              <textarea
-                className="wm-input"
-                value={aiSummary}
-                onChange={(e) => setAiSummary(e.target.value)}
-                rows={3}
-                placeholder=""
-              />
-            </label>
+            {/* Save button */}
+            <button
+              className="wm-btn"
+              type="button"
+              onClick={onSave}
+              disabled={saving}
+              style={{ width: '100%', marginTop: 8, marginBottom: 16 }}
+            >
+              {saving ? t('common.loading') : t('goals.saveGoal')}
+            </button>
 
-            <button className="wm-btn" type="button" onClick={onSave} disabled={loading}>
-              {t('goals.saveGoal')}
+            {/* Divider */}
+            <div style={{ borderTop: '1px solid #e2e8f0', margin: '16px 0' }} />
+
+            {/* AI calculate (optional) */}
+            <button
+              className="wm-btn"
+              type="button"
+              onClick={onRecommend}
+              disabled={recLoading}
+              style={{ width: '100%', background: 'transparent', border: '2px solid #6366f1', color: '#6366f1' }}
+            >
+              {recLoading ? t('goals.generating') : t('goals.getRecommendation')}
             </button>
           </div>
         ) : null}
       </div>
     </div>
-)
+  )
 }
