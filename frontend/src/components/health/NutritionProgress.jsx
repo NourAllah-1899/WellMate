@@ -10,7 +10,8 @@ const NutritionProgress = ({ summary }) => {
   // Circle progress calculations
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
+  const visualPercent = Math.min(progressPercentage, 100);
+  const strokeDashoffset = circumference - (visualPercent / 100) * circumference;
 
   const getGoalLabel = (type) => {
     switch (type) {
@@ -23,8 +24,8 @@ const NutritionProgress = ({ summary }) => {
 
   const getProgressColor = () => {
     if (progressPercentage > 100) return 'text-red-500';
-    if (progressPercentage > 85) return 'text-amber-500';
-    return 'text-indigo-600';
+    if (progressPercentage < 50) return 'text-sky-400';
+    return 'text-amber-500';
   };
 
   return (

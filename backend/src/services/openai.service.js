@@ -12,6 +12,8 @@ export const getOpenAIClient = () => {
     _openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
         baseURL: process.env.OPENAI_BASE_URL || 'https://openrouter.ai/api/v1',
+        timeout: parseInt(process.env.OPENAI_TIMEOUT_MS, 10) || 60000,
+        maxRetries: parseInt(process.env.OPENAI_MAX_RETRIES, 10) || 2,
         defaultHeaders: {
             "HTTP-Referer": "http://localhost:3000",
             "X-Title": "WellMate",

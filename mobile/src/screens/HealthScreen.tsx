@@ -198,15 +198,13 @@ export default function HealthScreen() {
           <Text style={[styles.cardTitle, { color: theme.text }]}>🥗 {t('health.nutrition.title')}</Text>
           <View style={styles.nutritionContent}>
             <View style={styles.progressPlaceholder}>
-              {/* Simple circle progress via View */}
-              <View style={[styles.circleBase, { borderColor: theme.border }]}>
-                <View style={[styles.circleContent]}>
-                  <Text style={[styles.caloriesValue, { color: theme.text }]}>{nutrition?.caloriesConsumedToday || 0}</Text>
-                  <Text style={[styles.caloriesSub, { color: theme.muted }]}>
-                    {nutrition?.calorieGoal > 0 ? `${t('health.nutrition.sur')} ${nutrition.calorieGoal}` : (t('health.nutrition.noGoal') || (language === 'fr' ? 'Pas d\'objectif' : 'No Goal'))}
-                  </Text>
-                </View>
-              </View>
+              {/* Circular progress with fill */}
+              <CalorieRing
+                consumed={nutrition?.caloriesConsumedToday || 0}
+                goal={nutrition?.calorieGoal || 0}
+                theme={theme}
+                isDarkMode={isDarkMode}
+              />
             </View>
             
             <View style={styles.nutritionStats}>
@@ -396,6 +394,47 @@ function VitalCard({ label, value, icon, theme }: any) {
       <View>
         <Text style={[styles.vitalLabel, { color: theme.muted }]}>{label.toUpperCase()}</Text>
         <Text style={[styles.vitalValue, { color: theme.text }]}>{value}</Text>
+      </View>
+    </View>
+  );
+}
+
+function CalorieRing({ consumed, goal, theme, isDarkMode }: any) {
+  const progress = goal > 0 ? Math.round((consumed / goal) * 100) : 0;
+  const visualProgress = Math.min(progress, 100);
+
+  let color = '#f59e0b'; // amber/orange
+  if (progress > 100) color = '#ef4444'; // red
+  else if (progress < 50) color = '#60a5fa'; // light blue
+
+  const trackColor = isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+  const opacity = 0.05 + (visualProgress / 100) * 0.28;
+
+  return (
+    <View style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' }}>
+      {/* Outer track ring */}
+      <View style={{
+        position: 'absolute',
+        width: 110, height: 110, borderRadius: 55,
+        borderWidth: 8, borderColor: trackColor,
+      }} />
+      {/* Inner fill */}
+      <View style={{
+        position: 'absolute',
+        width: 110, height: 110, borderRadius: 55,
+        backgroundColor: color,
+        opacity,
+      }} />
+      {/* Center hole */}
+      <View style={{
+        width: 90, height: 90, borderRadius: 45,
+        backgroundColor: theme.card,
+        alignItems: 'center', justifyContent: 'center',
+      }}>
+        <Text style={{ fontSize: 22, fontWeight: '900', color: theme.text }}>{consumed}</Text>
+        <Text style={{ fontSize: 8, fontWeight: 'bold', color: theme.muted }}>
+          {goal > 0 ? `sur ${goal}` : 'No Goal'}
+        </Text>
       </View>
     </View>
   );

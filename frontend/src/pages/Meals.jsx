@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -24,16 +24,6 @@ export default function Meals() {
 
   const [historyMeals, setHistoryMeals] = useState([])
 
-  const lastMealId = useMemo(() => {
-    let max = -1;
-    for (const m of meals) {
-      if (m.id > max) max = m.id;
-    }
-    for (const m of historyMeals) {
-      if (m.id > max) max = m.id;
-    }
-    return max;
-  }, [meals, historyMeals]);
 
   const fetchAll = async () => {
     const resToday = await api.get('/api/meals/today')
@@ -63,9 +53,7 @@ export default function Meals() {
     run()
   }, [me])
 
-  const canEstimate = useMemo(() => {
-    return !!me && description.trim().length >= 2 && !actionLoading
-  }, [me, description, actionLoading])
+  const canEstimate = !!me && description.trim().length >= 2 && !actionLoading
 
   const onEstimate = async () => {
     setApiError('')
@@ -138,6 +126,29 @@ export default function Meals() {
     }
   };
 
+  const MealMacros = ({ breakdownJson }) => {
+    let data = null;
+    try {
+      data = typeof breakdownJson === 'string' ? JSON.parse(breakdownJson) : breakdownJson;
+    } catch (e) {}
+    if (!data || (!data.protein_g && !data.carbs_g && !data.fat_g)) return null;
+    const macros = [
+      { label: t('meals.protein'), value: data.protein_g || 0, tint: 'color-mix(in srgb, #3b82f6 10%, transparent)', text: '#3b82f6' },
+      { label: t('meals.carbs'), value: data.carbs_g || 0, tint: 'color-mix(in srgb, #f59e0b 10%, transparent)', text: '#d97706' },
+      { label: t('meals.fat'), value: data.fat_g || 0, tint: 'color-mix(in srgb, #ec4899 10%, transparent)', text: '#db2777' },
+    ];
+    return (
+      <div className="grid grid-cols-3 gap-2 mt-2">
+        {macros.map((macro, i) => (
+          <div key={i} className="wm-panel p-2 text-center" style={{ backgroundColor: macro.tint, borderColor: macro.tint }}>
+            <div className="text-sm font-black" style={{ color: macro.text }}>{macro.value}g</div>
+            <div className="text-[9px] font-bold uppercase" style={{ color: macro.text, opacity: 0.7 }}>{macro.label}</div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   if (!me) {
     return (
       <div className="wm-container">
@@ -161,24 +172,30 @@ export default function Meals() {
           <button
             type="button"
             onClick={() => setActiveTab('log')}
-            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all border flex-1 ${
               activeTab === 'log'
-                ? 'bg-indigo-500 text-white border-indigo-600 shadow-lg shadow-indigo-200 dark:shadow-none'
-                : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700'
+                ? 'text-white shadow-lg dark:shadow-none'
+                : 'hover:opacity-80'
             }`}
-            style={activeTab !== 'log' ? { backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' } : {}}
+            style={activeTab === 'log'
+              ? { background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-action))', borderColor: 'transparent' }
+              : { backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', borderColor: 'var(--border-main)' }
+            }
           >
             🍽️ {t('meals.title')}
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('plan')}
-            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all border ${
+            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all border flex-1 ${
               activeTab === 'plan'
-                ? 'bg-indigo-500 text-white border-indigo-600 shadow-lg shadow-indigo-200 dark:shadow-none'
-                : 'border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-700'
+                ? 'text-white shadow-lg dark:shadow-none'
+                : 'hover:opacity-80'
             }`}
-            style={activeTab !== 'plan' ? { backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' } : {}}
+            style={activeTab === 'plan'
+              ? { background: 'linear-gradient(135deg, var(--brand-primary), var(--brand-action))', borderColor: 'transparent' }
+              : { backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', borderColor: 'var(--border-main)' }
+            }
           >
             🤖 Plan IA
           </button>
@@ -187,7 +204,11 @@ export default function Meals() {
         {/* Tab: Log Meals */}
         {activeTab === 'log' && (
           <div className="wm-card">
-            {apiError ? <div className="wm-alert error">{apiError}</div> : null}
+            {apiError ? (
+              <div className="p-3 rounded-xl text-sm font-bold border mb-4" style={{ backgroundColor: 'color-mix(in srgb, #ef4444 8%, transparent)', color: '#ef4444', borderColor: 'color-mix(in srgb, #ef4444 20%, transparent)' }}>
+                ⚠️ {apiError}
+              </div>
+            ) : null}
 
             <label className="wm-field">
               {t('meals.description')}
@@ -199,16 +220,16 @@ export default function Meals() {
                 placeholder='e.g. "2 eggs, bread, and a glass of milk"'
               />
             </label>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 14 }}>
-              <button className="wm-btn secondary" type="button" onClick={onEstimate} disabled={!canEstimate}>
-                {actionLoading ? t('meals.working') : t('meals.estimate')}
+            <div className="flex gap-3 flex-wrap mt-4">
+              <button className="wm-btn secondary flex-1" type="button" onClick={onEstimate} disabled={!canEstimate}>
+                {actionLoading ? t('meals.working') : '⚡ ' + t('meals.estimate')}
               </button>
-              <button className="wm-btn" type="button" onClick={onSave} disabled={!canEstimate}>
-                {actionLoading ? t('meals.working') : editingMealId ? 'Mettre à jour' : t('meals.saveMeal')}
+              <button className="wm-btn flex-1" type="button" onClick={onSave} disabled={!canEstimate}>
+                {actionLoading ? t('meals.working') : editingMealId ? '💾 Mettre à jour' : '💾 ' + t('meals.saveMeal')}
               </button>
               {editingMealId ? (
                 <button className="wm-btn secondary" type="button" onClick={onCancelEdit} disabled={actionLoading}>
-                  Annuler
+                  ❌ Annuler
                 </button>
               ) : null}
             </div>
@@ -217,6 +238,21 @@ export default function Meals() {
               <div className="wm-panel" style={{ marginTop: 14 }}>
                 <div className="wm-kpi-label">{t('meals.estimatedCalories')}</div>
                 <div className="wm-kpi">{estimate.totalCalories} kcal</div>
+                {/* Macros */}
+                {(estimate.protein_g || estimate.carbs_g || estimate.fat_g) ? (
+                  <div className="grid grid-cols-3 gap-2 mt-3">
+                    {[
+                      { label: t('meals.protein'), value: estimate.protein_g || 0, tint: 'color-mix(in srgb, #3b82f6 10%, transparent)', text: '#3b82f6' },
+                      { label: t('meals.carbs'), value: estimate.carbs_g || 0, tint: 'color-mix(in srgb, #f59e0b 10%, transparent)', text: '#d97706' },
+                      { label: t('meals.fat'), value: estimate.fat_g || 0, tint: 'color-mix(in srgb, #ec4899 10%, transparent)', text: '#db2777' },
+                    ].map((macro, i) => (
+                      <div key={i} className="wm-panel p-2 text-center" style={{ backgroundColor: macro.tint, borderColor: macro.tint }}>
+                        <div className="text-sm font-black" style={{ color: macro.text }}>{macro.value}g</div>
+                        <div className="text-[9px] font-bold uppercase" style={{ color: macro.text, opacity: 0.7 }}>{macro.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
                 {Array.isArray(estimate.items) && estimate.items.length ? (
                   <div style={{ marginTop: 10 }}>
                     <div className="wm-muted" style={{ fontWeight: 900, marginBottom: 6 }}>{t('meals.breakdown')}</div>
@@ -252,22 +288,19 @@ export default function Meals() {
               {!listLoading && meals.length ? (
                 <div style={{ display: 'grid', gap: 10 }}>
                   {meals.map((m) => (
-                    <div key={m.id} className="wm-panel" style={{ padding: 12 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline' }}>
-                        <div style={{ fontWeight: 900 }}>{m.description}</div>
-                        <div className="wm-badge">{m.estimated_calories} kcal</div>
+                    <div key={m.id} className="wm-panel" style={{ padding: 12, borderLeft: '3px solid var(--brand-primary)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start' }}>
+                        <div style={{ flex: 1, minWidth: 0, fontWeight: 900, color: 'var(--text-heading)' }}>{m.description}</div>
+                        <div className="wm-badge" style={{ flexShrink: 0, whiteSpace: 'nowrap', color: 'var(--brand-primary)', backgroundColor: 'color-mix(in srgb, var(--brand-primary) 8%, transparent)', borderColor: 'color-mix(in srgb, var(--brand-primary) 20%, transparent)' }}>{m.estimated_calories} kcal</div>
                       </div>
+                      <MealMacros breakdownJson={m.breakdown_json} />
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
                         <div className="wm-muted">
                           {m.eaten_at ? new Date(m.eaten_at).toLocaleString() : ''}
                         </div>
                         <div style={{ display: 'flex', gap: 8 }}>
-                          {m.id === lastMealId && (
-                            <>
-                              <button className="wm-btn secondary small" onClick={() => onEdit(m)}>Éditer</button>
-                              <button className="wm-btn error small" onClick={() => onDelete(m.id)}>Supprimer</button>
-                            </>
-                          )}
+                          <button className="wm-btn small" style={{ background: 'none', border: '1px solid var(--border-main)', color: 'var(--text-secondary)' }} onClick={() => onEdit(m)}>Edit</button>
+                          <button className="wm-btn small error" style={{ background: 'none', border: '1px solid color-mix(in srgb, #ef4444 30%, transparent)', color: '#ef4444' }} onClick={() => onDelete(m.id)}>Delete</button>
                         </div>
                       </div>
                     </div>
@@ -290,22 +323,15 @@ export default function Meals() {
               {!listLoading && historyMeals.length ? (
                 <div style={{ display: 'grid', gap: 10 }}>
                   {historyMeals.map((m) => (
-                    <div key={m.id} className="wm-panel" style={{ padding: 12 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline' }}>
-                        <div style={{ fontWeight: 900 }}>{m.description}</div>
-                        <div className="wm-badge">{m.estimated_calories} kcal</div>
+                    <div key={m.id} className="wm-panel" style={{ padding: 12, borderLeft: '3px solid var(--brand-primary)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start' }}>
+                        <div style={{ flex: 1, minWidth: 0, fontWeight: 900, color: 'var(--text-heading)' }}>{m.description}</div>
+                        <div className="wm-badge" style={{ flexShrink: 0, whiteSpace: 'nowrap', color: 'var(--brand-primary)', backgroundColor: 'color-mix(in srgb, var(--brand-primary) 8%, transparent)', borderColor: 'color-mix(in srgb, var(--brand-primary) 20%, transparent)' }}>{m.estimated_calories} kcal</div>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+                      <MealMacros breakdownJson={m.breakdown_json} />
+                      <div style={{ marginTop: 10 }}>
                         <div className="wm-muted">
                           {m.eaten_at ? new Date(m.eaten_at).toLocaleString() : ''}
-                        </div>
-                        <div style={{ display: 'flex', gap: 8 }}>
-                          {m.id === lastMealId && (
-                            <>
-                              <button className="wm-btn secondary small" onClick={() => onEdit(m)}>Éditer</button>
-                              <button className="wm-btn error small" onClick={() => onDelete(m.id)}>Supprimer</button>
-                            </>
-                          )}
                         </div>
                       </div>
                     </div>

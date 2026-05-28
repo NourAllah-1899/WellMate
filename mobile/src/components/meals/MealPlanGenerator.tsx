@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ActivityIndicator, ScrollView, Alert } from 'react-native';
 import apiClient from '../../api/apiClient';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -50,6 +50,11 @@ export default function MealPlanGenerator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [expandedMeal, setExpandedMeal] = useState<number | null>(null);
+  const [savingMealIndex, setSavingMealIndex] = useState<number | null>(null);
+  const [savedMealIndices, setSavedMealIndices] = useState<Set<number>>(new Set());
+  const [isPinned, setIsPinned] = useState(false);
+  const [pinning, setPinning] = useState(false);
+  const [saveAllLoading, setSaveAllLoading] = useState(false);
 
   const toggleAllergy = (id: string) => {
     setSelectedAllergies(prev =>
@@ -73,6 +78,7 @@ export default function MealPlanGenerator() {
     setLoading(true);
     setError('');
     setPlan(null);
+    setIsPinned(false);
     try {
       const res = await apiClient.post('/meals/generate-plan', {
         goal: goal || undefined,
@@ -85,6 +91,105 @@ export default function MealPlanGenerator() {
       setError(err.response?.data?.message || 'Erreur lors de la génération du plan.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePinPlan = async () => {
+    if (!plan) return;
+    setPinning(true);
+    try {
+      if (isPinned) {
+        await apiClient.delete('/meals/plan/today');
+        setIsPinned(false);
+        Alert.alert(
+          language === 'en' ? 'Unpinned' : language === 'ar' ? 'تم إلغاء التثبيت' : 'Désépinglé',
+          language === 'en' ? 'Your meal plan is no longer pinned.' : language === 'ar' ? 'لم يعد خطة وجباتك مثبتًا.' : 'Votre plan repas n\'est plus épinglé.'
+        );
+      } else {
+        await apiClient.post('/meals/save-plan', { plan });
+        setIsPinned(true);
+        Alert.alert(
+          language === 'en' ? 'Pinned!' : language === 'ar' ? 'تم التثبيت!' : 'Épinglé !',
+          language === 'en' ? 'Your meal plan is pinned for today.' : language === 'ar' ? 'تم تثبيت خطة وجباتك لهذا اليوم.' : 'Votre plan repas est épinglé pour aujourd\'hui.'
+        );
+      }
+    } catch (err: any) {
+      Alert.alert('Error', err.response?.data?.message || `Failed to ${isPinned ? 'unpin' : 'pin'} meal plan.`);
+    } finally {
+      setPinning(false);
+    }
+  };
+
+  useEffect(() => {
+    const checkTodayPlan = async () => {
+      try {
+        const res = await apiClient.get('/meals/plan/today');
+        if (res.data?.plan) {
+          setPlan(res.data.plan);
+          setIsPinned(true);
+        }
+      } catch (err) {
+        // silently ignore
+      }
+    };
+    checkTodayPlan();
+  }, []);
+
+  const handleSaveMealFromPlan = async (meal: any, index: number) => {
+    setSavingMealIndex(index);
+    try {
+      const description = `${meal.name} (${meal.mealType}) — ${meal.description || ''}`.trim();
+      await apiClient.post('/meals', {
+        description,
+        estimatedCalories: meal.calories,
+        eatenAt: new Date().toISOString(),
+      });
+      setSavedMealIndices(prev => {
+        const next = new Set(prev);
+        next.add(index);
+        return next;
+      });
+      Alert.alert(
+        language === 'en' ? 'Saved!' : language === 'ar' ? 'تم الحفظ!' : 'Enregistré !',
+        language === 'en' ? 'Meal added to your log.' : language === 'ar' ? 'تمت إضافة الوجبة إلى سجلّك.' : 'Repas ajouté à votre journal.'
+      );
+    } catch (err: any) {
+      Alert.alert('Error', err.response?.data?.message || 'Failed to save meal.');
+    } finally {
+      setSavingMealIndex(null);
+    }
+  };
+
+  const handleSaveAllToLog = async () => {
+    if (!plan?.meals?.length) return;
+    setSaveAllLoading(true);
+    const newSaved = new Set(savedMealIndices);
+    let failed = 0;
+    for (let i = 0; i < plan.meals.length; i++) {
+      if (newSaved.has(i)) continue;
+      const meal = plan.meals[i];
+      try {
+        const description = `${meal.name} (${meal.mealType}) — ${meal.description || ''}`.trim();
+        await apiClient.post('/meals', {
+          description,
+          estimatedCalories: meal.calories,
+          eatenAt: new Date().toISOString(),
+        });
+        newSaved.add(i);
+      } catch (err) {
+        failed++;
+      }
+    }
+    setSavedMealIndices(newSaved);
+    setSaveAllLoading(false);
+    const allSaved = plan.meals.every((_: any, i: number) => newSaved.has(i));
+    if (allSaved && failed === 0) {
+      Alert.alert(
+        language === 'en' ? 'All Saved!' : language === 'ar' ? 'تم الحفظ الكل!' : 'Tout enregistré !',
+        language === 'en' ? 'All meals added to your log.' : language === 'ar' ? 'تمت إضافة جميع الوجبات إلى سجلّك.' : 'Tous les repas ont été ajoutés à votre journal.'
+      );
+    } else if (failed > 0) {
+      Alert.alert('Error', `${failed} meal(s) failed to save.`);
     }
   };
 
@@ -177,9 +282,9 @@ export default function MealPlanGenerator() {
               <TouchableOpacity
                 key={idx}
                 onPress={() => removeIngredient(ing)}
-                style={[styles.chipButton, { backgroundColor: '#d1fae5', borderColor: '#10b981' }]}
+                style={[styles.chipButton, { backgroundColor: isDarkMode ? 'rgba(124,58,237,0.12)' : 'rgba(124,58,237,0.08)', borderColor: Colors.brand.primary }]}
               >
-                <Text style={{ color: '#047857', fontWeight: 'bold' }}>🥘 {ing} <Feather name="x" size={12} /></Text>
+                <Text style={{ color: Colors.brand.primary, fontWeight: 'bold' }}>🥘 {ing} <Feather name="x" size={12} /></Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -201,8 +306,8 @@ export default function MealPlanGenerator() {
         </TouchableOpacity>
 
         {error ? (
-          <View style={styles.errorBox}>
-            <Text style={styles.errorText}>⚠️ {error}</Text>
+          <View style={[styles.errorBox, { backgroundColor: isDarkMode ? 'rgba(239,68,68,0.08)' : 'rgba(239,68,68,0.05)', borderColor: isDarkMode ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.15)' }]}>
+            <Text style={[styles.errorText, { color: '#ef4444' }]}>⚠️ {error}</Text>
           </View>
         ) : null}
       </View>
@@ -210,39 +315,92 @@ export default function MealPlanGenerator() {
       {/* Generated Plan */}
       {plan && (
         <View style={styles.planContainer}>
-          <View style={[styles.planHeader, { backgroundColor: Colors.brand.primary }]}>
-            <View>
-              <Text style={styles.planTitle}>{plan.planTitle || 'Plan du Jour'}</Text>
-              <Text style={styles.planSubtitle}>
-                {language === 'en' ? 'Personalized by AI' : language === 'ar' ? 'مخصص بالذكاء الاصطناعي' : 'Personnalisé par IA'}
-              </Text>
+          {/* Plan Header */}
+          <View style={[styles.planHeaderCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.planTitle, { color: theme.text }]}>{plan.planTitle || 'Plan du Jour'}</Text>
+                <Text style={[styles.planSubtitle, { color: theme.secondaryText }]}>
+                  {language === 'en' ? 'Personalized by AI' : language === 'ar' ? 'مخصص بالذكاء الاصطناعي' : 'Personnalisé par IA'}
+                </Text>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={[styles.planCalories, { color: Colors.brand.primary }]}>{plan.totalDayCalories}</Text>
+                <Text style={[styles.planCaloriesUnit, { color: theme.muted }]}>KCAL / JOUR</Text>
+              </View>
             </View>
-            <View style={{ alignItems: 'flex-end' }}>
-              <Text style={styles.planCalories}>{plan.totalDayCalories}</Text>
-              <Text style={styles.planCaloriesUnit}>KCAL / JOUR</Text>
+
+            {plan.macroSummary && (
+              <View style={styles.macroRow}>
+                {[
+                  { label: language === 'en' ? 'Protein' : language === 'ar' ? 'بروتين' : 'Protéines', value: plan.macroSummary.totalProtein, unit: 'g', tint: '#3b82f622', text: '#3b82f6' },
+                  { label: language === 'en' ? 'Carbs' : language === 'ar' ? 'كربوهيدرات' : 'Glucides', value: plan.macroSummary.totalCarbs, unit: 'g', tint: '#f59e0b22', text: '#d97706' },
+                  { label: language === 'en' ? 'Fat' : language === 'ar' ? 'دهون' : 'Lipides', value: plan.macroSummary.totalFat, unit: 'g', tint: '#ec489922', text: '#db2777' },
+                ].map((macro, idx) => (
+                  <View key={idx} style={[styles.macroBox, { backgroundColor: macro.tint }]}>
+                    <Text style={[styles.macroValue, { color: macro.text }]}>{macro.value}{macro.unit}</Text>
+                    <Text style={[styles.macroLabel, { color: macro.text }]}>{macro.label}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Action Buttons */}
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10, marginTop: 15 }}>
+              <TouchableOpacity
+                onPress={handleSaveAllToLog}
+                disabled={saveAllLoading || (plan.meals || []).every((_: any, i: number) => savedMealIndices.has(i))}
+                style={[
+                  styles.actionButton,
+                  {
+                    backgroundColor: (plan.meals || []).every((_: any, i: number) => savedMealIndices.has(i))
+                      ? '#10b981'
+                      : theme.background,
+                    borderWidth: 1,
+                    borderColor: theme.border,
+                  },
+                ]}
+              >
+                {saveAllLoading ? (
+                  <ActivityIndicator color={(plan.meals || []).every((_: any, i: number) => savedMealIndices.has(i)) ? '#fff' : Colors.brand.primary} size="small" />
+                ) : (
+                  <Text style={[styles.actionButtonText, { color: (plan.meals || []).every((_: any, i: number) => savedMealIndices.has(i)) ? '#fff' : Colors.brand.primary }]}>
+                    {(plan.meals || []).every((_: any, i: number) => savedMealIndices.has(i))
+                      ? (language === 'en' ? '✓ All Saved' : language === 'ar' ? '✓ تم الحفظ الكل' : '✓ Tout enregistré')
+                      : (language === 'en' ? '💾 Save All' : language === 'ar' ? '💾 حفظ الكل' : '💾 Tout enregistrer')}
+                  </Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handlePinPlan}
+                disabled={pinning}
+                style={[
+                  styles.actionButton,
+                  {
+                    backgroundColor: isPinned ? '#10b981' : theme.background,
+                    borderWidth: 1,
+                    borderColor: isPinned ? '#10b981' : theme.border,
+                  },
+                ]}
+              >
+                {pinning ? (
+                  <ActivityIndicator color={isPinned ? '#fff' : Colors.brand.primary} size="small" />
+                ) : (
+                  <Text style={[styles.actionButtonText, { color: isPinned ? '#fff' : Colors.brand.primary }]}>
+                    {isPinned
+                      ? (language === 'en' ? '📌 Unpin' : language === 'ar' ? '📌 إلغاء التثبيت' : '📌 Désépingler')
+                      : (language === 'en' ? '📌 Pin this plan' : language === 'ar' ? '📌 تثبيت الخطة' : '📌 Épingler ce plan')}
+                  </Text>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
-
-          {plan.macroSummary && (
-            <View style={styles.macroRow}>
-              {[
-                { label: language === 'en' ? 'Protein' : language === 'ar' ? 'بروتين' : 'Protéines', value: plan.macroSummary.totalProtein, unit: 'g', color: '#3b82f6' },
-                { label: language === 'en' ? 'Carbs' : language === 'ar' ? 'كربوهيدرات' : 'Glucides', value: plan.macroSummary.totalCarbs, unit: 'g', color: '#f59e0b' },
-                { label: language === 'en' ? 'Fat' : language === 'ar' ? 'دهون' : 'Lipides', value: plan.macroSummary.totalFat, unit: 'g', color: '#ec4899' },
-              ].map((macro, idx) => (
-                <View key={idx} style={[styles.macroBox, { backgroundColor: macro.color + '22' }]}>
-                  <Text style={[styles.macroValue, { color: macro.color }]}>{macro.value}{macro.unit}</Text>
-                  <Text style={[styles.macroLabel, { color: macro.color }]}>{macro.label}</Text>
-                </View>
-              ))}
-            </View>
-          )}
 
           {/* Meals List */}
           <View style={styles.mealsList}>
             {(plan.meals || []).map((meal: any, idx: number) => {
               const isExpanded = expandedMeal === idx;
-              const bgColor = MEAL_TYPE_COLORS[meal.mealType]?.[0] || '#9ca3af';
+              const iconTint = isDarkMode ? 'rgba(124,58,237,0.15)' : 'rgba(124,58,237,0.08)';
 
               return (
                 <View key={idx} style={[styles.mealCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
@@ -251,7 +409,7 @@ export default function MealPlanGenerator() {
                     onPress={() => setExpandedMeal(isExpanded ? null : idx)}
                   >
                     <View style={styles.mealHeaderLeft}>
-                      <View style={[styles.mealIconBox, { backgroundColor: bgColor }]}>
+                      <View style={[styles.mealIconBox, { backgroundColor: iconTint }]}>
                         <Text style={{ fontSize: 20 }}>{MEAL_TYPE_ICONS[meal.mealType] || '🍽️'}</Text>
                       </View>
                       <View style={{ flex: 1, marginLeft: 12 }}>
@@ -279,18 +437,16 @@ export default function MealPlanGenerator() {
                       
                       {/* Macros */}
                       <View style={styles.mealMacros}>
-                        <View style={[styles.mealMacroBox, { backgroundColor: theme.background }]}>
-                          <Text style={[styles.mealMacroVal, { color: '#3b82f6' }]}>{meal.protein_g || 0}g</Text>
-                          <Text style={[styles.mealMacroLbl, { color: theme.muted }]}>{language === 'en' ? 'PRO' : 'PRO'}</Text>
-                        </View>
-                        <View style={[styles.mealMacroBox, { backgroundColor: theme.background }]}>
-                          <Text style={[styles.mealMacroVal, { color: '#f59e0b' }]}>{meal.carbs_g || 0}g</Text>
-                          <Text style={[styles.mealMacroLbl, { color: theme.muted }]}>{language === 'en' ? 'CARB' : 'GLU'}</Text>
-                        </View>
-                        <View style={[styles.mealMacroBox, { backgroundColor: theme.background }]}>
-                          <Text style={[styles.mealMacroVal, { color: '#ec4899' }]}>{meal.fat_g || 0}g</Text>
-                          <Text style={[styles.mealMacroLbl, { color: theme.muted }]}>{language === 'en' ? 'FAT' : 'LIP'}</Text>
-                        </View>
+                        {[
+                          { label: language === 'en' ? 'PRO' : 'PRO', value: meal.protein_g || 0, tint: isDarkMode ? 'rgba(59,130,246,0.12)' : 'rgba(59,130,246,0.08)', text: '#3b82f6' },
+                          { label: language === 'en' ? 'CARB' : 'GLU', value: meal.carbs_g || 0, tint: isDarkMode ? 'rgba(245,158,11,0.12)' : 'rgba(245,158,11,0.08)', text: '#d97706' },
+                          { label: language === 'en' ? 'FAT' : 'LIP', value: meal.fat_g || 0, tint: isDarkMode ? 'rgba(236,72,153,0.12)' : 'rgba(236,72,153,0.08)', text: '#db2777' },
+                        ].map((m, i) => (
+                          <View key={i} style={[styles.mealMacroBox, { backgroundColor: m.tint }]}>
+                            <Text style={[styles.mealMacroVal, { color: m.text }]}>{m.value}g</Text>
+                            <Text style={[styles.mealMacroLbl, { color: m.text, opacity: 0.7 }]}>{m.label}</Text>
+                          </View>
+                        ))}
                       </View>
 
                       {/* Prep Time */}
@@ -308,8 +464,8 @@ export default function MealPlanGenerator() {
                           </Text>
                           <View style={styles.wrapContainer}>
                             {meal.ingredients.map((ing: string, i: number) => (
-                              <View key={i} style={[styles.ingBadge, { backgroundColor: theme.background }]}>
-                                <Text style={[styles.ingBadgeText, { color: theme.text }]}>{ing}</Text>
+                              <View key={i} style={[styles.ingBadge, { backgroundColor: isDarkMode ? 'rgba(124,58,237,0.12)' : 'rgba(124,58,237,0.08)' }]}>
+                                <Text style={[styles.ingBadgeText, { color: Colors.brand.primary }]}>{ing}</Text>
                               </View>
                             ))}
                           </View>
@@ -325,6 +481,32 @@ export default function MealPlanGenerator() {
                           <Text style={[styles.recipeText, { color: theme.text }]}>{meal.recipe}</Text>
                         </View>
                       )}
+
+                      {/* Save Button */}
+                      <TouchableOpacity
+                        onPress={() => handleSaveMealFromPlan(meal, idx)}
+                        disabled={savingMealIndex === idx || savedMealIndices.has(idx)}
+                        style={[
+                          styles.saveButton,
+                          {
+                            backgroundColor: savedMealIndices.has(idx)
+                              ? '#10b981'
+                              : savingMealIndex === idx
+                              ? theme.border
+                              : Colors.brand.primary,
+                          },
+                        ]}
+                      >
+                        {savingMealIndex === idx ? (
+                          <ActivityIndicator color="#fff" size="small" />
+                        ) : (
+                          <Text style={styles.saveButtonText}>
+                            {savedMealIndices.has(idx)
+                              ? (language === 'en' ? '✓ Saved' : language === 'ar' ? '✓ تم الحفظ' : '✓ Enregistré')
+                              : (language === 'en' ? '💾 Save to Log' : language === 'ar' ? '💾 حفظ في السجل' : '💾 Enregistrer dans le journal')}
+                          </Text>
+                        )}
+                      </TouchableOpacity>
                     </View>
                   )}
                 </View>
@@ -361,14 +543,14 @@ const styles = StyleSheet.create({
   addButton: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   generateButton: { padding: 16, borderRadius: 12, alignItems: 'center' },
   generateButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  errorBox: { marginTop: 15, padding: 12, backgroundColor: '#fef2f2', borderRadius: 12, borderWidth: 1, borderColor: '#fca5a5' },
-  errorText: { color: '#dc2626', fontWeight: 'bold', fontSize: 13 },
+  errorBox: { marginTop: 15, padding: 12, borderRadius: 12, borderWidth: 1 },
+  errorText: { fontWeight: 'bold', fontSize: 13 },
   planContainer: { marginBottom: 20 },
-  planHeader: { padding: 20, borderRadius: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  planTitle: { fontSize: 24, fontWeight: '900', color: '#fff' },
-  planSubtitle: { fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 4 },
-  planCalories: { fontSize: 28, fontWeight: '900', color: '#fff' },
-  planCaloriesUnit: { fontSize: 10, fontWeight: 'bold', color: 'rgba(255,255,255,0.8)', letterSpacing: 1 },
+  planHeaderCard: { padding: 20, borderRadius: 20, borderWidth: 1, borderTopWidth: 3, marginBottom: 15 },
+  planTitle: { fontSize: 22, fontWeight: '900' },
+  planSubtitle: { fontSize: 12, marginTop: 4 },
+  planCalories: { fontSize: 28, fontWeight: '900' },
+  planCaloriesUnit: { fontSize: 10, fontWeight: 'bold', letterSpacing: 1 },
   macroRow: { flexDirection: 'row', gap: 10, marginTop: 15, marginBottom: 15 },
   macroBox: { flex: 1, padding: 12, borderRadius: 16, alignItems: 'center' },
   macroValue: { fontSize: 20, fontWeight: '900' },
@@ -393,4 +575,10 @@ const styles = StyleSheet.create({
   ingBadgeText: { fontSize: 12, fontWeight: '500' },
   recipeBox: { padding: 15, borderRadius: 12, marginTop: 15 },
   recipeText: { fontSize: 14, lineHeight: 22 },
+  saveButton: { padding: 14, borderRadius: 12, alignItems: 'center', marginTop: 15 },
+  saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
+  pinButton: { padding: 12, borderRadius: 12, alignItems: 'center', marginTop: 15 },
+  pinButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
+  actionButton: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 12, alignItems: 'center' },
+  actionButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
 });

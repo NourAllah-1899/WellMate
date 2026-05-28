@@ -77,7 +77,10 @@
     "breakdown": "DÉTAILS:",
     "today": "Aujourd'hui",
     "noMeals": "Aucun repas enregistré aujourd'hui.",
-    "history": "Historique (30 jours)"
+    "history": "Historique (30 jours)",
+    "protein": "Protéines",
+    "carbs": "Glucides",
+    "fat": "Lipides"
   },
   "goals": {
     "title": "Objectif de Poids",

@@ -7,6 +7,9 @@ Return ONLY valid JSON. No markdown.
 JSON schema:
 {
   "totalCalories": number,
+  "protein_g": number,
+  "carbs_g": number,
+  "fat_g": number,
   "items": [
     { "name": string, "quantity": string, "calories": number }
   ],
@@ -15,12 +18,16 @@ JSON schema:
 
 Rules:
 - totalCalories must be a positive number.
+- protein_g, carbs_g, fat_g must be non-negative numbers (estimates are acceptable).
 - If uncertain, make reasonable assumptions.
 `;
 
 const normalizeMealEstimate = (raw) => {
     const out = {
         totalCalories: 0,
+        protein_g: 0,
+        carbs_g: 0,
+        fat_g: 0,
         items: [],
         assumptions: '',
     };
@@ -42,6 +49,15 @@ const normalizeMealEstimate = (raw) => {
         }
 
         if (typeof raw.assumptions === 'string') out.assumptions = raw.assumptions.trim();
+
+        const protein = Number(raw.protein_g);
+        if (Number.isFinite(protein) && protein >= 0) out.protein_g = Math.round(protein);
+
+        const carbs = Number(raw.carbs_g);
+        if (Number.isFinite(carbs) && carbs >= 0) out.carbs_g = Math.round(carbs);
+
+        const fat = Number(raw.fat_g);
+        if (Number.isFinite(fat) && fat >= 0) out.fat_g = Math.round(fat);
     }
 
     if (!out.totalCalories) {
@@ -402,5 +418,76 @@ Return JSON only following the schema.`;
     } catch (err) {
         console.error('[Meal Plan] error:', err);
         res.status(500).json({ success: false, message: 'Failed to generate meal plan.' });
+    }
+};
+
+// POST /api/meals/save-plan (protected) — Persist a generated meal plan for the day
+export const saveMealPlan = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+        const { plan } = req.body;
+
+        if (!plan || typeof plan !== 'object') {
+            return res.status(400).json({ success: false, message: 'plan object is required.' });
+        }
+
+        const planJson = JSON.stringify(plan);
+
+        await pool.query(
+            'INSERT INTO meal_plans (user_id, plan_json) VALUES (?, ?)',
+            [userId, planJson]
+        );
+
+        console.log(`[Save Meal Plan] Plan saved for user ${userId}`);
+        res.status(201).json({ success: true, message: 'Meal plan pinned.' });
+    } catch (err) {
+        console.error('[Save Meal Plan] error:', err);
+        res.status(500).json({ success: false, message: 'Failed to save meal plan.' });
+    }
+};
+
+// GET /api/meals/plan/today (protected) — Retrieve today's pinned meal plan
+export const getTodayMealPlan = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+
+        const [rows] = await pool.query(
+            'SELECT id, plan_json, created_at FROM meal_plans WHERE user_id = ? AND DATE(created_at) = CURDATE() ORDER BY created_at DESC LIMIT 1',
+            [userId]
+        );
+
+        if (!rows || rows.length === 0) {
+            return res.json({ success: true, plan: null });
+        }
+
+        let plan = null;
+        try {
+            plan = JSON.parse(rows[0].plan_json);
+        } catch (parseErr) {
+            console.error('[Get Today Meal Plan] JSON parse error:', parseErr);
+        }
+
+        res.json({ success: true, plan });
+    } catch (err) {
+        console.error('[Get Today Meal Plan] error:', err);
+        res.status(500).json({ success: false, message: 'Failed to fetch meal plan.' });
+    }
+};
+
+// DELETE /api/meals/plan/today (protected) — Unpin today's meal plan
+export const unpinMealPlan = async (req, res) => {
+    try {
+        const userId = req.user.user_id;
+
+        const [result] = await pool.query(
+            'DELETE FROM meal_plans WHERE user_id = ? AND DATE(created_at) = CURDATE()',
+            [userId]
+        );
+
+        console.log(`[Unpin Meal Plan] Deleted ${result.affectedRows} row(s) for user ${userId}`);
+        res.json({ success: true, message: 'Meal plan unpinned.' });
+    } catch (err) {
+        console.error('[Unpin Meal Plan] error:', err);
+        res.status(500).json({ success: false, message: 'Failed to unpin meal plan.' });
     }
 };

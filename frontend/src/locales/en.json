@@ -201,7 +201,10 @@
     "today": "Today",
     "working": "Working…",
     "noMeals": "No meals recorded yet.",
-    "history": "History (30 days)"
+    "history": "History (30 days)",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat"
   },
   "dashboard": {
     "welcome": "Welcome back",

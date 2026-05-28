@@ -33,7 +33,7 @@ export const getNutritionSummary = async (req, res) => {
 
         // 3. Calculate remaining and percentage
         const caloriesRemaining = calorieGoal > 0 ? Math.max(0, calorieGoal - caloriesConsumedToday) : 0;
-        const progressPercentage = calorieGoal > 0 ? Math.min(100, Math.round((caloriesConsumedToday / calorieGoal) * 100)) : 0;
+        const progressPercentage = calorieGoal > 0 ? Math.round((caloriesConsumedToday / calorieGoal) * 100) : 0;
 
         res.json({
             success: true,

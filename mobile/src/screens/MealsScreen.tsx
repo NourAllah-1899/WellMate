@@ -23,6 +23,7 @@ export default function MealsScreen() {
 
   const [historyMeals, setHistoryMeals] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'log' | 'plan'>('log');
+  const [editingMealId, setEditingMealId] = useState<number | null>(null);
 
   const fetchTodayMeals = async () => {
     try {
@@ -78,7 +79,12 @@ export default function MealsScreen() {
         eatenAt: new Date().toISOString()
       };
 
-      await apiClient.post('/meals', payload);
+      if (editingMealId) {
+        await apiClient.put(`/meals/${editingMealId}`, payload);
+        setEditingMealId(null);
+      } else {
+        await apiClient.post('/meals', payload);
+      }
 
       setDescription('');
       setEstimate(null);
@@ -90,6 +96,40 @@ export default function MealsScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditMeal = (meal: any) => {
+    setEditingMealId(meal.id);
+    setDescription(meal.description);
+    setEstimate(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMealId(null);
+    setDescription('');
+    setEstimate(null);
+  };
+
+  const handleDeleteMeal = (id: number) => {
+    Alert.alert(
+      t('common.confirm') || 'Confirmer',
+      t('meals.confirmDelete') || 'Voulez-vous vraiment supprimer ce repas ?',
+      [
+        { text: t('common.cancel') || 'Annuler', style: 'cancel' },
+        {
+          text: t('common.delete') || 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await apiClient.delete(`/meals/${id}`);
+              fetchTodayMeals();
+            } catch (error: any) {
+              Alert.alert(t('common.error'), 'Impossible de supprimer ce repas.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   const renderBreakdown = (breakdownJson: any) => {
@@ -149,7 +189,7 @@ export default function MealsScreen() {
           <>
             {/* Ajouter un repas */}
             <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-              <Text style={[styles.cardTitle, { color: theme.text }]}>🍽️ {t('meals.addMeal')}</Text>
+              <Text style={[styles.cardTitle, { color: theme.text }]}>{editingMealId ? '✏️ Modifier le repas' : '🍽️ ' + t('meals.addMeal')}</Text>
           <TextInput
             style={[styles.input, { backgroundColor: theme.background, color: theme.text, borderColor: theme.border }]}
             placeholder={t('meals.placeholder')}
@@ -164,17 +204,31 @@ export default function MealsScreen() {
             <View style={[styles.estimateBox, { backgroundColor: theme.background, borderColor: Colors.brand.accent }]}>
               <Text style={[styles.estimateTitle, { color: Colors.brand.accent }]}>{t('meals.estimatedCalories')}</Text>
               <Text style={[styles.estimateValue, { color: theme.text }]}>{estimate.totalCalories} kcal</Text>
+              {(estimate.protein_g || estimate.carbs_g || estimate.fat_g) ? (
+                <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+                  {[
+                    { label: t('meals.protein'), value: estimate.protein_g || 0, tint: isDarkMode ? 'rgba(59,130,246,0.12)' : 'rgba(59,130,246,0.08)', text: '#3b82f6' },
+                    { label: t('meals.carbs'), value: estimate.carbs_g || 0, tint: isDarkMode ? 'rgba(245,158,11,0.12)' : 'rgba(245,158,11,0.08)', text: '#d97706' },
+                    { label: t('meals.fat'), value: estimate.fat_g || 0, tint: isDarkMode ? 'rgba(236,72,153,0.12)' : 'rgba(236,72,153,0.08)', text: '#db2777' },
+                  ].map((m, i) => (
+                    <View key={i} style={{ flex: 1, padding: 8, borderRadius: 10, alignItems: 'center', backgroundColor: m.tint }}>
+                      <Text style={{ fontSize: 14, fontWeight: '900', color: m.text }}>{m.value}g</Text>
+                      <Text style={{ fontSize: 9, fontWeight: 'bold', color: m.text, opacity: 0.7 }}>{m.label}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
               {renderBreakdown(estimate)}
             </View>
           )}
 
           <View style={styles.buttonRow}>
             <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: 'transparent', borderWidth: 1, borderColor: Colors.brand.accent }]}
+              style={[styles.actionButton, { backgroundColor: isDarkMode ? 'rgba(124,58,237,0.15)' : 'rgba(124,58,237,0.08)', borderWidth: 1, borderColor: Colors.brand.accent }]}
               onPress={handleEstimate}
               disabled={loading}
             >
-              <Text style={[styles.actionButtonText, { color: Colors.brand.accent }]}>{t('meals.estimate')}</Text>
+              <Text style={[styles.actionButtonText, { color: Colors.brand.accent }]}>⚡ {t('meals.estimate')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -182,9 +236,14 @@ export default function MealsScreen() {
               onPress={handleSaveMeal}
               disabled={loading}
             >
-              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.actionButtonText}>{t('meals.save')}</Text>}
+              {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.actionButtonText}>{editingMealId ? '💾 ' + (t('meals.update') || 'Mettre à jour') : '💾 ' + t('meals.save')}</Text>}
             </TouchableOpacity>
           </View>
+          {editingMealId && (
+            <TouchableOpacity onPress={handleCancelEdit} style={{ marginTop: 10, alignSelf: 'center' }}>
+              <Text style={{ color: theme.muted, fontWeight: 'bold' }}>❌ {t('common.cancel') || 'Annuler'}</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Aujourd'hui Summary */}
@@ -205,7 +264,7 @@ export default function MealsScreen() {
             <Text style={[styles.emptyText, { color: theme.muted }]}>{t('meals.noMeals')}</Text>
           ) : (
             meals.map((meal) => (
-              <View key={meal.id} style={[styles.mealCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
+              <View key={meal.id} style={[styles.mealCard, { backgroundColor: theme.card, borderColor: theme.border, borderLeftWidth: 3, borderLeftColor: Colors.brand.accent }]}>
                 <View style={styles.mealHeader}>
                   <View style={styles.mealInfo}>
                     <Text style={[styles.mealDescription, { color: theme.text }]}>{meal.description}</Text>
@@ -213,7 +272,19 @@ export default function MealsScreen() {
                       {new Date(meal.eaten_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </Text>
                   </View>
-                  <Text style={[styles.mealCalories, { color: Colors.brand.accent }]}>{meal.estimated_calories} kcal</Text>
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <View style={[styles.calBadge, { backgroundColor: isDarkMode ? 'rgba(124,58,237,0.15)' : 'rgba(124,58,237,0.08)' }]}>
+                      <Text style={[styles.mealCalories, { color: Colors.brand.accent }]}>{meal.estimated_calories} kcal</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 6, marginTop: 8 }}>
+                      <TouchableOpacity onPress={() => handleEditMeal(meal)} style={[styles.textBtn, { backgroundColor: theme.background, borderColor: theme.border }]}>
+                        <Text style={{ color: Colors.brand.accent, fontWeight: 'bold', fontSize: 12 }}>Edit</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => handleDeleteMeal(meal.id)} style={[styles.textBtn, { backgroundColor: isDarkMode ? 'rgba(239,68,68,0.12)' : 'rgba(239,68,68,0.06)', borderColor: isDarkMode ? 'rgba(239,68,68,0.25)' : 'rgba(239,68,68,0.2)' }]}>
+                        <Text style={{ color: '#ef4444', fontWeight: 'bold', fontSize: 12 }}>Delete</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
 
                 {meal.breakdown_json && (
@@ -233,7 +304,7 @@ export default function MealsScreen() {
             <Text style={[styles.summaryTitle, { color: theme.text, marginBottom: 15 }]}>{t('meals.history')}</Text>
             <View style={{ gap: 15 }}>
               {historyMeals.map((meal) => (
-                <View key={meal.id} style={[styles.mealCard, { backgroundColor: theme.card, borderColor: theme.border, opacity: 0.8 }]}>
+                <View key={meal.id} style={[styles.mealCard, { backgroundColor: theme.card, borderColor: theme.border, opacity: 0.85, borderLeftWidth: 3, borderLeftColor: Colors.brand.accent }]}>
                   <View style={styles.mealHeader}>
                     <View style={styles.mealInfo}>
                       <Text style={[styles.mealDescription, { color: theme.text }]}>{meal.description}</Text>
@@ -241,7 +312,11 @@ export default function MealsScreen() {
                         {new Date(meal.eaten_at).toLocaleDateString()}
                       </Text>
                     </View>
-                    <Text style={[styles.mealCalories, { color: Colors.brand.accent }]}>{meal.estimated_calories} kcal</Text>
+                    <View style={{ alignItems: 'flex-end' }}>
+                      <View style={[styles.calBadge, { backgroundColor: isDarkMode ? 'rgba(124,58,237,0.1)' : 'rgba(124,58,237,0.06)' }]}>
+                        <Text style={[styles.mealCalories, { color: Colors.brand.accent }]}>{meal.estimated_calories} kcal</Text>
+                      </View>
+                    </View>
                   </View>
                 </View>
               ))}
@@ -320,4 +395,7 @@ const styles = StyleSheet.create({
   assumptions: { fontSize: 11, fontStyle: 'italic', marginTop: 8 },
 
   emptyText: { fontStyle: 'italic', textAlign: 'center', marginTop: 20 },
+  calBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10 },
+  iconBtn: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  textBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
 });

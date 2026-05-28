@@ -168,6 +168,17 @@ CREATE TABLE IF NOT EXISTS event_participants (
     INDEX idx_user_id (user_id)
 );
 
+-- Meal plans table (persisted AI-generated daily plans)
+CREATE TABLE IF NOT EXISTS meal_plans (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    plan_json TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_id (user_id),
+    INDEX idx_created_at (created_at)
+);
+
 -- Water logs table
 CREATE TABLE IF NOT EXISTS water_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,

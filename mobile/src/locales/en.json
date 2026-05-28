@@ -77,7 +77,10 @@
     "breakdown": "DETAILS:",
     "today": "Today",
     "noMeals": "No meals recorded today.",
-    "history": "History (30 days)"
+    "history": "History (30 days)",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat"
   },
   "goals": {
     "title": "Weight Goal",
