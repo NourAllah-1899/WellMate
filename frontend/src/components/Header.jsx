@@ -149,9 +149,9 @@ export default function Header() {
 
           {/* Drawer Sidebar Panel */}
           <div 
-            className="fixed inset-y-0 right-0 w-[280px] h-full shadow-2xl z-[2000] p-6 flex flex-col justify-between transition-transform duration-300 transform translate-x-0"
+            className="fixed inset-y-0 right-0 w-[280px] h-full shadow-2xl z-[2000] p-6 flex flex-col justify-between transition-transform duration-300 transform translate-x-0 bg-white dark:bg-slate-900"
             style={{ 
-              backgroundColor: 'var(--bg-secondary)', 
+              backgroundColor: isDarkMode ? '#111827' : '#ffffff', 
               borderLeft: '1px solid var(--border-main)',
             }}
           >
