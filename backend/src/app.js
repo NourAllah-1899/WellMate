@@ -19,8 +19,14 @@ import adminRouter from './routes/admin.route.js';
 const app = express();
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://wellmate-eta.vercel.app',
+    process.env.CLIENT_ORIGIN
+].filter(Boolean);
+
 app.use(cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    origin: allowedOrigins,
     credentials: true,
 }));
 
