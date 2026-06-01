@@ -184,8 +184,7 @@
   }
 
   .wm-topbar-inner {
-    @apply max-w-[1100px] mx-auto px-4 py-3.5 grid gap-4 items-center;
-    grid-template-columns: 1fr 2fr 1.2fr;
+    @apply max-w-[1100px] mx-auto px-4 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4;
   }
 
   .wm-main {

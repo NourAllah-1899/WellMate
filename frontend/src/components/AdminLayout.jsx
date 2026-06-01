@@ -50,19 +50,19 @@ export default function AdminLayout({ children }) {
             </Link>
           </div>
 
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-2 sm:gap-6">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-3 py-2 rounded-xl text-sm font-bold transition-all duration-200 no-underline flex items-center gap-1.5 ${
+                className={`px-2 py-1.5 sm:px-3 sm:py-2 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 no-underline flex items-center gap-1.5 ${
                   isActive(item.path)
                     ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
                     : 'hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
                 style={{ color: isActive(item.path) ? undefined : 'var(--text-secondary)' }}
               >
-                <span className="hidden sm:inline">{item.label}</span>
+                <span>{item.label}</span>
               </Link>
             ))}
           </nav>
