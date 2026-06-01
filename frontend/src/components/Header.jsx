@@ -37,12 +37,12 @@ export default function Header() {
   return (
     <header className="wm-topbar">
       <div className="wm-topbar-inner">
-        <NavLink to="/" className="wm-brand" aria-label="WellMate Home">
+        <NavLink to={me ? '/' : '/accueil'} className="wm-brand" aria-label="WellMate Home">
           <img key={isDarkMode ? 'dark' : 'light'} className="wm-logo" src={isDarkMode ? logoDark : logoLight} alt="WellMate" />
         </NavLink>
 
         <nav className="hidden md:flex wm-nav-center" aria-label="Main navigation">
-          <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/">{t('common.home')}</NavLink>
+          <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to={me ? '/' : '/accueil'}>{t('common.home')}</NavLink>
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/health">{t('common.health')}</NavLink>
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/physical-activity">{t('common.physicalActivity')}</NavLink>
           <NavLink className={({ isActive }) => `wm-nav-link ${isActive ? 'is-active' : ''}`} to="/events">{t('common.events')}</NavLink>
