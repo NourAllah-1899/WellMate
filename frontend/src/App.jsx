@@ -12,6 +12,7 @@ import Contact from './pages/Contact.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Goals from './pages/Goals.jsx'
 import Meals from './pages/Meals.jsx'
+import Accueil from './pages/Accueil.jsx'
 import Layout from './components/Layout.jsx'
 
 import ProtectedRoute from './components/ProtectedRoute.jsx'
@@ -25,6 +26,7 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
+      <Route path="/accueil" element={<Layout><Accueil /></Layout>} />
       <Route path="/health" element={<ProtectedRoute><Layout><Health /></Layout></ProtectedRoute>} />
       <Route path="/goals" element={<ProtectedRoute><Layout><Goals /></Layout></ProtectedRoute>} />
       <Route path="/meals" element={<ProtectedRoute><Layout><Meals /></Layout></ProtectedRoute>} />
