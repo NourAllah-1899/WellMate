@@ -178,7 +178,7 @@
 
   /* Topbar */
   .wm-topbar {
-    @apply relative z-50 backdrop-blur-md transition-colors duration-300;
+    @apply relative z-[9999] backdrop-blur-md transition-colors duration-300;
     background-color: color-mix(in srgb, var(--bg-main) 75%, transparent);
     border-bottom: 1px solid var(--border-main);
   }

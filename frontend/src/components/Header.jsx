@@ -180,7 +180,7 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                   style={({ isActive }) => ({ color: isActive ? undefined : 'var(--text-secondary)' })}
                 >
-                  🏠 {t('common.home')}
+                  {t('common.home')}
                 </NavLink>
                 <NavLink 
                   className={({ isActive }) => `px-4 py-3 rounded-xl font-bold transition-all text-base no-underline ${isActive ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`} 
@@ -188,7 +188,7 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                   style={({ isActive }) => ({ color: isActive ? undefined : 'var(--text-secondary)' })}
                 >
-                  ❤️ {t('common.health')}
+                  {t('common.health')}
                 </NavLink>
                 <NavLink 
                   className={({ isActive }) => `px-4 py-3 rounded-xl font-bold transition-all text-base no-underline ${isActive ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`} 
@@ -196,7 +196,7 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                   style={({ isActive }) => ({ color: isActive ? undefined : 'var(--text-secondary)' })}
                 >
-                  🏃 {t('common.physicalActivity')}
+                  {t('common.physicalActivity')}
                 </NavLink>
                 <NavLink 
                   className={({ isActive }) => `px-4 py-3 rounded-xl font-bold transition-all text-base no-underline ${isActive ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`} 
@@ -204,7 +204,7 @@ export default function Header() {
                   onClick={() => setMobileMenuOpen(false)}
                   style={({ isActive }) => ({ color: isActive ? undefined : 'var(--text-secondary)' })}
                 >
-                  📅 {t('common.events')}
+                  {t('common.events')}
                 </NavLink>
               </nav>
             </div>
@@ -233,7 +233,7 @@ export default function Header() {
                         navigate('/admin')
                       }}
                     >
-                      🛡️ Espace Admin
+                      Espace Admin
                     </button>
                   )}
 
@@ -246,7 +246,7 @@ export default function Header() {
                       navigate('/profile')
                     }}
                   >
-                    👤 {t('header.myProfile')}
+                    {t('header.myProfile')}
                   </button>
 
                   <button
@@ -258,7 +258,7 @@ export default function Header() {
                       navigate('/login')
                     }}
                   >
-                    🚪 {t('header.logout')}
+                    {t('header.logout')}
                   </button>
                 </div>
               ) : (
