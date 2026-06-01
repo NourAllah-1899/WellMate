@@ -4,6 +4,7 @@ import { TouchableOpacity, Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import LoginScreen from '../screens/Login';
 import RegisterScreen from '../screens/Register';
+import AccueilScreen from '../screens/Accueil';
 import MainTabNavigator from './MainTabNavigator';
 import AdminTabNavigator from './AdminTabNavigator';
 import MealsScreen from '../screens/MealsScreen';
@@ -26,7 +27,7 @@ export default function AppNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName="Login"
+      initialRouteName="Accueil"
       screenOptions={{
         headerStyle: { backgroundColor: theme.card },
         headerTintColor: theme.text,
@@ -37,6 +38,11 @@ export default function AppNavigator() {
         headerRightContainerStyle: { paddingRight: 10 },
       }}
     >
+      <Stack.Screen 
+        name="Accueil" 
+        component={AccueilScreen} 
+        options={{ headerShown: false }} 
+      />
       <Stack.Screen 
         name="Login" 
         component={LoginScreen} 
