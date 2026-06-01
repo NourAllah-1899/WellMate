@@ -8,9 +8,9 @@ const ALLERGY_OPTIONS = [
   { id: 'nuts', label: '🥜 Noix', labelEn: '🥜 Nuts', labelAr: '🥜 مكسرات' },
   { id: 'eggs', label: '🥚 Œufs', labelEn: '🥚 Eggs', labelAr: '🥚 بيض' },
   { id: 'seafood', label: '🦐 Fruits de mer', labelEn: '🦐 Seafood', labelAr: '🦐 مأكولات بحرية' },
-  { id: 'soy', label: '🫘 Soja', labelEn: '🫘 Soy', labelAr: '🫘 صويا' },
+  { id: 'soy', label: '🌱 Soja', labelEn: '🌱 Soy', labelAr: '🌱 صويا' },
   { id: 'vegetarian', label: '🥬 Végétarien', labelEn: '🥬 Vegetarian', labelAr: '🥬 نباتي' },
-  { id: 'vegan', label: '🌱 Végan', labelEn: '🌱 Vegan', labelAr: '🌱 نباتي صرف' },
+  { id: 'vegan', label: '� Végan', labelEn: '� Vegan', labelAr: '� نباتي صرف' },
 ];
 
 const GOAL_OPTIONS = [

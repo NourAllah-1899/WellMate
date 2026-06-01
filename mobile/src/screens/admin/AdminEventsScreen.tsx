@@ -87,7 +87,7 @@ export default function AdminEventsScreen({ navigation }: any) {
             {item.activity_type} · {new Date(item.date).toLocaleDateString()}
           </Text>
           <Text style={[styles.eventSub, { color: theme.muted }]} numberOfLines={1}>
-            👤 {item.organizer || item.username || '—'}
+            👤 {item.creator_username || '—'}
           </Text>
         </View>
       </View>

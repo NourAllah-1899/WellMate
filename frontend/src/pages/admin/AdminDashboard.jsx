@@ -97,9 +97,9 @@ export default function AdminDashboard() {
                 <div key={user.id} className="flex items-center justify-between p-3 rounded-xl border transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50"
                      style={{ borderColor: 'var(--border-main)' }}>
                   <div className="flex items-center gap-3">
-                    <div className="wm-avatar text-xs">{user.username?.charAt(0)?.toUpperCase()}</div>
+                    <div className="wm-avatar text-xs">{(user.full_name || user.username)?.charAt(0)?.toUpperCase()}</div>
                     <div>
-                      <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{user.username}</p>
+                      <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{user.full_name || user.username}</p>
                       <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{user.email}</p>
                     </div>
                   </div>

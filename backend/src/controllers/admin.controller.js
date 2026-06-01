@@ -560,7 +560,7 @@ export const getAllEvents = async (req, res) => {
 
         const [events] = await pool.query(
 
-            `SELECT e.*, u.username as creator_username, u.email as creator_email,
+            `SELECT e.*, COALESCE(u.full_name, u.username) as creator_username, u.email as creator_email,
 
                     (SELECT COUNT(*) FROM event_participants WHERE event_id = e.id) as participant_count
 
@@ -632,7 +632,7 @@ export const getEventById = async (req, res) => {
 
         const [events] = await pool.query(
 
-            `SELECT e.*, u.username as creator_username, u.email as creator_email
+            `SELECT e.*, COALESCE(u.full_name, u.username) as creator_username, u.email as creator_email
 
              FROM events e
 

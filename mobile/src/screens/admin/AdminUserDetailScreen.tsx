@@ -26,7 +26,7 @@ export default function AdminUserDetailScreen({ route, navigation }: any) {
   }, [userId]);
 
   const handleDelete = () => {
-    const username = data?.user?.username || '';
+    const username = data?.user?.full_name || data?.user?.username || '';
     Alert.alert(
       language === 'en' ? 'Delete User' : "Supprimer l'utilisateur",
       language === 'en'
@@ -94,9 +94,9 @@ export default function AdminUserDetailScreen({ route, navigation }: any) {
         {/* Avatar + Name */}
         <View style={styles.profileHeader}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{user.username?.charAt(0)?.toUpperCase()}</Text>
+            <Text style={styles.avatarText}>{(user.full_name || user.username)?.charAt(0)?.toUpperCase()}</Text>
           </View>
-          <Text style={[styles.username, { color: theme.text }]}>{user.username}</Text>
+          <Text style={[styles.username, { color: theme.text }]}>{user.full_name || user.username}</Text>
           <Text style={[styles.emailLabel, { color: theme.muted }]}>{user.email}</Text>
         </View>
 

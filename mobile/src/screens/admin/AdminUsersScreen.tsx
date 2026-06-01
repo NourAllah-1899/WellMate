@@ -67,17 +67,17 @@ export default function AdminUsersScreen({ navigation }: any) {
     >
       <View style={styles.userInfo}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{item.username?.charAt(0)?.toUpperCase()}</Text>
+          <Text style={styles.avatarText}>{(item.full_name || item.username)?.charAt(0)?.toUpperCase()}</Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={[styles.username, { color: theme.text }]}>{item.username}</Text>
+          <Text style={[styles.username, { color: theme.text }]}>{item.full_name || item.username}</Text>
           <Text style={[styles.email, { color: theme.muted }]}>{item.email}</Text>
         </View>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <TouchableOpacity 
           style={styles.deleteBtn}
-          onPress={() => handleDelete(item.id, item.username)}
+          onPress={() => handleDelete(item.id, item.full_name || item.username)}
         >
           <Feather name="trash-2" size={18} color="#ef4444" />
         </TouchableOpacity>

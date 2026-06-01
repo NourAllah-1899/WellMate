@@ -463,9 +463,9 @@
 
     "eventsTitle": "Gestion des Événements",
     "eventsCount": "{count} événement(s) au total",
-    "searchEvents": "Rechercher par titre, description ou créateur...",
+    "searchEvents": "Rechercher par titre, description ou organisateur...",
     "colEvent": "Événement",
-    "colCreator": "Créateur",
+    "colCreator": "Organisateur",
     "colDate": "Date",
     "colLocation": "Lieu",
     "colParticipants": "Participants",

@@ -141,7 +141,7 @@ export default function AdminEvents() {
       <div className="wm-card">
         <input
           type="text"
-          placeholder={t('admin.searchEvents', 'Rechercher par titre, description ou créateur...')}
+          placeholder={t('admin.searchEvents', 'Rechercher par titre, description ou organisateur...')}
           className="wm-input !mt-0"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -165,7 +165,7 @@ export default function AdminEvents() {
               <thead>
                 <tr className="border-b" style={{ borderColor: 'var(--border-main)', backgroundColor: 'var(--bg-secondary)' }}>
                   <th className="text-left px-4 py-3 font-black text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('admin.colEvent', 'Événement')}</th>
-                  <th className="text-left px-4 py-3 font-black text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('admin.colCreator', 'Créateur')}</th>
+                  <th className="text-left px-4 py-3 font-black text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('admin.colCreator', 'Organisateur')}</th>
                   <th className="text-left px-4 py-3 font-black text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('admin.colDate', 'Date')}</th>
                   <th className="text-left px-4 py-3 font-black text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('admin.colLocation', 'Lieu')}</th>
                   <th className="text-center px-4 py-3 font-black text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{t('admin.colParticipants', 'Participants')}</th>
@@ -302,7 +302,7 @@ export default function AdminEvents() {
                   <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>📍 {viewingEvent.location || 'N/A'}</p>
                 </div>
                 <div className="p-3 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-main)' }}>
-                  <p className="text-[10px] font-black uppercase" style={{ color: 'var(--text-muted)' }}>{t('admin.colCreator', 'Créateur')}</p>
+                  <p className="text-[10px] font-black uppercase" style={{ color: 'var(--text-muted)' }}>{t('admin.colCreator', 'Organisateur')}</p>
                   <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{viewingEvent.creator_username || t('admin.unknownCreator', 'Inconnu')}</p>
                 </div>
               </div>

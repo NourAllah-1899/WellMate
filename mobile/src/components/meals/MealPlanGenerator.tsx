@@ -12,9 +12,9 @@ const ALLERGY_OPTIONS = [
   { id: 'nuts', label: '🥜 Noix', labelEn: '🥜 Nuts', labelAr: '🥜 مكسرات' },
   { id: 'eggs', label: '🥚 Œufs', labelEn: '🥚 Eggs', labelAr: '🥚 بيض' },
   { id: 'seafood', label: '🦐 Fruits de mer', labelEn: '🦐 Seafood', labelAr: '🦐 مأكولات بحرية' },
-  { id: 'soy', label: '🫘 Soja', labelEn: '🫘 Soy', labelAr: '🫘 صويا' },
+  { id: 'soy', label: '🌱 Soja', labelEn: '🌱 Soy', labelAr: '🌱 صويا' },
   { id: 'vegetarian', label: '🥬 Végétarien', labelEn: '🥬 Vegetarian', labelAr: '🥬 نباتي' },
-  { id: 'vegan', label: '🌱 Végan', labelEn: '🌱 Vegan', labelAr: '🌱 نباتي صرف' },
+  { id: 'vegan', label: '� Végan', labelEn: '� Vegan', labelAr: '� نباتي صرف' },
 ];
 
 const GOAL_OPTIONS = [
@@ -532,8 +532,8 @@ const styles = StyleSheet.create({
   card: { padding: 20, borderRadius: 20, borderWidth: 1, marginBottom: 20 },
   cardTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20 },
   sectionTitle: { fontSize: 10, fontWeight: '900', letterSpacing: 1, marginBottom: 10 },
-  gridContainer: { flexDirection: 'row', gap: 10 },
-  gridButton: { flex: 1, paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center' },
+  gridContainer: { flexDirection: 'column', gap: 10 },
+  gridButton: { paddingVertical: 12, borderRadius: 12, borderWidth: 1, alignItems: 'center', width: '100%' },
   gridButtonText: { fontSize: 13, fontWeight: 'bold' },
   wrapContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chipButton: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1 },

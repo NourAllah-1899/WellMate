@@ -113,10 +113,9 @@ export default function AdminUsers() {
                   <tr key={user.id} className="border-b transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/30" style={{ borderColor: 'var(--border-main)' }}>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="wm-avatar text-xs">{user.username?.charAt(0)?.toUpperCase()}</div>
+                        <div className="wm-avatar text-xs">{(user.full_name || user.username)?.charAt(0)?.toUpperCase()}</div>
                         <div>
-                          <p className="font-bold" style={{ color: 'var(--text-primary)' }}>{user.username}</p>
-                          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{user.full_name || '—'}</p>
+                          <p className="font-bold" style={{ color: 'var(--text-primary)' }}>{user.full_name || user.username}</p>
                         </div>
                       </div>
                     </td>
@@ -127,7 +126,7 @@ export default function AdminUsers() {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          onClick={() => handleDelete(user.id, user.username)}
+                          onClick={() => handleDelete(user.id, user.full_name || user.username)}
                           disabled={actionLoading}
                           className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/40 transition-colors disabled:opacity-50"
                         >

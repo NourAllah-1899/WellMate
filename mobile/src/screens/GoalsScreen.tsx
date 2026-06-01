@@ -210,7 +210,7 @@ export default function GoalsScreen() {
               ? <ActivityIndicator color="#fff" />
               : <>
                   <Feather name="check-circle" size={16} color="#fff" style={{ marginRight: 8 }} />
-                  <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>{t('goals.saveGoal')}</Text>
+                  <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>{t('goals.confirm')}</Text>
                 </>
             }
           </TouchableOpacity>
@@ -228,7 +228,7 @@ export default function GoalsScreen() {
               ? <ActivityIndicator color={Colors.brand.action} />
               : <>
                   <Text style={[styles.buttonOutlineText, { color: Colors.brand.action, fontWeight: 'bold' }]}>
-                    {t('goals.getRecommendation')}
+                    {t('goals.calculate')}
                   </Text>
                 </>
             }

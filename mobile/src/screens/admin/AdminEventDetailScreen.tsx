@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   content: { padding: 20, paddingBottom: 40 },
   eventHeader: { alignItems: 'center', marginBottom: 24 },
   imageBanner: {
-    width: '100%', height: 160, borderRadius: 20,
+    width: '100%', height: 220, borderRadius: 20,
     overflow: 'hidden', marginBottom: 16,
   },
   bannerImg: { width: '100%', height: '100%' },
