@@ -614,7 +614,7 @@
     }
 
     .wm-footer-logo {
-      self-center: center;
+      @apply mx-auto;
     }
 
     .wm-footer-contact li {
