@@ -22,6 +22,30 @@
     "success": "Succès",
     "language": "Langue"
   },
+  "landing": {
+    "tag": "La communauté santé de Tunisie",
+    "title": "Prenez le contrôle de votre bien-être avec",
+    "subtitle": "Rejoignez la première plateforme tunisienne intelligente dédiée à la santé, la nutrition et le fitness communautaire. Repas IA, objectifs de poids personnalisés et événements sportifs collectifs.",
+    "getStarted": "Commencer",
+    "signIn": "Se connecter",
+    "featuresTitle": "Tout ce dont vous avez besoin au même endroit",
+    "featuresSubtitle": "Découvrez des fonctionnalités de pointe développées par des experts pour transformer votre mode de vie.",
+    "feature1Title": "Générateur de Repas IA",
+    "feature1Desc": "Obtenez des plans de repas sur mesure générés par l'IA Gemini. Adaptés à vos objectifs de poids, allergies alimentaires et ingrédients disponibles.",
+    "feature2Title": "Objectifs de Poids Précis",
+    "feature2Desc": "Définissez vos objectifs de perte, prise ou maintien de poids. Suivez vos pesées régulières avec des courbes de progression claires et des conseils d'entraînement.",
+    "feature3Title": "Événements & Communauté",
+    "feature3Desc": "Rejoignez des sessions de course à pied, yoga ou vélo en groupe en Tunisie. Rencontrez des passionnés de fitness près de chez vous.",
+    "feature4Title": "Hydratation Intelligente",
+    "feature4Desc": "Suivez votre consommation d'eau quotidienne et restez hydraté grâce à notre interface interactive et nos rappels de santé personnalisés.",
+    "feature5Title": "Suivi d'Arrêt du Tabac",
+    "feature5Desc": "Prenez soin de votre système cardiovasculaire en mesurant votre réduction de cigarettes et en visualisant l'argent économisé au fil du temps.",
+    "feature6Title": "Gamification & Récompenses",
+    "feature6Desc": "Maintenez une parfaite cohérence (séries) et débloquez des badges exclusifs en complétant vos tâches et entraînements quotidiens.",
+    "ctaTitle": "Prêt à transformer votre santé ?",
+    "ctaDesc": "Inscrivez-vous maintenant pour générer votre premier plan de repas IA et rejoignez des événements de fitness dans votre région.",
+    "ctaButton": "Rejoindre la communauté"
+  },
   "header": {
     "myProfile": "Mon profil",
     "logout": "Déconnexion"

@@ -106,7 +106,7 @@ export default function AccueilScreen({ navigation }: Props) {
               style={[styles.primaryBtn, { backgroundColor: Colors.brand.primary }]}
               onPress={() => navigation.navigate('Register')}
             >
-              <Text style={styles.primaryBtnText}>{t('landing.getStarted', 'Get started for free')}</Text>
+              <Text style={styles.primaryBtnText}>{t('landing.getStarted', 'Get Started')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity

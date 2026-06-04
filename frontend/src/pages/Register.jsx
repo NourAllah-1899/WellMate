@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useTheme } from '../context/ThemeContext.jsx'
+import { useLanguage } from '../context/LanguageContext.jsx'
 import logoLight from '../assets/WellMate_light.png'
 import logoDark from '../assets/WellMate_dark.png'
 
@@ -22,6 +23,7 @@ export default function Register() {
   const navigate = useNavigate()
   const { refreshMe } = useAuth()
   const { isDarkMode } = useTheme()
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -91,12 +93,12 @@ export default function Register() {
         alt="WellMate"
       />
       <div className="wm-auth-card">
-        <h1 style={{ textAlign: 'center' }}>Create account</h1>
-        <p className="wm-subtitle" style={{ textAlign: 'center' }}>Start tracking your health with WellMate.</p>
+        <h1 style={{ textAlign: 'center' }}>{t('auth.register')}</h1>
+        <p className="wm-subtitle" style={{ textAlign: 'center' }}>{t('auth.registerSubtitle')}</p>
 
         <form onSubmit={onSubmit} className="wm-form">
           <label className="wm-field">
-            Email
+            {t('auth.email')}
             <input
               className="wm-input"
               value={email}
@@ -109,7 +111,7 @@ export default function Register() {
           {fieldErrors.email ? <div className="wm-error">{fieldErrors.email}</div> : null}
 
           <label className="wm-field">
-            Password
+            {t('auth.password')}
             <input
               className="wm-input"
               value={password}
@@ -122,7 +124,7 @@ export default function Register() {
           {fieldErrors.password ? <div className="wm-error">{fieldErrors.password}</div> : null}
 
           <label className="wm-field">
-            Confirm password
+            {t('auth.confirmPassword')}
             <input
               className="wm-input"
               value={confirmPassword}
@@ -137,12 +139,12 @@ export default function Register() {
           {apiError ? <div className="wm-error">{apiError}</div> : null}
 
           <button type="submit" disabled={!canSubmit} className="wm-btn">
-            {loading ? 'Creating account…' : 'Register'}
+            {loading ? t('common.loading') : t('auth.register')}
           </button>
         </form>
 
         <p className="wm-subtitle" style={{ marginTop: 14, textAlign: 'center' }}>
-          Already have an account? <Link to="/login">Log in</Link>
+          {t('auth.haveAccount')} <Link to="/login">{t('common.login')}</Link>
         </p>
       </div>
     </>

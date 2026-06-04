@@ -30,7 +30,7 @@ export default function Accueil() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Link to="/register" className="wm-btn !mt-0 !w-auto px-8 py-4 text-base shadow-lg shadow-violet-500/20 no-underline">
-              {t('landing.getStarted', "Get started for free")}
+              {t('landing.getStarted', "Get Started")}
             </Link>
             <Link to="/login" className="wm-btn secondary !mt-0 !w-auto px-8 py-4 text-base no-underline">
               {t('landing.signIn', "Sign in")}
