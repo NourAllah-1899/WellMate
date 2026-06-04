@@ -14,6 +14,7 @@ import Goals from './pages/Goals.jsx'
 import Meals from './pages/Meals.jsx'
 import Accueil from './pages/Accueil.jsx'
 import Layout from './components/Layout.jsx'
+import AuthLayout from './components/AuthLayout.jsx'
 
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import AdminRoute from './components/AdminRoute.jsx'
@@ -34,8 +35,8 @@ function App() {
       <Route path="/physical-activity" element={<ProtectedRoute><Layout><PhysicalActivity /></Layout></ProtectedRoute>} />
       <Route path="/events" element={<ProtectedRoute><Layout><Events /></Layout></ProtectedRoute>} />
       <Route path="/contact" element={<Layout><Contact /></Layout>} />
-      <Route path="/register" element={<Layout><Register /></Layout>} />
-      <Route path="/login" element={<Layout><Login /></Layout>} />
+      <Route path="/register" element={<AuthLayout><Register /></AuthLayout>} />
+      <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
       <Route path="/profile" element={<ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>} />
 
       {/* Admin Routes */}

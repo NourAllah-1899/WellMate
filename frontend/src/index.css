@@ -621,6 +621,44 @@
       justify-content: center;
     }
   }
+  /* Auth Layout */
+  .wm-auth-layout {
+    @apply flex flex-col;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .wm-auth-topbar {
+    @apply flex justify-end items-center px-4 py-3 flex-shrink-0;
+  }
+
+  .wm-auth-toggles {
+    @apply flex gap-2;
+  }
+
+  .wm-auth-main {
+    @apply flex-1 flex flex-col items-center justify-start;
+    overflow: hidden;
+  }
+
+  .wm-auth-logo {
+    height: 120px;
+    max-width: 260px;
+    margin: 0 auto;
+    display: block;
+    object-fit: contain;
+    margin-top: -20px;
+  }
+
+  .wm-auth-card {
+    @apply w-full mx-auto p-5;
+    max-width: 420px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-main);
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+  }
+
   /* Global Header Card */
   .wm-header-card {
     @apply mb-8 p-10 rounded-[24px] relative overflow-hidden;

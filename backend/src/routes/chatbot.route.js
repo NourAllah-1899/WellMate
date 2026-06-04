@@ -20,21 +20,20 @@ CRITICAL RULES:
 - If the user asks about ANYTHING else (sports stars like Messi, politics, etc.), you MUST politely refuse and say you only talk about health.
 - NEVER break character.
 - Keep responses EXTREMELY SHORT (max 2-3 sentences).
-- DO NOT provide "Follow-up questions" or "Solutions" or long paragraphs. 
+- DO NOT provide "Follow-up questions" or "Solutions" or long paragraphs.
 - Just give the answer directly and stop.
-
-Always match the user's language.`;
+- You MUST ALWAYS respond in the SAME language the user is writing in.`;
 
   try {
     // Using Ollama
     console.log(`[Chatbot] Message from user: "${message}"`);
-    console.log(`[Chatbot] Calling local Ollama with model: phi3:3.8b`);
+    console.log(`[Chatbot] Calling local Ollama with model: gemma3:4b`);
     
     const response = await fetch('http://localhost:11434/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'phi3:3.8b',
+        model: 'gemma3:4b',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
@@ -59,7 +58,7 @@ Always match the user's language.`;
     console.log(`[Chatbot] Ollama reply: "${reply}"`);
 
     if (!reply) {
-      return res.json({ reply: "Je n'ai pas pu générer de réponse. Pouvez-vous reformuler ?" });
+      return res.json({ reply: "I couldn't generate a response. Could you rephrase that?" });
     }
 
     res.json({ reply });

@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
+import logoLight from '../assets/WellMate_light.png'
+import logoDark from '../assets/WellMate_dark.png'
 
 const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email)
 
@@ -18,6 +21,7 @@ const isStrongPassword = (password) => {
 export default function Register() {
   const navigate = useNavigate()
   const { refreshMe } = useAuth()
+  const { isDarkMode } = useTheme()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -80,13 +84,15 @@ export default function Register() {
   }
 
   return (
-    <div className="wm-container">
-      <div className="wm-card" style={{ maxWidth: 440, margin: '0 auto' }}>
-        <div className="wm-header">
-          <h1>Create account</h1>
-          <Link to="/">Home</Link>
-        </div>
-        <p className="wm-subtitle">Start tracking your health with WellMate.</p>
+    <>
+      <img
+        className="wm-auth-logo"
+        src={isDarkMode ? logoDark : logoLight}
+        alt="WellMate"
+      />
+      <div className="wm-auth-card">
+        <h1 style={{ textAlign: 'center' }}>Create account</h1>
+        <p className="wm-subtitle" style={{ textAlign: 'center' }}>Start tracking your health with WellMate.</p>
 
         <form onSubmit={onSubmit} className="wm-form">
           <label className="wm-field">
@@ -135,10 +141,10 @@ export default function Register() {
           </button>
         </form>
 
-        <p className="wm-subtitle" style={{ marginTop: 14 }}>
+        <p className="wm-subtitle" style={{ marginTop: 14, textAlign: 'center' }}>
           Already have an account? <Link to="/login">Log in</Link>
         </p>
       </div>
-    </div>
+    </>
   )
 }

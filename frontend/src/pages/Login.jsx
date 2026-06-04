@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import api from '../api/client.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useLanguage } from '../context/LanguageContext.jsx'
+import { useTheme } from '../context/ThemeContext.jsx'
+import logoLight from '../assets/WellMate_light.png'
+import logoDark from '../assets/WellMate_dark.png'
 
 const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email)
 
@@ -10,6 +13,7 @@ export default function Login() {
   const navigate = useNavigate()
   const { refreshMe } = useAuth()
   const { t } = useLanguage()
+  const { isDarkMode } = useTheme()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -65,13 +69,15 @@ export default function Login() {
   }
 
   return (
-    <div className="wm-container">
-      <div className="wm-card" style={{ maxWidth: 440, margin: '0 auto' }}>
-        <div className="wm-header">
-          <h1>{t('auth.login')}</h1>
-          <Link to="/">{t('common.home')}</Link>
-        </div>
-        <p className="wm-subtitle">{t('auth.loginSubtitle')}</p>
+    <>
+      <img
+        className="wm-auth-logo"
+        src={isDarkMode ? logoDark : logoLight}
+        alt="WellMate"
+      />
+      <div className="wm-auth-card">
+        <h1 style={{ textAlign: 'center' }}>{t('auth.login')}</h1>
+        <p className="wm-subtitle" style={{ textAlign: 'center' }}>{t('auth.loginSubtitle')}</p>
 
         <form onSubmit={onSubmit} className="wm-form">
           <label className="wm-field">
@@ -107,10 +113,10 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="wm-subtitle" style={{ marginTop: 14 }}>
+        <p className="wm-subtitle" style={{ marginTop: 14, textAlign: 'center' }}>
           {t('auth.noAccount')} <Link to="/register">{t('auth.register')}</Link>
         </p>
       </div>
-    </div>
+    </>
   )
 }
