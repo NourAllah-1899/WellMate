@@ -23,7 +23,8 @@ export default function Accueil() {
             {t('landing.tag', 'The health community of Tunisia')}
           </span>
           <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight" style={{ color: 'var(--text-heading)' }}>
-            {t('landing.title', 'Take control of your well-being with')} <span className="bg-gradient-to-r from-violet-600 to-blue-500 bg-clip-text text-transparent">WellMate</span>
+            <span className="block">{t('landing.title', 'Take control of your well-being')}</span>
+            <span className="block bg-gradient-to-r from-violet-600 to-blue-500 bg-clip-text text-transparent">WellMate</span>
           </h1>
           <p className="text-base md:text-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
             {t('landing.subtitle', "Join the first intelligent Tunisian platform dedicated to health, nutrition and community fitness. AI meal plans, personalized weight goals and collective sport events.")}

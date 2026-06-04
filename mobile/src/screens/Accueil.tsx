@@ -95,6 +95,9 @@ export default function AccueilScreen({ navigation }: Props) {
           <Text style={[styles.heroTitle, { color: theme.text }]}>
             {t('landing.title', 'Take control of your well-being')}
           </Text>
+          <Text style={[styles.heroTitle, { color: Colors.brand.primary, marginTop: -10 }]}>
+            WellMate
+          </Text>
 
           <Text style={[styles.heroSubtitle, { color: theme.secondaryText }]}>
             {t('landing.subtitle', "Join the first intelligent Tunisian platform dedicated to health, nutrition and community fitness. AI meal plans and collective events.")}
