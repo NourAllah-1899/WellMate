@@ -24,7 +24,8 @@
   },
   "landing": {
     "tag": "La communauté santé de Tunisie",
-    "title": "Prenez le contrôle de votre bien-être",
+    "titleLine1": "Prenez le contrôle de votre",
+    "titleLine2": "bien-être",
     "subtitle": "Rejoignez la première plateforme tunisienne intelligente dédiée à la santé, la nutrition et le fitness communautaire. Repas IA, objectifs de poids personnalisés et événements sportifs collectifs.",
     "getStarted": "Commencer",
     "signIn": "Se connecter",

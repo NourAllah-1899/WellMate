@@ -23,7 +23,8 @@ export default function Accueil() {
             {t('landing.tag', 'The health community of Tunisia')}
           </span>
           <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight" style={{ color: 'var(--text-heading)' }}>
-            <span className="block">{t('landing.title', 'Take control of your well-being')}</span>
+            <span className="block">{t('landing.titleLine1', 'Take control of your')}</span>
+            <span className="block">{t('landing.titleLine2', 'well-being')}</span>
             <span className="block bg-gradient-to-r from-violet-600 to-blue-500 bg-clip-text text-transparent">WellMate</span>
           </h1>
           <p className="text-base md:text-lg leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
